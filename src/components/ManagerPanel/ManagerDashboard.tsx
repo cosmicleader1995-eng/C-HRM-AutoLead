@@ -65,7 +65,9 @@ import {
   Filter,
   Zap,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  FileText,
+  ExternalLink
 } from 'lucide-react';
 
 interface ManagerDashboardProps {
@@ -146,6 +148,15 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
   const [ratingInput, setRatingInput] = useState(5);
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
 
+  // Quick Flyout Modal for Manager Point-and-Shoot
+  const [quickFlyout, setQuickFlyout] = useState<{
+    type: 'unsubmitted' | 'meetings' | 'overdue' | 'pending_feedback' | 'concern';
+    title: string;
+    subtitle: string;
+    badgeCount?: number;
+    concernName?: string;
+  } | null>(null);
+
   // Gemini AI state
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null);
@@ -184,7 +195,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
 
   // Lock background scroll when any modal is open
   useEffect(() => {
-    if (selectedReportDetail || selectedConsultantDetail) {
+    if (selectedReportDetail || selectedConsultantDetail || quickFlyout) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -192,7 +203,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [selectedReportDetail, selectedConsultantDetail]);
+  }, [selectedReportDetail, selectedConsultantDetail, quickFlyout]);
 
   const todayShamsiInfo = useMemo(() => getCurrentShamsiDate(), []);
 
@@ -835,6 +846,138 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
     all: { label: 'کل سال / تمام دوران', sub: 'جامع و تجمعی', icon: Trophy }
   };
 
+  // 1. Unsubmitted Consultants in active period
+  const unsubmittedConsultants = useMemo(() => {
+    if (timePeriod === 'today') {
+      return consultantsAggregatedList.filter(c => !c.hasSubmittedToday);
+    }
+    return consultantsAggregatedList.filter(c => c.totalReportsCount === 0);
+  }, [consultantsAggregatedList, timePeriod]);
+
+  // 2. Overdue follow-up detailed list
+  const overdueFollowUpsDetailList = useMemo(() => {
+    const list: {
+      clientName: string;
+      phone: string;
+      activityField: string;
+      employerConcern: string;
+      consultantName: string;
+      consultantCode: string;
+      elapsedDays: number;
+      nextStepNumber: number;
+      dateShamsi: string;
+      parentReportId: string;
+    }[] = [];
+    const now = Date.now();
+    reports.forEach(rep => {
+      const repDateObj = rep.dateShamsi ? shamsiToDate(rep.dateShamsi) : (rep.createdAt ? new Date(rep.createdAt) : null);
+      const reportTime = repDateObj && !isNaN(repDateObj.getTime()) ? repDateObj.getTime() : now;
+      const elapsedDays = Math.floor((now - reportTime) / (1000 * 60 * 60 * 24));
+      rep.rows.forEach(r => {
+        const isTerminal = 
+          r.followUpResult === '✓' || 
+          r.followUpResult === '-' || 
+          r.followUpResult === '*' || 
+          r.followUp1 === '✓' || 
+          r.followUp2 === '✓' || 
+          r.followUp3 === '✓' || 
+          r.followUp4 === '✓' || 
+          (r.followUp4 && r.followUp4.trim() !== '');
+        if (r.followUp1 && !isTerminal) {
+          let nextStep = 2;
+          if (r.followUp3) nextStep = 4;
+          else if (r.followUp2) nextStep = 3;
+          const targetCycleDays = (nextStep - 1) * 4;
+          if (elapsedDays > targetCycleDays) {
+            list.push({
+              clientName: r.clientName,
+              phone: r.phone,
+              activityField: r.activityField,
+              employerConcern: r.employerConcern,
+              consultantName: rep.consultantName,
+              consultantCode: rep.consultantCode,
+              elapsedDays,
+              nextStepNumber: nextStep,
+              dateShamsi: rep.dateShamsi,
+              parentReportId: rep.id
+            });
+          }
+        }
+      });
+    });
+    return list.sort((a, b) => b.elapsedDays - a.elapsedDays);
+  }, [reports]);
+
+  // 3. Successful meetings detail list
+  const successfulMeetingsDetailList = useMemo(() => {
+    const list: {
+      clientName: string;
+      phone: string;
+      activityField: string;
+      employerConcern: string;
+      meetingTopic: string;
+      consultantName: string;
+      consultantCode: string;
+      dateShamsi: string;
+      followUpResult: string;
+      parentReportId: string;
+    }[] = [];
+    periodFilteredReports.forEach(rep => {
+      rep.rows.forEach(row => {
+        if (
+          row.followUpResult === '✓' || 
+          row.followUpResult.includes('جلسه') || 
+          row.followUpResult.includes('ست شد') ||
+          row.followUp1 === '✓' || 
+          row.followUp2 === '✓' || 
+          row.followUp3 === '✓' || 
+          row.followUp4 === '✓'
+        ) {
+          list.push({
+            clientName: row.clientName,
+            phone: row.phone,
+            activityField: row.activityField,
+            employerConcern: row.employerConcern,
+            meetingTopic: row.meetingTopic || 'جلسه حضوری مشاوره حقوقی/منابع انسانی',
+            consultantName: rep.consultantName,
+            consultantCode: rep.consultantCode,
+            dateShamsi: rep.dateShamsi,
+            followUpResult: row.followUpResult,
+            parentReportId: rep.id
+          });
+        }
+      });
+    });
+    return list;
+  }, [periodFilteredReports]);
+
+  // 4. Pending feedback reports list
+  const pendingFeedbackReportsList = useMemo(() => {
+    return periodFilteredReports.filter(r => r.status !== 'approved' && !r.managerFeedback);
+  }, [periodFilteredReports]);
+
+  // 5. Send quick official directive / warning to consultant
+  const handleSendQuickWarning = (consultant: { consultantId?: string; id?: string; consultantName?: string; fullName?: string; consultantCode?: string }) => {
+    const name = consultant.consultantName || consultant.fullName || 'مشاور محترم';
+    const cId = consultant.consultantId || consultant.id || 'all';
+    const code = consultant.consultantCode || '—';
+    const content = `همکار گرامی جناب/سرکار ${name} (کد ${code})، موعد قانونی ثبت گزارش عملکرد شما در بازه «${periodLabels[timePeriod].label}» سپری گردیده و گزارشی واصل نشده است. این عدم ارسال در پرونده انضباطی و شاخص KPI منظور می‌گردد. لطفاً در صورت داشتن عذر موجه، فوراً به مدیریت اعلام فرمایید.`;
+    const dir: ManagerDirective = {
+      id: `dir-${Date.now()}`,
+      authorName: currentUser.fullName || 'مدیریت ارشد',
+      authorId: currentUser.id,
+      content,
+      priority: 'high',
+      targetConsultantId: cId,
+      targetConsultantName: name,
+      createdAt: new Date().toISOString(),
+      dateShamsi: todayShamsiInfo.formatted
+    };
+    saveDirective(dir);
+    setDirectives(getStoredDirectives());
+    alert(`تذکر انضباطی رسمی با موفقیت در کارتابل مشاور «${name}» ثبت و ابلاغ گردید.`);
+  };
+
   return (
     <div className="space-y-6 pb-20 font-['Vazirmatn',sans-serif] text-[#2B1810]">
       
@@ -959,102 +1102,276 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
       {activeTab === 'analytics' && (
         <div className="space-y-6 animate-fadeIn">
           
-          {/* 5 Large High-Legibility KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* 1. INSTANT STATUS ALERT BANNER */}
+          <div className={`p-4 sm:p-5 rounded-3xl border transition-all shadow-sm ${
+            unsubmittedConsultants.length === 0 
+              ? 'bg-gradient-to-r from-[#D8F3DC]/70 via-[#E8F5E9]/80 to-[#D8F3DC]/70 border-[#B7E4C7] text-[#1B4332]' 
+              : 'bg-gradient-to-r from-[#FFEBEE]/80 via-[#FFF3E0]/70 to-[#FFEBEE]/80 border-[#FFCDD2] text-[#B71C1C]'
+          }`}>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-3">
+                <span className={`p-2.5 rounded-2xl shadow-xs shrink-0 ${
+                  unsubmittedConsultants.length === 0 ? 'bg-[#2D6A4F] text-white' : 'bg-[#D32F2F] text-white animate-pulse'
+                }`}>
+                  {unsubmittedConsultants.length === 0 ? (
+                    <CheckCircle2 className="w-5 h-5" />
+                  ) : (
+                    <AlertTriangle className="w-5 h-5" />
+                  )}
+                </span>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-black text-sm sm:text-base">
+                      {unsubmittedConsultants.length === 0
+                        ? `وضعیت انضباطی عالی: تمامی مشاوران (${toPersianDigits(consultantsAggregatedList.length)} نفر) گزارش خود را ثبت کرده‌اند`
+                        : `توجه مدیریت: ${toPersianDigits(unsubmittedConsultants.length)} مشاور هنوز گزارش خود را در بازه «${periodLabels[timePeriod].label}» ارسال نکرده‌اند`
+                      }
+                    </span>
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/70 border border-current/20">
+                      بازه {periodLabels[timePeriod].label}
+                    </span>
+                  </div>
+                  {unsubmittedConsultants.length > 0 && (
+                    <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                      <span className="text-xs font-semibold text-[#5C4033]">مشاوران فاقد گزارش:</span>
+                      {unsubmittedConsultants.map(c => (
+                        <span key={c.consultantId} className="px-2 py-0.5 rounded-xl bg-white text-[#C62828] border border-[#FFCDD2] font-bold text-[11px] shadow-2xs">
+                          {c.consultantName} ({c.consultantCode})
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons inside Banner */}
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                {unsubmittedConsultants.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      unsubmittedConsultants.forEach(c => handleSendQuickWarning(c));
+                    }}
+                    className="px-3.5 py-2 rounded-2xl bg-[#D32F2F] hover:bg-[#B71C1C] text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                    title="ارسال همزمان تذکر انضباطی رسمی به تمام مشاوران غایب"
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                    <span>⚡ شلیک تذکر رسمی به غایبین</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setQuickFlyout({
+                    type: 'unsubmitted',
+                    title: 'پایش انضباطی و وضعیت گزارشات مشاوران',
+                    subtitle: `بررسی تفکیکی وضعیت ارسال در بازه ${periodLabels[timePeriod].label}`,
+                    badgeCount: unsubmittedConsultants.length
+                  })}
+                  className="px-3.5 py-2 rounded-2xl bg-white hover:bg-[#FAF7F2] text-[#2B1810] border border-[#DEC8B0] text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5 text-[#9C6644]" />
+                  <span>نقطه‌زنی انضباطی ({toPersianDigits(unsubmittedConsultants.length)})</span>
+                  <ExternalLink className="w-3 h-3 text-[#8D5B4C]" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. SYMMETRICAL 6-CARD INTERACTIVE EXECUTIVE KPI GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
             
-            {/* KPI 1 */}
-            <div className="bg-white rounded-3xl border border-[#E6DAC8] p-5 shadow-sm hover:shadow-md transition-all space-y-2.5">
+            {/* Card 1: Submissions & Discipline (CLICKABLE) */}
+            <div 
+              onClick={() => setQuickFlyout({
+                type: 'unsubmitted',
+                title: 'پایش انضباطی و وضعیت گزارشات مشاوران',
+                subtitle: `بررسی تفکیکی وضعیت ارسال در بازه ${periodLabels[timePeriod].label}`,
+                badgeCount: unsubmittedConsultants.length
+              })}
+              className={`rounded-3xl border p-4 sm:p-5 shadow-sm hover:shadow-md transition-all space-y-2 cursor-pointer group relative overflow-hidden ${
+                unsubmittedConsultants.length > 0 
+                  ? 'bg-gradient-to-b from-white to-[#FFF5F5] border-[#FFCDD2] hover:border-[#E57373]' 
+                  : 'bg-gradient-to-b from-white to-[#F9FBF9] border-[#C8E6C9] hover:border-[#81C784]'
+              }`}
+            >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#6F4E37]">کل کارفرمایان پیگیری‌شده</span>
-                <span className="p-2 rounded-2xl bg-[#F5EDE2] text-[#9C6644] border border-[#E6DAC8]">
-                  <Users className="w-4 h-4" />
+                <span className="text-xs font-bold text-[#5C4033]">انضباط و ثبت گزارش</span>
+                <span className={`p-2 rounded-2xl transition-transform group-hover:scale-110 ${
+                  unsubmittedConsultants.length > 0 ? 'bg-[#FFEBEE] text-[#C62828]' : 'bg-[#E8F5E9] text-[#2E7D32]'
+                }`}>
+                  <FileText className="w-4 h-4" />
                 </span>
               </div>
               <div className="text-2xl sm:text-3xl font-black text-[#2B1810]">
-                {toPersianDigits(totalRowsCount)}
-                <span className="text-xs text-[#8D5B4C] font-semibold mr-1.5">کارفرما</span>
+                {toPersianDigits(consultantsAggregatedList.length - unsubmittedConsultants.length)}
+                <span className="text-xs text-[#8D5B4C] font-semibold mr-1">از {toPersianDigits(consultantsAggregatedList.length)}</span>
               </div>
-              <div className="text-[11px] text-[#2D6A4F] font-bold flex items-center gap-1">
-                <TrendingUp className="w-3 h-3" />
-                <span>ثبت در بازه {periodLabels[timePeriod].label}</span>
+              <div className="text-[11px] font-bold truncate">
+                {unsubmittedConsultants.length > 0 ? (
+                  <span className="text-[#C62828] flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3 shrink-0" />
+                    {toPersianDigits(unsubmittedConsultants.length)} مشاور بدون گزارش
+                  </span>
+                ) : (
+                  <span className="text-[#2E7D32] flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 shrink-0" />
+                    ۱۰۰٪ گزارش‌ها واصل شد
+                  </span>
+                )}
+              </div>
+              <div className="text-[10px] text-[#9C6644] font-bold flex items-center gap-0.5 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>مشاهده غایبین و تذکر</span>
+                <ExternalLink className="w-3 h-3" />
               </div>
             </div>
 
-            {/* KPI 2 */}
-            <div className="bg-white rounded-3xl border border-[#E6DAC8] p-5 shadow-sm hover:shadow-md transition-all space-y-2.5">
+            {/* Card 2: Meetings Set (CLICKABLE) */}
+            <div 
+              onClick={() => setQuickFlyout({
+                type: 'meetings',
+                title: 'جلسات مشاوره ست‌شده و توافقات قطعی',
+                subtitle: `فهرست تمام کارفرمایانی که در بازه ${periodLabels[timePeriod].label} قرار جلسه گذاشته‌اند`,
+                badgeCount: totalSuccessfulMeetings
+              })}
+              className="bg-gradient-to-b from-white to-[#F0FFF4] rounded-3xl border border-[#C6F6D5] p-4 sm:p-5 shadow-sm hover:shadow-md hover:border-[#68D391] transition-all space-y-2 cursor-pointer group relative overflow-hidden"
+            >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#6F4E37]">جلسات مشاوره ست‌شده</span>
-                <span className="p-2 rounded-2xl bg-[#D8F3DC] text-[#2D6A4F] border border-[#B7E4C7]">
+                <span className="text-xs font-bold text-[#276749]">جلسات ست‌شده (✓)</span>
+                <span className="p-2 rounded-2xl bg-[#C6F6D5] text-[#22543D] transition-transform group-hover:scale-110">
                   <CheckCircle2 className="w-4 h-4" />
                 </span>
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-[#2D6A4F]">
+              <div className="text-2xl sm:text-3xl font-black text-[#22543D]">
                 {toPersianDigits(totalSuccessfulMeetings)}
-                <span className="text-xs text-[#2D6A4F] font-semibold mr-1.5">جلسه</span>
+                <span className="text-xs text-[#276749] font-semibold mr-1">جلسه</span>
               </div>
-              <div className="text-[11px] text-[#5C4033] font-bold">
-                نرخ موفقیت: <strong className="text-[#2D6A4F] font-black">{totalRowsCount > 0 ? toPersianDigits(Math.round((totalSuccessfulMeetings / totalRowsCount) * 100)) : '۰'}٪</strong>
+              <div className="text-[11px] text-[#2F855A] font-bold truncate">
+                نرخ موفقیت: <strong className="text-[#22543D] font-black">{totalRowsCount > 0 ? toPersianDigits(Math.round((totalSuccessfulMeetings / totalRowsCount) * 100)) : '۰'}٪</strong>
               </div>
-            </div>
-
-            {/* KPI 3 */}
-            <div className="bg-white rounded-3xl border border-[#E6DAC8] p-5 shadow-sm hover:shadow-md transition-all space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#6F4E37]">مشاوران فعال این دوره</span>
-                <span className="p-2 rounded-2xl bg-[#F5EDE2] text-[#9C6644] border border-[#E6DAC8]">
-                  <UserCheck className="w-4 h-4" />
-                </span>
-              </div>
-              <div className="text-2xl sm:text-3xl font-black text-[#2B1810]">
-                {toPersianDigits(activeConsultantsCount)}
-                <span className="text-xs text-[#8D5B4C] font-semibold mr-1.5">مشاور</span>
-              </div>
-              <div className="text-[11px] text-[#8D5B4C] font-bold">
-                از مجموع {toPersianDigits(consultantsAggregatedList.length)} مشاور سازمان
+              <div className="text-[10px] text-[#276749] font-bold flex items-center gap-0.5 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>لیست اسامی و موضوعات</span>
+                <ExternalLink className="w-3 h-3" />
               </div>
             </div>
 
-            {/* KPI 4: Overdue Follow-ups indicator */}
-            <div className="bg-white rounded-3xl border border-[#E6DAC8] p-5 shadow-sm hover:shadow-md transition-all space-y-2.5">
+            {/* Card 3: Overdue Follow-ups (CLICKABLE) */}
+            <div 
+              onClick={() => setQuickFlyout({
+                type: 'overdue',
+                title: 'پرونده‌ها و پیگیری‌های معوق (+۴ روز)',
+                subtitle: 'کارفرمایانی که مهلت ۴ روزه پیگیری‌شان منقضی شده و نیازمند تماس فوری هستند',
+                badgeCount: companyOverdueFollowUpsCount
+              })}
+              className="bg-gradient-to-b from-white to-[#FFF5F5] rounded-3xl border border-[#FED7D7] p-4 sm:p-5 shadow-sm hover:shadow-md hover:border-[#FC8181] transition-all space-y-2 cursor-pointer group relative overflow-hidden"
+            >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-rose-700">پیگیری‌های معوق (+۴ روز)</span>
-                <span className="p-2 rounded-2xl bg-rose-100 text-rose-700 border border-rose-200">
+                <span className="text-xs font-bold text-[#9B2C2C]">معوق (+۴ روز)</span>
+                <span className="p-2 rounded-2xl bg-[#FED7D7] text-[#9B2C2C] transition-transform group-hover:scale-110">
                   <AlertTriangle className="w-4 h-4" />
                 </span>
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-rose-700">
+              <div className="text-2xl sm:text-3xl font-black text-[#9B2C2C]">
                 {toPersianDigits(companyOverdueFollowUpsCount)}
-                <span className="text-xs text-rose-600 font-semibold mr-1.5">مورد</span>
+                <span className="text-xs text-[#C53030] font-semibold mr-1">مورد</span>
               </div>
-              <div className="text-[11px] text-rose-700 font-bold">
-                نیازمند تماس مجدد مشاوران
+              <div className="text-[11px] text-[#C53030] font-bold truncate">
+                {companyOverdueFollowUpsCount > 0 ? 'نیازمند تماس مجدد مشاوران' : 'هیچ پرونده معوقی وجود ندارد'}
+              </div>
+              <div className="text-[10px] text-[#9B2C2C] font-bold flex items-center gap-0.5 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>رهگیری و شماره‌ها</span>
+                <ExternalLink className="w-3 h-3" />
               </div>
             </div>
 
-            {/* KPI 5 */}
-            <div className="bg-white rounded-3xl border border-[#E6DAC8] p-5 shadow-sm hover:shadow-md transition-all space-y-2.5">
+            {/* Card 4: Manager Feedback (CLICKABLE) */}
+            <div 
+              onClick={() => setQuickFlyout({
+                type: 'pending_feedback',
+                title: 'کارتابل بازخورد و دستورات مدیریت',
+                subtitle: `گزارش‌های منتظر بررسی و امتیازدهی در بازه ${periodLabels[timePeriod].label}`,
+                badgeCount: pendingFeedbackCount
+              })}
+              className="bg-gradient-to-b from-white to-[#FFFAF0] rounded-3xl border border-[#FEEBC8] p-4 sm:p-5 shadow-sm hover:shadow-md hover:border-[#FBD38D] transition-all space-y-2 cursor-pointer group relative overflow-hidden"
+            >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#6F4E37]">وضعیت بازخورد مدیریت</span>
-                <span className="p-2 rounded-2xl bg-[#FFF3CD] text-[#9A6B00] border border-[#FFE69C]">
+                <span className="text-xs font-bold text-[#7B341E]">بازخورد مدیریت</span>
+                <span className="p-2 rounded-2xl bg-[#FEEBC8] text-[#9C4221] transition-transform group-hover:scale-110">
                   <FileCheck className="w-4 h-4" />
                 </span>
               </div>
               <div className="text-2xl sm:text-3xl font-black text-[#2B1810]">
                 {toPersianDigits(feedbackedReportsCount)}
-                <span className="text-xs text-[#8D5B4C] font-semibold mr-1.5">از {toPersianDigits(periodFilteredReports.length)}</span>
+                <span className="text-xs text-[#8D5B4C] font-semibold mr-1">از {toPersianDigits(periodFilteredReports.length)}</span>
               </div>
-              <div className="text-[11px] font-bold">
+              <div className="text-[11px] font-bold truncate">
                 {pendingFeedbackCount > 0 ? (
-                  <span className="text-[#9A6B00] flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
+                  <span className="text-[#DD6B20] flex items-center gap-1">
+                    <Clock className="w-3 h-3 shrink-0" />
                     {toPersianDigits(pendingFeedbackCount)} در انتظار بازخورد
                   </span>
                 ) : (
-                  <span className="text-[#2D6A4F] flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" />
+                  <span className="text-[#2F855A] flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 shrink-0" />
                     تماماً بررسی شد
                   </span>
                 )}
+              </div>
+              <div className="text-[10px] text-[#C05621] font-bold flex items-center gap-0.5 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>ثبت دستور و بازخورد</span>
+                <ExternalLink className="w-3 h-3" />
+              </div>
+            </div>
+
+            {/* Card 5: Total Contacted Clients (CLICKABLE -> switches to Aggregated Table) */}
+            <div 
+              onClick={() => {
+                setActiveTab('aggregated');
+              }}
+              className="bg-gradient-to-b from-white to-[#FAF7F2] rounded-3xl border border-[#E6DAC8] p-4 sm:p-5 shadow-sm hover:shadow-md hover:border-[#9C6644] transition-all space-y-2 cursor-pointer group relative overflow-hidden"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#6F4E37]">کل کارفرمایان</span>
+                <span className="p-2 rounded-2xl bg-[#F5EDE2] text-[#9C6644] border border-[#E6DAC8] transition-transform group-hover:scale-110">
+                  <Users className="w-4 h-4" />
+                </span>
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-[#2B1810]">
+                {toPersianDigits(totalRowsCount)}
+                <span className="text-xs text-[#8D5B4C] font-semibold mr-1">کارفرما</span>
+              </div>
+              <div className="text-[11px] text-[#2D6A4F] font-bold flex items-center gap-1 truncate">
+                <TrendingUp className="w-3 h-3 shrink-0" />
+                <span>ثبت در {periodLabels[timePeriod].label}</span>
+              </div>
+              <div className="text-[10px] text-[#9C6644] font-bold flex items-center gap-0.5 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>مشاهده در جدول کل</span>
+                <ExternalLink className="w-3 h-3" />
+              </div>
+            </div>
+
+            {/* Card 6: Active Consultants (CLICKABLE -> switches to Consultants Tab) */}
+            <div 
+              onClick={() => {
+                setActiveTab('consultants');
+              }}
+              className="bg-gradient-to-b from-white to-[#F5EDE2]/50 rounded-3xl border border-[#DEC8B0] p-4 sm:p-5 shadow-sm hover:shadow-md hover:border-[#9C6644] transition-all space-y-2 cursor-pointer group relative overflow-hidden"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#6F4E37]">مشاوران فعال</span>
+                <span className="p-2 rounded-2xl bg-[#F5EDE2] text-[#9C6644] border border-[#E6DAC8] transition-transform group-hover:scale-110">
+                  <UserCheck className="w-4 h-4" />
+                </span>
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-[#2B1810]">
+                {toPersianDigits(activeConsultantsCount)}
+                <span className="text-xs text-[#8D5B4C] font-semibold mr-1">از {toPersianDigits(consultantsAggregatedList.length)}</span>
+              </div>
+              <div className="text-[11px] text-[#8D5B4C] font-bold truncate">
+                {topConsultant ? `برتر: ${topConsultant.consultantName}` : 'ثبت عملکرد دوره'}
+              </div>
+              <div className="text-[10px] text-[#9C6644] font-bold flex items-center gap-0.5 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span>کارتابل تفکیکی مشاورین</span>
+                <ExternalLink className="w-3 h-3" />
               </div>
             </div>
 
@@ -1131,20 +1448,32 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                 {sortedConcerns.slice(0, 8).map((item, idx) => {
                   const percentage = totalRowsCount > 0 ? Math.round((item.count / totalRowsCount) * 100) : 0;
                   return (
-                    <div key={idx} className="space-y-1.5">
+                    <div 
+                      key={idx} 
+                      onClick={() => setQuickFlyout({
+                        type: 'concern',
+                        title: `دغدغه کارفرمایان: ${item.name}`,
+                        subtitle: `فهرست کارفرمایانی که این چالش را در بازه ${periodLabels[timePeriod].label} اعلام کرده‌اند`,
+                        badgeCount: item.count,
+                        concernName: item.name
+                      })}
+                      className="p-2.5 rounded-2xl hover:bg-[#FAF7F2] border border-transparent hover:border-[#DEC8B0] transition-all cursor-pointer group space-y-1.5"
+                      title="برای مشاهده لیست کارفرمایان دارای این دغدغه و نقطه‌زنی کلیک کنید"
+                    >
                       <div className="flex items-center justify-between text-xs sm:text-sm">
                         <span className="font-bold text-[#2B1810] flex items-center gap-2.5">
-                          <span className="w-6 h-6 rounded-lg bg-[#F5EDE2] border border-[#DEC8B0] flex items-center justify-center text-xs text-[#9C6644] font-black">
+                          <span className="w-6 h-6 rounded-lg bg-[#F5EDE2] border border-[#DEC8B0] flex items-center justify-center text-xs text-[#9C6644] font-black group-hover:bg-[#9C6644] group-hover:text-white transition-colors">
                             {toPersianDigits(idx + 1)}
                           </span>
-                          <span className="font-bold">{item.name}</span>
+                          <span className="font-bold group-hover:text-[#9C6644] transition-colors">{item.name}</span>
                         </span>
                         <div className="flex items-center gap-3">
                           <span className="text-[#6F4E37] font-bold">{toPersianDigits(item.count)} کارفرما</span>
                           <span className="text-[#9C6644] font-black text-sm w-12 text-left">{toPersianDigits(percentage)}٪</span>
+                          <ExternalLink className="w-3.5 h-3.5 text-[#9C6644] opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                       </div>
-                      <div className="w-full h-3.5 bg-[#FAF7F2] rounded-full overflow-hidden p-0.5 border border-[#E6DAC8]">
+                      <div className="w-full h-3 bg-[#FAF7F2] rounded-full overflow-hidden p-0.5 border border-[#E6DAC8]">
                         <div 
                           className="h-full rounded-full bg-gradient-to-l from-[#9C6644] via-[#B08968] to-[#D4A373] transition-all duration-500 shadow-sm"
                           style={{ width: `${Math.max(percentage, 4)}%` }}
@@ -2913,6 +3242,336 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                 </div>
               </div>
 
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* QUICK FLYOUT MODAL FOR MANAGER POINT-AND-SHOOT DRILL-DOWN */}
+      {quickFlyout && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DEC8B0] shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 bg-gradient-to-l from-[#FAF7F2] to-[#F5EDE2] border-b border-[#DEC8B0] flex items-center justify-between gap-4 shrink-0">
+              <div className="flex items-center gap-3">
+                <span className="p-2.5 rounded-2xl bg-[#9C6644] text-white shadow-sm flex items-center justify-center">
+                  {quickFlyout.type === 'unsubmitted' && <AlertTriangle className="w-5 h-5 text-rose-200" />}
+                  {quickFlyout.type === 'meetings' && <CheckCircle2 className="w-5 h-5 text-emerald-200" />}
+                  {quickFlyout.type === 'overdue' && <Clock className="w-5 h-5 text-amber-200" />}
+                  {quickFlyout.type === 'pending_feedback' && <FileCheck className="w-5 h-5 text-amber-200" />}
+                  {quickFlyout.type === 'concern' && <Building className="w-5 h-5 text-rose-200" />}
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base sm:text-lg font-black text-[#2B1810]">
+                      {quickFlyout.title}
+                    </h3>
+                    {quickFlyout.badgeCount !== undefined && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-[#9C6644] text-white">
+                        {toPersianDigits(quickFlyout.badgeCount)} مورد
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-[#6F4E37] font-medium mt-0.5">
+                    {quickFlyout.subtitle}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setQuickFlyout(null)}
+                className="p-2 rounded-2xl bg-white/80 hover:bg-white text-[#6F4E37] hover:text-[#2B1810] border border-[#DEC8B0] transition-colors cursor-pointer"
+                title="بستن پنجره"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body: Content based on Type */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
+              
+              {/* TYPE 1: UN-SUBMITTED CONSULTANTS */}
+              {quickFlyout.type === 'unsubmitted' && (
+                <div className="space-y-3">
+                  {unsubmittedConsultants.length === 0 ? (
+                    <div className="py-12 text-center text-[#2D6A4F] bg-[#D8F3DC]/40 rounded-2xl border border-[#B7E4C7] p-6 space-y-2">
+                      <CheckCircle2 className="w-8 h-8 text-[#2D6A4F] mx-auto" />
+                      <p className="font-bold text-sm">وضعیت انضباطی ۱۰۰٪ مطلوب است؛ هیچ مشاوری بدون گزارش نیست.</p>
+                    </div>
+                  ) : (
+                    unsubmittedConsultants.map((consultant) => (
+                      <div key={consultant.consultantId} className="p-4 rounded-2xl bg-[#FFF5F5] border border-[#FFCDD2] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-black text-sm shrink-0">
+                            {consultant.consultantCode}
+                          </div>
+                          <div>
+                            <h4 className="font-black text-sm text-[#2B1810]">{consultant.consultantName}</h4>
+                            <p className="text-xs text-rose-700 font-semibold mt-0.5">
+                              عدم ثبت گزارش در بازه {periodLabels[timePeriod].label}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => handleSendQuickWarning(consultant)}
+                            className="px-3.5 py-2 rounded-xl bg-[#D32F2F] hover:bg-[#B71C1C] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Zap className="w-3.5 h-3.5" />
+                            <span>⚡ ارسال تذکر انضباطی</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedConsultantDetail(consultant);
+                              setQuickFlyout(null);
+                            }}
+                            className="px-3 py-2 rounded-xl bg-white hover:bg-[#FAF7F2] text-[#5C4033] border border-[#DEC8B0] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            <span>مشاهده پرونده</span>
+                            <ChevronLeft className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* TYPE 2: OVERDUE FOLLOW-UPS */}
+              {quickFlyout.type === 'overdue' && (
+                <div className="space-y-3">
+                  {overdueFollowUpsDetailList.length === 0 ? (
+                    <div className="py-12 text-center text-[#2D6A4F] bg-[#D8F3DC]/40 rounded-2xl border border-[#B7E4C7] p-6 space-y-2">
+                      <CheckCircle2 className="w-8 h-8 text-[#2D6A4F] mx-auto" />
+                      <p className="font-bold text-sm">هیچ پیگیری معوقی در سازمان وجود ندارد. چرخه پیگیری‌ها منظم است.</p>
+                    </div>
+                  ) : (
+                    overdueFollowUpsDetailList.map((item, idx) => (
+                      <div key={idx} className="p-4 rounded-2xl bg-white border border-[#FED7D7] hover:border-[#FC8181] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs transition-all">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-black text-sm text-[#2B1810]">{item.clientName}</span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                              {toPersianDigits(item.elapsedDays)} روز گذشته (گام {toPersianDigits(item.nextStepNumber)})
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#6F4E37]">
+                            <span className="font-bold">زمینه:</span> {item.activityField || '—'} • <span className="font-bold">دغدغه:</span> {item.employerConcern}
+                          </p>
+                          <p className="text-xs text-[#8D5B4C] flex items-center gap-2">
+                            <span>مشاور مسئول: <strong>{item.consultantName}</strong> ({item.consultantCode})</span>
+                            <span>•</span>
+                            <span className="dir-ltr font-mono font-bold text-[#2B1810]">{item.phone}</span>
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveTab('periodic');
+                              setQuickFlyout(null);
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-[#9C6644] hover:bg-[#7F4F24] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <span>رهگیری در جدول تقویمی</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* TYPE 3: MEETINGS SET */}
+              {quickFlyout.type === 'meetings' && (
+                <div className="space-y-3">
+                  {successfulMeetingsDetailList.length === 0 ? (
+                    <div className="py-12 text-center text-[#8D5B4C] bg-[#FAF7F2] rounded-2xl border border-[#DEC8B0] p-6 space-y-2">
+                      <Clock className="w-8 h-8 text-[#9C6644] mx-auto opacity-70" />
+                      <p className="font-bold text-sm">در این بازه زمانی جلسه مشاوره‌ای جدیدی ثبت نگردیده است.</p>
+                    </div>
+                  ) : (
+                    successfulMeetingsDetailList.map((item, idx) => (
+                      <div key={idx} className="p-4 rounded-2xl bg-[#F0FFF4] border border-[#C6F6D5] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-black text-sm text-[#1C4532]">{item.clientName}</span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#C6F6D5] text-[#22543D] border border-[#9AE6B4]">
+                              ✓ جلسه ست شد
+                            </span>
+                            <span className="text-[11px] font-mono text-[#48BB78]">({item.dateShamsi})</span>
+                          </div>
+                          <p className="text-xs text-[#22543D] font-bold">
+                            موضوع: {item.meetingTopic}
+                          </p>
+                          <p className="text-xs text-[#276749]">
+                            <span>مشاور: <strong>{item.consultantName}</strong> ({item.consultantCode})</span>
+                            <span className="mx-2">•</span>
+                            <span className="dir-ltr font-mono font-bold">{item.phone}</span>
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedSymbolFilter('✓');
+                              setActiveTab('aggregated');
+                              setQuickFlyout(null);
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-[#22543D] hover:bg-[#1C4532] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <span>مشاهده در جدول کل</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* TYPE 4: PENDING FEEDBACK */}
+              {quickFlyout.type === 'pending_feedback' && (
+                <div className="space-y-3">
+                  {pendingFeedbackReportsList.length === 0 ? (
+                    <div className="py-12 text-center text-[#2D6A4F] bg-[#D8F3DC]/40 rounded-2xl border border-[#B7E4C7] p-6 space-y-2">
+                      <CheckCircle2 className="w-8 h-8 text-[#2D6A4F] mx-auto" />
+                      <p className="font-bold text-sm">تمامی گزارش‌های این بازه بررسی شده و هیچ گزارشی منتظر بازخورد نیست.</p>
+                    </div>
+                  ) : (
+                    pendingFeedbackReportsList.map((rep) => (
+                      <div key={rep.id} className="p-4 rounded-2xl bg-[#FFFAF0] border border-[#FEEBC8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-black text-sm text-[#7B341E]">{rep.consultantName}</span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FEEBC8] text-[#9C4221]">
+                              {toPersianDigits(rep.rows.length)} کارفرما
+                            </span>
+                            <span className="text-xs font-mono text-[#A0AEC0]">({rep.dateShamsi})</span>
+                          </div>
+                          <p className="text-xs text-[#9C4221] font-medium line-clamp-1">
+                            صنف: {rep.guild} • دیدگاه مشاور: {rep.personalOpinion || '—'}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedReportDetail(rep);
+                              setFeedbackInput(rep.managerFeedback || '');
+                              setRatingInput(rep.managerRating || 5);
+                              setQuickFlyout(null);
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-[#C05621] hover:bg-[#9C4221] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <span>✍️ ثبت بازخورد و تایید</span>
+                            <ChevronLeft className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* TYPE 5: EMPLOYER CONCERN DRILL-DOWN (USER SPECIAL REQUEST) */}
+              {quickFlyout.type === 'concern' && quickFlyout.concernName && (
+                <div className="space-y-3">
+                  {(() => {
+                    const employersWithThisConcern = periodFilteredReports.flatMap(rep => 
+                      rep.rows
+                        .filter(r => r.employerConcern === quickFlyout.concernName)
+                        .map(r => ({
+                          ...r,
+                          consultantName: rep.consultantName,
+                          consultantCode: rep.consultantCode,
+                          reportDateShamsi: rep.dateShamsi
+                        }))
+                    );
+
+                    if (employersWithThisConcern.length === 0) {
+                      return (
+                        <div className="py-12 text-center text-[#8D5B4C] bg-[#FAF7F2] rounded-2xl border border-[#DEC8B0] p-6 space-y-2">
+                          <p className="font-bold text-sm">هیچ کارفرمایی با این دغدغه در بازه انتخابی ثبت نشده است.</p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="space-y-3">
+                        <div className="p-3 bg-[#FAF7F2] rounded-2xl border border-[#DEC8B0] text-xs text-[#6F4E37] flex items-center justify-between">
+                          <span>تعداد کل کارفرمایان ثبت‌شده با این دغدغه: <strong>{toPersianDigits(employersWithThisConcern.length)} شرکت/کارفرما</strong></span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedConcernFilter(quickFlyout.concernName || 'all');
+                              setActiveTab('aggregated');
+                              setQuickFlyout(null);
+                            }}
+                            className="text-[#9C6644] hover:text-[#7F4F24] font-bold flex items-center gap-1 underline cursor-pointer"
+                          >
+                            <span>فیلتر و مشاهده همه در جدول کل</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </button>
+                        </div>
+
+                        {employersWithThisConcern.map((emp, idx) => (
+                          <div key={idx} className="p-4 rounded-2xl bg-white border border-[#DEC8B0] hover:border-[#9C6644] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-black text-sm text-[#2B1810]">{emp.clientName}</span>
+                                <span className="text-xs text-[#8D5B4C]">({emp.activityField || '—'})</span>
+                              </div>
+                              <p className="text-xs text-[#6F4E37]">
+                                <span className="font-bold">نتیجه پیگیری:</span> {emp.followUpResult || '—'}
+                              </p>
+                              <p className="text-xs text-[#8D5B4C] flex items-center gap-2">
+                                <span>مشاور: <strong>{emp.consultantName}</strong> ({emp.consultantCode})</span>
+                                <span>•</span>
+                                <span className="dir-ltr font-mono font-bold text-[#2B1810]">{emp.phone}</span>
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className="px-2.5 py-1 rounded-xl bg-[#FAF7F2] text-[#5C4033] font-mono text-xs font-bold border border-[#DEC8B0]">
+                                {emp.reportDateShamsi}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 sm:p-5 bg-[#FAF7F2] border-t border-[#DEC8B0] flex items-center justify-between gap-3 shrink-0">
+              <span className="text-xs text-[#8D5B4C] font-semibold hidden sm:inline">
+                سامانه مدیریت عملکرد و گزارشات اجرایی کارینو
+              </span>
+
+              <div className="flex items-center gap-2 mr-auto">
+                <button
+                  type="button"
+                  onClick={() => setQuickFlyout(null)}
+                  className="px-5 py-2.5 rounded-2xl bg-white hover:bg-[#F5EDE2] text-[#5C4033] border border-[#DEC8B0] text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                >
+                  بستن پنجره
+                </button>
+              </div>
             </div>
 
           </div>
