@@ -22,6 +22,7 @@ export { isReportSubmittedBeforeWindow, isReportSubmittedPastDeadline };
 const STORAGE_KEYS = {
   USERS: 'karino_users_v2',
   CURRENT_USER: 'karino_current_user_v2',
+  JWT_TOKEN: 'karino_jwt_token_v1',
   REPORTS: 'karino_reports_v2',
   OVERALL_REPORTS: 'karino_overall_reports_v1',
   ARCHIVES: 'karino_archives_v2',
@@ -501,6 +502,31 @@ export function deleteUser(userId: string): void {
   }).catch(() => {});
 }
 
+export function saveJwtToken(token: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(STORAGE_KEYS.JWT_TOKEN, token);
+  }
+}
+
+export function getStoredJwtToken(): string | null {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(STORAGE_KEYS.JWT_TOKEN);
+  }
+  return null;
+}
+
+export function getAuthHeaders(extraHeaders: Record<string, string> = {}): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...extraHeaders
+  };
+  const token = getStoredJwtToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 export function getCurrentUser(): User | null {
   try {
     const data = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
@@ -512,68 +538,88 @@ export function getCurrentUser(): User | null {
 }
 
 export function setCurrentUser(user: User): void {
-  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+  // Ensure no password is saved in localStorage
+  const { password: _p, ...sanitized } = user;
+  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(sanitized));
 }
 
 export function logoutUser(): void {
-  localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+    localStorage.removeItem(STORAGE_KEYS.JWT_TOKEN);
+  }
+  notifyDbListeners();
 }
 
-// Full-Stack Server/Cloud Authoritative Login Function (100% Reliable Cross-Device Auth)
+// Full-Stack Server/Cloud Authoritative Login Function (100% Reliable Cross-Device Auth with Bcrypt & JWT)
 export async function performLogin(
   usernameOrCode: string, 
   passwordInput: string, 
   expectedRole?: 'consultant' | 'ceo' | 'it_admin'
 ): Promise<{ success: boolean; user?: User; message?: string }> {
   const query = usernameOrCode.trim().toLowerCase();
-  const queryEn = toEnglishDigits(query);
   const pass = passwordInput.trim();
-  const passEn = toEnglishDigits(pass);
 
-  // 1. First Attempt: Pull Fresh Cloud Database from Supabase
-  await syncWithServer();
-  const users = getStoredUsers();
-
-  const matched = users.find(u => 
-    (u.username?.toLowerCase() === query || 
-     u.username?.toLowerCase() === queryEn ||
-     u.consultantCode?.toLowerCase() === query ||
-     u.consultantCode?.toLowerCase() === queryEn ||
-     u.id?.toLowerCase() === query ||
-     u.id?.toLowerCase() === queryEn) &&
-    (u.password === pass || u.password === passEn)
-  );
-
-  if (matched) {
-    if (expectedRole && matched.role !== expectedRole) {
-      if ((expectedRole === 'ceo' || expectedRole === 'it_admin') && matched.role === 'consultant') {
-        return { success: false, message: 'این حساب دسترسی به بخش مدیریت ندارد.' };
-      }
-      if (expectedRole === 'consultant' && (matched.role === 'ceo' || matched.role === 'it_admin')) {
-        return { success: false, message: 'این حساب متعلق به مدیریت است. لطفاً از تب مدیریت وارد شوید.' };
-      }
-    }
-    setCurrentUser(matched);
-    notifyDbListeners();
-    return { success: true, user: matched };
-  }
-
-  // 2. Also try API login endpoint
+  // 1. Primary: Server Authoritative Authentication (Bcrypt + JWT)
   try {
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usernameOrCode: query, password: pass, role: expectedRole })
     });
+
     if (response.ok) {
       const json = await response.json();
       if (json.success && json.user) {
+        if (json.token) {
+          saveJwtToken(json.token);
+        }
         setCurrentUser(json.user);
+        
+        // If server sent refreshed data, update local caches safely
+        if (json.db) {
+          if (Array.isArray(json.db.users)) {
+            cachedUsers = json.db.users;
+            try {
+              localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(json.db.users));
+            } catch (e) {}
+          }
+          if (Array.isArray(json.db.reports)) {
+            cachedReports = json.db.reports;
+            try {
+              localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(json.db.reports));
+            } catch (e) {}
+          }
+        }
         notifyDbListeners();
         return { success: true, user: json.user };
       }
+    } else {
+      const errJson = await response.json().catch(() => ({}));
+      if (errJson.message) {
+        return { success: false, message: errJson.message };
+      }
     }
-  } catch (_) {}
+  } catch (netErr) {
+    console.warn('[Auth] Server login endpoint unreachable, checking offline session cache...');
+  }
+
+  // 2. Offline Fallback: If network is temporarily down and this user is currently authenticated
+  const current = getCurrentUser();
+  if (current) {
+    const qEn = toEnglishDigits(query);
+    const isCurrent = 
+      current.username?.toLowerCase() === query ||
+      current.username?.toLowerCase() === qEn ||
+      current.consultantCode?.toLowerCase() === query ||
+      current.consultantCode?.toLowerCase() === qEn ||
+      current.id?.toLowerCase() === query;
+
+    if (isCurrent && (!expectedRole || current.role === expectedRole)) {
+      notifyDbListeners();
+      return { success: true, user: current };
+    }
+  }
 
   return { success: false, message: 'کد کاربری یا کلمه عبور وارد شده نادرست است.' };
 }

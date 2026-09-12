@@ -714,7 +714,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                     type="button"
                     onClick={() => {
                       setEditingUser(user);
-                      setNewPasswordInput(user.password || '');
+                      setNewPasswordInput('');
                     }}
                     className="px-3 py-1.5 bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-blue-200 rounded-lg text-xs flex items-center gap-1.5 cursor-pointer font-bold whitespace-nowrap"
                   >
@@ -767,7 +767,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                           type="button"
                           onClick={() => {
                             setEditingUser(user);
-                            setNewPasswordInput(user.password || '');
+                            setNewPasswordInput('');
                           }}
                           className="px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-300 rounded-lg text-xs flex items-center gap-1 mx-auto cursor-pointer whitespace-nowrap"
                         >

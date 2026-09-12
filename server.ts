@@ -53,6 +53,33 @@ function generateToken(user: any): string {
   );
 }
 
+// Automatically upgrade any plaintext passwords in dataset to secure Bcrypt hashes
+function upgradeUsersToBcrypt(users: any[]): boolean {
+  let changed = false;
+  if (!Array.isArray(users)) return false;
+  for (const u of users) {
+    if (u && u.password && typeof u.password === 'string') {
+      if (!u.password.startsWith('$2a$') && !u.password.startsWith('$2b$')) {
+        u.password = hashPassword(u.password);
+        changed = true;
+      }
+    }
+  }
+  return changed;
+}
+
+// Sanitize user object to never leak password or hash to client
+function sanitizeUser(user: any): any {
+  if (!user) return null;
+  const { password, ...safe } = user;
+  return safe;
+}
+
+function sanitizeUsers(users: any[]): any[] {
+  if (!Array.isArray(users)) return [];
+  return users.map(sanitizeUser);
+}
+
 // Local digit conversion function to avoid import issues
 function toEnglishDigits(str: string): string {
   if (!str) return '';
@@ -221,13 +248,21 @@ let inMemoryDB: DatabaseSchema = (() => {
       const parsed = JSON.parse(raw);
       if (parsed && parsed.users) {
         console.log('[Startup] Loaded existing database from disk:', parsed.reports?.length || 0, 'reports');
+        if (upgradeUsersToBcrypt(parsed.users)) {
+          console.log('[Security] Upgraded all stored user passwords to secure Bcrypt hashes.');
+          try {
+            fs.writeFileSync(DB_FILE_INIT, JSON.stringify(parsed, null, 2), 'utf-8');
+          } catch (e) {}
+        }
         return parsed;
       }
     }
   } catch (err) {
     console.error('[Startup] Failed to load local DB, using defaults:', err);
   }
-  return getInitialDB();
+  const init = getInitialDB();
+  upgradeUsersToBcrypt(init.users);
+  return init;
 })();
 let isCloudConnected = false;
 
@@ -484,7 +519,17 @@ async function getDB(): Promise<DatabaseSchema> {
   // If not yet synced, try fetching once
   if (!isCloudConnected) {
     const cloud = await syncFromSupabase();
-    if (cloud) return ensureDBShape(cloud);
+    if (cloud) {
+      if (upgradeUsersToBcrypt(cloud.users)) {
+        writeLocalDB(cloud);
+        syncToSupabase(cloud).catch(() => {});
+      }
+      return ensureDBShape(cloud);
+    }
+  }
+  if (upgradeUsersToBcrypt(inMemoryDB.users)) {
+    writeLocalDB(inMemoryDB);
+    syncToSupabase(inMemoryDB).catch(() => {});
   }
   return ensureDBShape(inMemoryDB);
 }
@@ -648,7 +693,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // Verify Current Token and Get Authenticated User Profile
-app.get('/api/auth/me', async (req, res) => {
+app.get(['/api/auth/me', '/api/auth/verify'], async (req, res) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) {
@@ -669,12 +714,15 @@ app.get('/api/auth/me', async (req, res) => {
   });
 });
 
-// 1. GET Full Database State
+// 1. GET Full Database State (Users are fully sanitized of passwords)
 app.get('/api/db/all', async (req, res) => {
   const db = await getDB();
   res.json({
     success: true,
-    data: db,
+    data: {
+      ...db,
+      users: sanitizeUsers(db.users)
+    },
     cloudSynced: isCloudConnected
   });
 });
@@ -688,10 +736,14 @@ app.post('/api/db/sync', async (req, res) => {
     }
     const currentDB = await getDB();
     const mergedDB = mergeServerDBs(currentDB, ensureDBShape(clientState));
+    upgradeUsersToBcrypt(mergedDB.users);
     await persistDB(mergedDB);
     res.json({
       success: true,
-      data: mergedDB,
+      data: {
+        ...mergedDB,
+        users: sanitizeUsers(mergedDB.users)
+      },
       cloudSynced: isCloudConnected
     });
   } catch (err: any) {
