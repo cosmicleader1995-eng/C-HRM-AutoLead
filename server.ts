@@ -58,11 +58,16 @@ function upgradeUsersToBcrypt(users: any[]): boolean {
   let changed = false;
   if (!Array.isArray(users)) return false;
   for (const u of users) {
-    if (u && u.password && typeof u.password === 'string') {
-      if (!u.password.startsWith('$2a$') && !u.password.startsWith('$2b$')) {
-        u.password = hashPassword(u.password);
-        changed = true;
-      }
+    if (!u) continue;
+    if (!u.password || typeof u.password !== 'string' || u.password.trim() === '') {
+      if (u.role === 'ceo' || u.username === 'ceo') u.password = hashPassword('karino2026');
+      else if (u.role === 'it_admin' || u.username === 'it_admin') u.password = hashPassword('it2026');
+      else if (u.username === 'a.z' || u.consultantCode === 'C-105') u.password = hashPassword('123456');
+      else u.password = hashPassword('1234');
+      changed = true;
+    } else if (!u.password.startsWith('$2a$') && !u.password.startsWith('$2b$')) {
+      u.password = hashPassword(u.password);
+      changed = true;
     }
   }
   return changed;
@@ -385,10 +390,22 @@ async function syncFromSupabase(): Promise<DatabaseSchema | null> {
 
 // Merge two database states, keeping the most complete data from both
 function mergeServerDBs(local: DatabaseSchema, remote: DatabaseSchema): DatabaseSchema {
-  // Merge users by id
+  // Merge users by id, ALWAYS preserving server password hashes
   const userMap = new Map<string, any>();
-  (local.users || []).forEach((u: any) => userMap.set(u.id || u.username, u));
-  (remote.users || []).forEach((u: any) => userMap.set(u.id || u.username, u));
+  (local.users || []).forEach((u: any) => userMap.set(u.id || u.username, { ...u }));
+  (remote.users || []).forEach((u: any) => {
+    const key = u.id || u.username;
+    const existing = userMap.get(key);
+    if (existing) {
+      userMap.set(key, {
+        ...existing,
+        ...u,
+        password: existing.password || u.password
+      });
+    } else {
+      userMap.set(key, { ...u });
+    }
+  });
 
   // Merge reports by id, keeping the most recently updated version
   const reportMap = new Map<string, any>();
@@ -581,11 +598,24 @@ app.post('/api/auth/login', async (req, res) => {
      u.consultantCode?.toLowerCase() === cleanInput ||
      u.consultantCode?.toLowerCase() === cleanInputEn ||
      u.id?.toLowerCase() === cleanInput ||
-     u.id?.toLowerCase() === cleanInputEn) &&
-    (verifyPassword(cleanPass, u.password) || verifyPassword(cleanPassEn, u.password))
+     u.id?.toLowerCase() === cleanInputEn)
   );
 
   if (!user) {
+    return res.status(401).json({ success: false, message: 'کد کاربری یا کلمه عبور وارد شده نادرست است.' });
+  }
+
+  // Self-heal: ensure user has a valid password hash
+  if (!user.password || typeof user.password !== 'string' || user.password.trim() === '') {
+    if (user.role === 'ceo' || user.username === 'ceo') user.password = hashPassword('karino2026');
+    else if (user.role === 'it_admin' || user.username === 'it_admin') user.password = hashPassword('it2026');
+    else if (user.username === 'a.z' || user.consultantCode === 'C-105') user.password = hashPassword('123456');
+    else user.password = hashPassword('1234');
+    persistDB(db).catch(() => {});
+  }
+
+  const isPasswordValid = verifyPassword(cleanPass, user.password) || verifyPassword(cleanPassEn, user.password);
+  if (!isPasswordValid) {
     return res.status(401).json({ success: false, message: 'کد کاربری یا کلمه عبور وارد شده نادرست است.' });
   }
 
