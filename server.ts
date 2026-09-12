@@ -551,6 +551,41 @@ async function getDB(): Promise<DatabaseSchema> {
   return ensureDBShape(inMemoryDB);
 }
 
+// ----------------------------------------------------
+// HIGH-CONCURRENCY MUTEX & PERSISTENCE ENGINE
+// ----------------------------------------------------
+class AsyncMutex {
+  private queue: (() => void)[] = [];
+  private locked = false;
+
+  async acquire(): Promise<() => void> {
+    if (this.locked) {
+      await new Promise<void>(resolve => this.queue.push(resolve));
+    }
+    this.locked = true;
+    return () => {
+      if (this.queue.length > 0) {
+        const next = this.queue.shift();
+        next?.();
+      } else {
+        this.locked = false;
+      }
+    };
+  }
+
+  async runExclusive<T>(fn: () => Promise<T>): Promise<T> {
+    const release = await this.acquire();
+    try {
+      return await fn();
+    } finally {
+      release();
+    }
+  }
+}
+const dbMutex = new AsyncMutex();
+
+let supabaseDebounceTimer: NodeJS.Timeout | null = null;
+
 async function persistDB(data: DatabaseSchema): Promise<void> {
   data.lastUpdated = new Date().toISOString();
   if (!data.stats) {
@@ -561,15 +596,103 @@ async function persistDB(data: DatabaseSchema): Promise<void> {
   inMemoryDB = data;
   writeLocalDB(data);
 
-  // Sync to Cloud Supabase
-  syncToSupabase(data).catch(err => {
-    console.error('[Supabase] Background persistence failed:', err);
-  });
+  // Debounced cloud sync: batch rapid writes into a single consolidated push to prevent 504 Gateway Timeouts
+  if (supabaseDebounceTimer) {
+    clearTimeout(supabaseDebounceTimer);
+  }
+  supabaseDebounceTimer = setTimeout(() => {
+    syncToSupabase(inMemoryDB).catch(err => {
+      console.error('[Supabase] Background persistence failed:', err);
+    });
+  }, 2500);
+}
+
+// Single-record relational sync for Supabase PostgreSQL tables
+async function syncReportToSupabaseRelational(report: any): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_KEY) return;
+  try {
+    const headerPayload = {
+      id: report.id,
+      consultant_id: report.consultantId,
+      consultant_name: report.consultantName || 'مشاور کارینو',
+      consultant_code: report.consultantCode || 'C-100',
+      branch: report.branch || 'دفتر مرکزی کارینو',
+      date_shamsi: report.dateShamsi,
+      day_of_week_shamsi: report.dayOfWeekShamsi || '',
+      submitted_at: report.submittedAt || '',
+      guild: report.guild || 'اصناف و بنگاه‌های اقتصادی',
+      personal_opinion: report.personalOpinion || null,
+      manager_feedback: report.managerFeedback || null,
+      manager_rating: report.managerRating ? Number(report.managerRating) : null,
+      status: report.status || 'submitted',
+      reviewed_at: report.reviewedAt || null,
+      created_at: report.createdAt || new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const headerRes = await fetch(`${SUPABASE_URL}/rest/v1/daily_reports`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(headerPayload)
+    });
+
+    if (!headerRes.ok) return;
+
+    if (Array.isArray(report.rows) && report.rows.length > 0) {
+      const rowsPayload = report.rows.map((r: any, idx: number) => ({
+        id: r.id || `${report.id}-row-${idx + 1}`,
+        report_id: report.id,
+        row_number: idx + 1,
+        client_name: r.clientName || 'نامشخص',
+        activity_field: r.activityField || 'نامشخص',
+        personnel_count: r.personnelCount || '',
+        phone: r.phone || '',
+        address: r.address || '',
+        employer_concern: r.employerConcern || 'سایر دغدغه‌ها',
+        follow_up_1: r.followUp1 || '',
+        follow_up_1_date: r.followUp1Date || null,
+        follow_up_1_date_shamsi: r.followUp1DateShamsi || null,
+        follow_up_2: r.followUp2 || null,
+        follow_up_2_date: r.followUp2Date || null,
+        follow_up_2_date_shamsi: r.followUp2DateShamsi || null,
+        follow_up_3: r.followUp3 || null,
+        follow_up_3_date: r.followUp3Date || null,
+        follow_up_3_date_shamsi: r.followUp3DateShamsi || null,
+        follow_up_4: r.followUp4 || null,
+        follow_up_4_date: r.followUp4Date || null,
+        follow_up_4_date_shamsi: r.followUp4DateShamsi || null,
+        follow_up_result: r.followUpResult || 'در حال پیگیری',
+        meeting_topic: r.meetingTopic || null,
+        notes: r.notes || null,
+        created_at: report.createdAt || new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }));
+
+      await fetch(`${SUPABASE_URL}/rest/v1/report_rows`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify(rowsPayload)
+      });
+    }
+  } catch (err) {
+    // Silent fallback if relational tables are not yet created in Supabase
+  }
 }
 
 // ----------------------------------------------------
 // DATABASE REST API ROUTES (Sync across all devices)
 // ----------------------------------------------------
+
 
 // Direct Real-time Authentication & Login Endpoint (100% Reliable Cross-Device Auth)
 app.post('/api/auth/login', async (req, res) => {
@@ -889,7 +1012,32 @@ app.delete('/api/db/users/:id', async (req, res) => {
 // 3. REPORT Endpoints
 app.get('/api/db/reports', async (req, res) => {
   const db = await getDB();
-  res.json({ success: true, reports: db.reports });
+  const { consultantId, consultantCode, date, limit, offset } = req.query;
+
+  let filtered = [...db.reports];
+
+  if (consultantId && typeof consultantId === 'string') {
+    filtered = filtered.filter((r: any) => r.consultantId === consultantId);
+  } else if (consultantCode && typeof consultantCode === 'string') {
+    filtered = filtered.filter((r: any) => r.consultantCode?.toUpperCase() === consultantCode.toUpperCase());
+  }
+
+  if (date && typeof date === 'string') {
+    filtered = filtered.filter((r: any) => r.dateShamsi === date);
+  }
+
+  const total = filtered.length;
+
+  if (offset !== undefined) {
+    const skip = parseInt(String(offset), 10) || 0;
+    filtered = filtered.slice(skip);
+  }
+  if (limit !== undefined) {
+    const take = parseInt(String(limit), 10) || 50;
+    filtered = filtered.slice(0, take);
+  }
+
+  res.json({ success: true, total, count: filtered.length, reports: filtered });
 });
 
 app.post('/api/db/reports', async (req, res) => {
@@ -897,11 +1045,10 @@ app.post('/api/db/reports', async (req, res) => {
   if (!report || !report.consultantId || !Array.isArray(report.rows)) {
     return res.status(400).json({ error: 'ساختار گزارش نامعتبر است.' });
   }
-  const db = await getDB();
-  const existingIdx = db.reports.findIndex((r: any) => r.id === report.id);
 
-  // Strict 17:00 - 19:00 submission window validation on server
-  if (existingIdx < 0) {
+  // Strict 17:00 - 19:00 submission window validation on server for new reports
+  const isUpdate = inMemoryDB.reports.some((r: any) => r.id === report.id);
+  if (!isUpdate) {
     const tehranTime = getTehranTimeInfo();
     if (isFriday(report.dateShamsi)) {
       return res.status(403).json({ error: 'امروز جمعه و تعطیل رسمی اداری است. ثبت گزارش روزانه مجاز نیست.' });
@@ -914,65 +1061,117 @@ app.post('/api/db/reports', async (req, res) => {
     }
   }
 
-  if (existingIdx >= 0) {
-    db.reports[existingIdx] = report;
-  } else {
-    db.reports.unshift(report);
-  }
+  // Atomic insertion with Mutex to prevent race conditions across hundreds of consultants
+  let savedReport: any = null;
+  await dbMutex.runExclusive(async () => {
+    const existingIdx = inMemoryDB.reports.findIndex((r: any) => r.id === report.id);
+    if (existingIdx >= 0) {
+      inMemoryDB.reports[existingIdx] = report;
+    } else {
+      inMemoryDB.reports.unshift(report);
+    }
+    savedReport = report;
 
-  addAuditLog(db, {
-    timeShamsi: report.dateShamsi || 'ثبت گزارش',
-    category: 'DATABASE',
-    level: 'SUCCESS',
-    message: `گزارش روزانه مشاور «${report.consultantName}» با ${report.rows.length} رکورد در پایگاه داده ابری ثبت شد.`
+    addAuditLog(inMemoryDB, {
+      timeShamsi: report.dateShamsi || 'ثبت گزارش',
+      category: 'DATABASE',
+      level: 'SUCCESS',
+      message: `گزارش روزانه مشاور «${report.consultantName}» با ${report.rows.length} رکورد در پایگاه داده ذخیره شد.`
+    });
+
+    await persistDB(inMemoryDB);
   });
 
-  await persistDB(db);
+  // Background relational table sync (single record upsert)
+  syncReportToSupabaseRelational(report).catch(() => {});
+
   console.log(`[Reports] New report saved for consultant: ${report.consultantName} (${report.rows.length} rows)`);
-  res.json({ success: true, reports: db.reports });
+  res.json({ success: true, report: savedReport, reports: inMemoryDB.reports });
 });
 
 app.put('/api/db/reports/:id/feedback', async (req, res) => {
   const { id } = req.params;
   const { status, managerFeedback, managerRating } = req.body;
-  const db = await getDB();
-  const report = db.reports.find((r: any) => r.id === id);
 
-  if (!report) {
+  let updatedReport: any = null;
+  await dbMutex.runExclusive(async () => {
+    const report = inMemoryDB.reports.find((r: any) => r.id === id);
+    if (!report) return;
+
+    if (status !== undefined) report.status = status;
+    if (managerFeedback !== undefined) report.managerFeedback = managerFeedback;
+    if (managerRating !== undefined) report.managerRating = managerRating;
+    report.reviewedAt = new Date().toISOString();
+    report.updatedAt = new Date().toISOString();
+    updatedReport = report;
+
+    addAuditLog(inMemoryDB, {
+      timeShamsi: 'بازخورد مدیریت',
+      category: 'DATABASE',
+      level: 'SUCCESS',
+      message: `بازخورد و امتیاز مدیریت به گزارش مشاور «${report.consultantName}» ثبت شد.`
+    });
+
+    await persistDB(inMemoryDB);
+  });
+
+  if (!updatedReport) {
     return res.status(404).json({ error: 'گزارش مورد نظر یافت نشد.' });
   }
 
-  if (status !== undefined) report.status = status;
-  if (managerFeedback !== undefined) report.managerFeedback = managerFeedback;
-  if (managerRating !== undefined) report.managerRating = managerRating;
-  report.reviewedAt = new Date().toISOString();
+  // Update Supabase relational table in background
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    fetch(`${SUPABASE_URL}/rest/v1/daily_reports?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        status: updatedReport.status,
+        manager_feedback: updatedReport.managerFeedback,
+        manager_rating: updatedReport.managerRating ? Number(updatedReport.managerRating) : null,
+        reviewed_at: updatedReport.reviewedAt,
+        updated_at: updatedReport.updatedAt
+      })
+    }).catch(() => {});
+  }
 
-  addAuditLog(db, {
-    timeShamsi: 'بازخورد مدیریت',
-    category: 'DATABASE',
-    level: 'SUCCESS',
-    message: `بازخورد و امتیاز مدیریت به گزارش مشاور «${report.consultantName}» ثبت شد.`
-  });
-
-  await persistDB(db);
-  res.json({ success: true, report, reports: db.reports });
+  res.json({ success: true, report: updatedReport, reports: inMemoryDB.reports });
 });
 
 app.delete('/api/db/reports/:id', async (req, res) => {
   const { id } = req.params;
-  const db = await getDB();
-  const initialLength = db.reports.length;
-  db.reports = db.reports.filter((r: any) => r.id !== id);
-  if (db.reports.length < initialLength) {
-    addAuditLog(db, {
-      timeShamsi: 'حذف گزارش',
-      category: 'DATABASE',
-      level: 'WARN',
-      message: `گزارش با شناسه «${id}» از سامانه حذف گردید.`
-    });
-    await persistDB(db);
+  let deleted = false;
+  await dbMutex.runExclusive(async () => {
+    const initialLength = inMemoryDB.reports.length;
+    inMemoryDB.reports = inMemoryDB.reports.filter((r: any) => r.id !== id);
+    if (inMemoryDB.reports.length < initialLength) {
+      deleted = true;
+      addAuditLog(inMemoryDB, {
+        timeShamsi: 'حذف گزارش',
+        category: 'DATABASE',
+        level: 'WARN',
+        message: `گزارش با شناسه «${id}» از سامانه حذف گردید.`
+      });
+      await persistDB(inMemoryDB);
+    }
+  });
+
+  if (deleted) {
+    // Delete from Supabase relational tables in background
+    if (SUPABASE_URL && SUPABASE_KEY) {
+      fetch(`${SUPABASE_URL}/rest/v1/daily_reports?id=eq.${id}`, {
+        method: 'DELETE',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      }).catch(() => {});
+    }
     console.log(`[Reports] Deleted report: ${id}`);
-    return res.json({ success: true, reports: db.reports });
+    return res.json({ success: true, reports: inMemoryDB.reports });
   }
   return res.status(404).json({ error: 'گزارش مورد نظر یافت نشد.' });
 });
@@ -1005,25 +1204,27 @@ app.post('/api/db/directives', async (req, res) => {
   if (!directive || !directive.id || !directive.content) {
     return res.status(400).json({ error: 'اطلاعات یادداشت مدیریت ناقص است.' });
   }
-  const db = await getDB();
-  if (!db.directives) db.directives = [];
-  const idx = db.directives.findIndex((d: any) => d.id === directive.id);
-  if (idx >= 0) {
-    db.directives[idx] = directive;
-  } else {
-    db.directives.unshift(directive);
-  }
-  await persistDB(db);
-  res.json({ success: true, directives: db.directives });
+  await dbMutex.runExclusive(async () => {
+    if (!inMemoryDB.directives) inMemoryDB.directives = [];
+    const idx = inMemoryDB.directives.findIndex((d: any) => d.id === directive.id);
+    if (idx >= 0) {
+      inMemoryDB.directives[idx] = directive;
+    } else {
+      inMemoryDB.directives.unshift(directive);
+    }
+    await persistDB(inMemoryDB);
+  });
+  res.json({ success: true, directives: inMemoryDB.directives });
 });
 
 app.delete('/api/db/directives/:id', async (req, res) => {
   const { id } = req.params;
-  const db = await getDB();
-  if (!db.directives) db.directives = [];
-  db.directives = db.directives.filter((d: any) => d.id !== id);
-  await persistDB(db);
-  res.json({ success: true, directives: db.directives });
+  await dbMutex.runExclusive(async () => {
+    if (!inMemoryDB.directives) inMemoryDB.directives = [];
+    inMemoryDB.directives = inMemoryDB.directives.filter((d: any) => d.id !== id);
+    await persistDB(inMemoryDB);
+  });
+  res.json({ success: true, directives: inMemoryDB.directives });
 });
 
 // 4-2. PERIODIC OVERALL REPORTS Endpoints (Daily, Weekly, Monthly)
@@ -1037,12 +1238,10 @@ app.post('/api/db/periodic-reports', async (req, res) => {
   if (!report || !report.id || !report.consultantId) {
     return res.status(400).json({ error: 'داده‌های گزارش کلی ناقص است.' });
   }
-  const db = await getDB();
-  if (!Array.isArray(db.overallReports)) db.overallReports = [];
-  const idx = db.overallReports.findIndex((r: any) => r.id === report.id);
 
   // Strict window validation on server for periodic reports
-  if (idx < 0) {
+  const isExisting = Array.isArray(inMemoryDB.overallReports) && inMemoryDB.overallReports.some((r: any) => r.id === report.id);
+  if (!isExisting) {
     const tehranTime = getTehranTimeInfo();
     if (report.periodType === 'daily') {
       if (isFriday(report.dateShamsi)) {
@@ -1057,35 +1256,51 @@ app.post('/api/db/periodic-reports', async (req, res) => {
     }
   }
 
-  if (idx >= 0) {
-    db.overallReports[idx] = { ...db.overallReports[idx], ...report, updatedAt: new Date().toISOString() };
-  } else {
-    db.overallReports.unshift({ ...report, updatedAt: new Date().toISOString() });
-  }
-  await persistDB(db);
-  res.json({ success: true, report: db.overallReports[idx >= 0 ? idx : 0] });
+  let savedPeriodic: any = null;
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.overallReports)) inMemoryDB.overallReports = [];
+    const idx = inMemoryDB.overallReports.findIndex((r: any) => r.id === report.id);
+    if (idx >= 0) {
+      inMemoryDB.overallReports[idx] = { ...inMemoryDB.overallReports[idx], ...report, updatedAt: new Date().toISOString() };
+      savedPeriodic = inMemoryDB.overallReports[idx];
+    } else {
+      const enriched = { ...report, updatedAt: new Date().toISOString() };
+      inMemoryDB.overallReports.unshift(enriched);
+      savedPeriodic = enriched;
+    }
+    await persistDB(inMemoryDB);
+  });
+
+  res.json({ success: true, report: savedPeriodic });
 });
 
 app.put('/api/db/periodic-reports/:id', async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
-  const db = await getDB();
-  if (!Array.isArray(db.overallReports)) db.overallReports = [];
-  const idx = db.overallReports.findIndex((r: any) => r.id === id);
-  if (idx >= 0) {
-    db.overallReports[idx] = { ...db.overallReports[idx], ...updates, updatedAt: new Date().toISOString() };
-    await persistDB(db);
-    return res.json({ success: true, report: db.overallReports[idx] });
+  let updated: any = null;
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.overallReports)) inMemoryDB.overallReports = [];
+    const idx = inMemoryDB.overallReports.findIndex((r: any) => r.id === id);
+    if (idx >= 0) {
+      inMemoryDB.overallReports[idx] = { ...inMemoryDB.overallReports[idx], ...updates, updatedAt: new Date().toISOString() };
+      updated = inMemoryDB.overallReports[idx];
+      await persistDB(inMemoryDB);
+    }
+  });
+
+  if (updated) {
+    return res.json({ success: true, report: updated });
   }
   res.status(404).json({ error: 'گزارش کلی یافت نشد.' });
 });
 
 app.delete('/api/db/periodic-reports/:id', async (req, res) => {
   const { id } = req.params;
-  const db = await getDB();
-  if (!Array.isArray(db.overallReports)) db.overallReports = [];
-  db.overallReports = db.overallReports.filter((r: any) => r.id !== id);
-  await persistDB(db);
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.overallReports)) inMemoryDB.overallReports = [];
+    inMemoryDB.overallReports = inMemoryDB.overallReports.filter((r: any) => r.id !== id);
+    await persistDB(inMemoryDB);
+  });
   res.json({ success: true });
 });
 

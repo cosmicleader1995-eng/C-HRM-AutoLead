@@ -169,6 +169,20 @@ CREATE TABLE IF NOT EXISTS public.directives (
 CREATE INDEX IF NOT EXISTS idx_directives_target ON public.directives(target_consultant_id);
 
 -- ====================================================================
+-- جدول ۸: گزارش‌های نظارتی و ردپای تغییرات (audit_logs)
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS public.audit_logs (
+    id TEXT PRIMARY KEY,
+    timestamp TIMESTAMPTZ DEFAULT NOW(),
+    time_shamsi TEXT,
+    category TEXT NOT NULL,
+    level TEXT NOT NULL,
+    message TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON public.audit_logs(timestamp DESC);
+
+-- ====================================================================
 -- تنظیمات امنیت سطح ردیف (Row Level Security - RLS)
 -- ====================================================================
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
@@ -178,26 +192,37 @@ ALTER TABLE public.periodic_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.archives ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.employer_concerns ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.directives ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 
--- سیاست‌های دسترسی خواندن و نوشتن سرویس
--- کاربران احراز هویت شده بر اساس توکن سرویس به داده‌ها دسترسی دارند:
+-- سیاست‌های دسترسی کامل برای کلاینت و سرویس (سازگار با کلید anon و authenticated)
 DROP POLICY IF EXISTS "Service role has full access to users" ON public.users;
-CREATE POLICY "Service role has full access to users" ON public.users FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all access to users" ON public.users;
+CREATE POLICY "Allow all access to users" ON public.users FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Service role has full access to daily_reports" ON public.daily_reports;
-CREATE POLICY "Service role has full access to daily_reports" ON public.daily_reports FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all access to daily_reports" ON public.daily_reports;
+CREATE POLICY "Allow all access to daily_reports" ON public.daily_reports FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Service role has full access to report_rows" ON public.report_rows;
-CREATE POLICY "Service role has full access to report_rows" ON public.report_rows FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all access to report_rows" ON public.report_rows;
+CREATE POLICY "Allow all access to report_rows" ON public.report_rows FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Service role has full access to periodic_reports" ON public.periodic_reports;
-CREATE POLICY "Service role has full access to periodic_reports" ON public.periodic_reports FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all access to periodic_reports" ON public.periodic_reports;
+CREATE POLICY "Allow all access to periodic_reports" ON public.periodic_reports FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Service role has full access to archives" ON public.archives;
-CREATE POLICY "Service role has full access to archives" ON public.archives FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all access to archives" ON public.archives;
+CREATE POLICY "Allow all access to archives" ON public.archives FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Service role has full access to employer_concerns" ON public.employer_concerns;
-CREATE POLICY "Service role has full access to employer_concerns" ON public.employer_concerns FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all access to employer_concerns" ON public.employer_concerns;
+CREATE POLICY "Allow all access to employer_concerns" ON public.employer_concerns FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Service role has full access to directives" ON public.directives;
-CREATE POLICY "Service role has full access to directives" ON public.directives FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all access to directives" ON public.directives;
+CREATE POLICY "Allow all access to directives" ON public.directives FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow all access to audit_logs" ON public.audit_logs;
+CREATE POLICY "Allow all access to audit_logs" ON public.audit_logs FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+

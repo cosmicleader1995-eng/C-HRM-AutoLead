@@ -242,7 +242,9 @@ function mergeStates(local: CloudDatabaseState, remote: CloudDatabaseState): Clo
 async function fetchCloudDatabase(): Promise<CloudDatabaseState | null> {
   // 1. Primary: Query the server-side API (/api/db/all) which holds persistent disk DB and merges with Supabase
   try {
-    const res = await fetch('/api/db/all');
+    const res = await fetch('/api/db/all', {
+      headers: getAuthHeaders()
+    });
     if (res.ok) {
       const json = await res.json();
       if (json && json.data) {
@@ -301,7 +303,7 @@ async function persistCloudDatabase(localData: CloudDatabaseState): Promise<bool
     try {
       const serverRes = await fetch('/api/db/sync', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(finalData)
       });
       if (serverRes.ok) {
@@ -467,16 +469,14 @@ export function saveUser(user: User): void {
   localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
   notifyDbListeners();
 
-  // 1. Direct Cloud Sync to Supabase with intelligent merge
-  const fullState = getCurrentFullState();
-  persistCloudDatabase(fullState);
-
-  // 2. Also send to /api if available
+  // Atomic User persistence
   fetch('/api/db/users', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(user)
-  }).catch(() => {});
+  }).catch(err => {
+    console.warn('[Storage] API user save network error:', err);
+  });
 }
 
 export function updateUserPassword(userId: string, newPassword: string): void {
@@ -494,12 +494,13 @@ export function deleteUser(userId: string): void {
   localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
   notifyDbListeners();
 
-  const fullState = getCurrentFullState();
-  persistCloudDatabase(fullState);
-
+  // Atomic User deletion
   fetch(`/api/db/users/${userId}`, {
-    method: 'DELETE'
-  }).catch(() => {});
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  }).catch(err => {
+    console.warn('[Storage] API user delete network error:', err);
+  });
 }
 
 export function saveJwtToken(token: string): void {
@@ -703,14 +704,14 @@ export function saveConcerns(concerns: string[]): void {
   localStorage.setItem(STORAGE_KEYS.CONCERNS, JSON.stringify(concerns));
   notifyDbListeners();
 
-  const fullState = getCurrentFullState();
-  persistCloudDatabase(fullState);
-
+  // Atomic concerns persistence
   fetch('/api/db/concerns', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ concerns })
-  }).catch(() => {});
+  }).catch(err => {
+    console.warn('[Storage] API concerns save network error:', err);
+  });
 }
 
 // -----------------------------------------------------------
@@ -812,16 +813,14 @@ export function saveReport(report: DailyReport): void {
   localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(sortedReports));
   notifyDbListeners();
 
-  // 1. Direct Cloud Sync to Supabase with intelligent merge
-  const fullState = getCurrentFullState();
-  persistCloudDatabase(fullState);
-
-  // 2. Also forward to API
+  // Atomic Point-to-Point Persistence via Server API (eliminates Race Conditions)
   fetch('/api/db/reports', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(enrichedReport)
-  }).catch(() => {});
+  }).catch(err => {
+    console.warn('[Storage] API report save network error:', err);
+  });
 }
 
 export function updateReportStatus(
@@ -844,18 +843,18 @@ export function updateReportStatus(
     localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(reports));
     notifyDbListeners();
 
-    const fullState = getCurrentFullState();
-    persistCloudDatabase(fullState);
-
+    // Atomic feedback submission
     fetch(`/api/db/reports/${reportId}/feedback`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         status,
         managerFeedback: feedback,
         managerRating: rating
       })
-    }).catch(() => {});
+    }).catch(err => {
+      console.warn('[Storage] API feedback save network error:', err);
+    });
   }
 }
 
@@ -865,12 +864,13 @@ export function deleteReport(reportId: string): void {
   localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(reports));
   notifyDbListeners();
 
-  const fullState = getCurrentFullState();
-  persistCloudDatabase(fullState);
-
+  // Atomic report deletion
   fetch(`/api/db/reports/${reportId}`, {
-    method: 'DELETE'
-  }).catch(() => {});
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  }).catch(err => {
+    console.warn('[Storage] API report delete network error:', err);
+  });
 }
 
 export function getReportsByConsultant(consultantIdOrCode: string): DailyReport[] {
@@ -1394,14 +1394,14 @@ export function saveDirective(directive: ManagerDirective): void {
   } catch (e) {}
   notifyDbListeners();
 
-  const fullState = getCurrentFullState();
-  persistCloudDatabase(fullState);
-
+  // Atomic directive persistence
   fetch('/api/db/directives', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(directive)
-  }).catch(() => {});
+  }).catch(err => {
+    console.warn('[Storage] API directive save network error:', err);
+  });
 }
 
 export function deleteDirective(id: string): void {
@@ -1412,12 +1412,13 @@ export function deleteDirective(id: string): void {
   } catch (e) {}
   notifyDbListeners();
 
-  const fullState = getCurrentFullState();
-  persistCloudDatabase(fullState);
-
+  // Atomic directive deletion
   fetch(`/api/db/directives/${id}`, {
-    method: 'DELETE'
-  }).catch(() => {});
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  }).catch(err => {
+    console.warn('[Storage] API directive delete network error:', err);
+  });
 }
 
 export function getDirectivesForConsultant(consultantId: string, consultantCode?: string): ManagerDirective[] {
@@ -1530,14 +1531,14 @@ export function savePeriodicReport(report: PeriodicOverallReport): void {
   } catch (e) {}
   notifyDbListeners();
 
-  const fullState = getCurrentFullState();
-  persistCloudDatabase(fullState);
-
+  // Atomic periodic report persistence
   fetch('/api/db/periodic-reports', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(enriched)
-  }).catch(() => {});
+  }).catch(err => {
+    console.warn('[Storage] API periodic report save network error:', err);
+  });
 }
 
 export function updatePeriodicReportManagerStatus(
@@ -1562,14 +1563,14 @@ export function updatePeriodicReportManagerStatus(
   } catch (e) {}
   notifyDbListeners();
 
-  const fullState = getCurrentFullState();
-  persistCloudDatabase(fullState);
-
+  // Atomic periodic report feedback
   fetch(`/api/db/periodic-reports/${reportId}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ managerStatus: status, managerFeedback: feedback, managerRating: rating })
-  }).catch(() => {});
+  }).catch(err => {
+    console.warn('[Storage] API periodic report feedback network error:', err);
+  });
 }
 
 export function deletePeriodicReport(id: string): void {
@@ -1580,11 +1581,12 @@ export function deletePeriodicReport(id: string): void {
   } catch (e) {}
   notifyDbListeners();
 
-  const fullState = getCurrentFullState();
-  persistCloudDatabase(fullState);
-
+  // Atomic periodic report deletion
   fetch(`/api/db/periodic-reports/${id}`, {
-    method: 'DELETE'
-  }).catch(() => {});
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  }).catch(err => {
+    console.warn('[Storage] API periodic report delete network error:', err);
+  });
 }
 

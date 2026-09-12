@@ -1,6 +1,6 @@
 {
   "version": "2.5",
-  "lastUpdated": "2026-09-12T13:37:04.394Z",
+  "lastUpdated": "2026-09-12T14:12:30.473Z",
   "users": [
     {
       "id": "user-ceo",
@@ -80,10 +80,45 @@
       "fullName": "اصغر",
       "username": "asghar",
       "consultantCode": "897",
-      "password": "$2b$10$XF2bsaWpG7zmsysYqfCwTu/ntPkbpp9EGsavwy0kf3lSOzkz83W6e"
+      "password": "$2b$10$s7Yod4t7OWY1pMGr04W8ieufZBNkrOA/LXbLc40TM5.V1mehIEWyy"
     }
   ],
   "reports": [
+    {
+      "id": "rep-test-relational-1789222328348",
+      "consultantId": "user-105",
+      "consultantName": "علی زارع",
+      "consultantCode": "C-105",
+      "dateShamsi": "۱۴۰۴/۰۶/۱۹",
+      "dayOfWeekShamsi": "چهارشنبه",
+      "submittedAt": "17:42",
+      "guild": "اصناف و بنگاه‌های اقتصادی",
+      "personalOpinion": "تست معماری رابطه‌ای و ارسال اتمیک",
+      "rows": [
+        {
+          "id": "row-1",
+          "clientName": "آزمایشگاه کنترل همروندی کارینو",
+          "activityField": "فناوری اطلاعات",
+          "phone": "09121234567",
+          "address": "تهران، خیابان ولیعصر",
+          "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+          "followUp1": "✓",
+          "followUp1Date": "2026-09-12T14:12:08.348Z",
+          "followUp1DateShamsi": "۱۴۰۴/۰۶/۱۹",
+          "followUpResult": "مذاکره اولیه با موفقیت انجام شد",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "meetingTopic": "",
+          "notes": ""
+        }
+      ],
+      "status": "approved",
+      "managerFeedback": "تست موفق بازخورد اتمیک در معماری رابطه‌ای",
+      "managerRating": 5,
+      "reviewedAt": "2026-09-12T14:12:30.473Z",
+      "updatedAt": "2026-09-12T14:12:30.473Z"
+    },
     {
       "id": "rep-c101-today",
       "rows": [
@@ -496,8 +531,7 @@
           "activityField": "پیمانکاری پروژه‌های مسکونی و تجاری",
           "followUpResult": "حله دادا",
           "personnelCount": 115,
-          "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
-          "followUp1DateShamsi": "1405/06/15"
+          "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
         }
       ],
       "guild": "ساختمانی، انبوه‌سازی و تأسیسات",
@@ -603,8 +637,7 @@
           "activityField": "بسته‌بندی حبوبات و خشکبار صادراتی",
           "followUpResult": "جوالدوز",
           "personnelCount": 38,
-          "employerConcern": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ",
-          "followUp1DateShamsi": "1405/06/15"
+          "employerConcern": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ"
         }
       ],
       "guild": "صنایع غذایی و کشاورزی",
@@ -1255,24 +1288,64 @@
   ],
   "overallReports": [
     {
-      "id": "per-110-daily-14050621",
-      "summary": "شنبلیله 12",
-      "createdAt": "2026-09-12T13:31:03.614Z",
-      "updatedAt": "2026-09-12T13:31:03.616Z",
-      "dateShamsi": "1405/06/21",
+      "id": "per-897-daily-14050621",
+      "consultantId": "user-1788870918188",
+      "consultantName": "اصغر",
+      "consultantCode": "897",
       "periodType": "daily",
-      "selfRating": 5,
+      "dateShamsi": "1405/06/21",
       "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
-      "submittedAt": "۱۷:۰۱",
-      "consultantId": "user-1788870728032",
+      "summary": "asghar",
+      "keyAchievements": "asghar",
+      "challengesOrBarriers": "asghar",
+      "plansOrPriorities": "asghar",
       "hasSetMeeting": false,
-      "managerStatus": "pending",
-      "consultantCode": "110",
-      "consultantName": "علی زارع",
-      "keyAchievements": "شنبلیله 12",
-      "plansOrPriorities": "شنبلیله 12",
       "autoFollowUpEnabled": true,
-      "challengesOrBarriers": "شنبلیله 12"
+      "selfRating": 3,
+      "submittedAt": "۱۷:۳۸",
+      "createdAt": "2026-09-12T14:08:08.226Z",
+      "managerStatus": "pending",
+      "updatedAt": "2026-09-12T14:08:08.230Z"
+    },
+    {
+      "id": "per-C-103-daily-14050621",
+      "consultantId": "user-c103",
+      "consultantName": "سعید حسینی",
+      "consultantCode": "C-103",
+      "periodType": "daily",
+      "dateShamsi": "1405/06/21",
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "summary": "karino2026",
+      "keyAchievements": "karino2026",
+      "challengesOrBarriers": "karino2026",
+      "plansOrPriorities": "karino2026",
+      "hasSetMeeting": false,
+      "autoFollowUpEnabled": true,
+      "selfRating": 2,
+      "submittedAt": "۱۷:۲۱",
+      "createdAt": "2026-09-12T13:51:20.418Z",
+      "managerStatus": "pending",
+      "updatedAt": "2026-09-12T13:51:20.420Z"
+    },
+    {
+      "id": "per-110-daily-14050621",
+      "consultantId": "user-1788870728032",
+      "consultantName": "علی زارع",
+      "consultantCode": "110",
+      "periodType": "daily",
+      "dateShamsi": "1405/06/21",
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "summary": "شنبلیله 12",
+      "keyAchievements": "شنبلیله 12",
+      "challengesOrBarriers": "شنبلیله 12",
+      "plansOrPriorities": "شنبلیله 12",
+      "hasSetMeeting": false,
+      "autoFollowUpEnabled": true,
+      "selfRating": 5,
+      "submittedAt": "۱۷:۰۱",
+      "createdAt": "2026-09-12T13:31:03.614Z",
+      "managerStatus": "pending",
+      "updatedAt": "2026-09-12T13:31:03.616Z"
     },
     {
       "id": "per-C-103-weekly-14050619",
@@ -1298,76 +1371,76 @@
     },
     {
       "id": "per-c101-daily-today",
-      "summary": "انجام ۷ تماس هدفمند با مدیران کارخانجات شهرک صنعتی طوس. استقبال صنایع دارویی و شیمیایی از خدمات حسابرسی بیمه بالا بود.",
-      "createdAt": "2026-09-12T12:22:40.438Z",
-      "dateShamsi": "1405/06/21",
-      "periodType": "daily",
-      "selfRating": 5,
-      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
-      "submittedAt": "۱۸:۵۹",
       "consultantId": "user-c101",
-      "managerRating": 5,
-      "managerStatus": "approved",
-      "consultantCode": "C-101",
       "consultantName": "علیرضا رضایی",
+      "consultantCode": "C-101",
+      "periodType": "daily",
+      "dateShamsi": "1405/06/21",
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "summary": "انجام ۷ تماس هدفمند با مدیران کارخانجات شهرک صنعتی طوس. استقبال صنایع دارویی و شیمیایی از خدمات حسابرسی بیمه بالا بود.",
       "keyAchievements": "تنظیم پیش‌نویس توافق با شرکت پارت‌سازان و ست شدن جلسه حضوری شنبه ساعت ۱۰ با مدیر مالی.",
-      "managerFeedback": "عملکرد عالی و پیگیری‌های منضبط؛ جلسه حضوری شنبه پیگیری شود.",
-      "managerReviewedAt": "2026-09-12T12:22:40.438Z",
+      "challengesOrBarriers": "برخی کارفرمایان خواستار نمونه قراردادهای استاندارد محرمانگی بودند که نیاز به فرم‌های حقوقی تکمیلی دارد.",
       "plansOrPriorities": "پیگیری مرحله سوم کارفرما رضایی و ارسال تاییدیه جلسه به کارفرما حسینی.",
-      "challengesOrBarriers": "برخی کارفرمایان خواستار نمونه قراردادهای استاندارد محرمانگی بودند که نیاز به فرم‌های حقوقی تکمیلی دارد."
+      "selfRating": 5,
+      "submittedAt": "۱۸:۵۹",
+      "createdAt": "2026-09-12T12:22:40.438Z",
+      "managerStatus": "approved",
+      "managerFeedback": "عملکرد عالی و پیگیری‌های منضبط؛ جلسه حضوری شنبه پیگیری شود.",
+      "managerRating": 5,
+      "managerReviewedAt": "2026-09-12T12:22:40.438Z"
     },
     {
       "id": "per-c102-daily-today",
-      "summary": "مذاکره با ۵ مدیر ارشد هلدینگ‌های غذایی و دارویی در خصوص دعاوی ماده ۱۴۸ قانون کار و بازنشستگی پیش‌ازموعد.",
-      "createdAt": "2026-09-12T11:22:40.438Z",
-      "dateShamsi": "1405/06/21",
-      "periodType": "daily",
-      "selfRating": 4,
-      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
-      "submittedAt": "۱۷:۰۵",
       "consultantId": "user-c102",
-      "managerStatus": "pending",
-      "consultantCode": "C-102",
       "consultantName": "سارا علیزاده",
+      "consultantCode": "C-102",
+      "periodType": "daily",
+      "dateShamsi": "1405/06/21",
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "summary": "مذاکره با ۵ مدیر ارشد هلدینگ‌های غذایی و دارویی در خصوص دعاوی ماده ۱۴۸ قانون کار و بازنشستگی پیش‌ازموعد.",
       "keyAchievements": "جلب نظر مساعد مدیر منابع انسانی شرکت بهنام‌شهد و هماهنگی جلسه معارفه.",
+      "challengesOrBarriers": "عدم حضور مستقیم تصمیم‌گیرنده نهایی در برخی کارخانجات و لزوم پیگیری از طریق سرپرستان.",
       "plansOrPriorities": "ارسال مدارک حقوقی کارینو و برقراری تماس دوم در چرخه ۴ روزه.",
-      "challengesOrBarriers": "عدم حضور مستقیم تصمیم‌گیرنده نهایی در برخی کارخانجات و لزوم پیگیری از طریق سرپرستان."
+      "selfRating": 4,
+      "submittedAt": "۱۷:۰۵",
+      "createdAt": "2026-09-12T11:22:40.438Z",
+      "managerStatus": "pending"
     },
     {
       "id": "per-c104-daily-today",
-      "summary": "تماس با ۶ شرکت نرم‌افزاری و شتاب‌دهنده پارک علم و فناوری خراسان. دغدغه اصلی قراردادهای عدم افشا (NDA) و تضامین پرسنلی است.",
-      "createdAt": "2026-09-12T10:22:40.438Z",
-      "dateShamsi": "1405/06/21",
-      "periodType": "daily",
-      "selfRating": 5,
-      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
-      "submittedAt": "۱۶:۰۰",
       "consultantId": "user-c104",
-      "managerRating": 5,
-      "managerStatus": "approved",
-      "consultantCode": "C-104",
       "consultantName": "ندا کریمی",
+      "consultantCode": "C-104",
+      "periodType": "daily",
+      "dateShamsi": "1405/06/21",
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "summary": "تماس با ۶ شرکت نرم‌افزاری و شتاب‌دهنده پارک علم و فناوری خراسان. دغدغه اصلی قراردادهای عدم افشا (NDA) و تضامین پرسنلی است.",
       "keyAchievements": "هماهنگی جلسه آنلاین برای دوشنبه با شتاب‌دهنده پرشین و بررسی پکیج قراردادهای استارتاپی.",
+      "challengesOrBarriers": "نبود مدل تعرفه ساعتی مشخص برای استارتاپ‌های کوچک.",
       "plansOrPriorities": "آماده‌سازی پیش‌نویس پکیج ویژه دانش‌بنیان‌ها.",
-      "challengesOrBarriers": "نبود مدل تعرفه ساعتی مشخص برای استارتاپ‌های کوچک."
+      "selfRating": 5,
+      "submittedAt": "۱۶:۰۰",
+      "createdAt": "2026-09-12T10:22:40.438Z",
+      "managerStatus": "approved",
+      "managerRating": 5
     },
     {
       "id": "per-c101-daily-yesterday",
-      "summary": "تمرکز بر پرونده‌های معوق و حل چالش‌های کارفرمایان چاپ و بسته‌بندی در خصوص جرایم تأمین اجتماعی.",
-      "createdAt": "2026-09-11T11:22:40.438Z",
-      "dateShamsi": "1405/06/20",
-      "periodType": "daily",
-      "selfRating": 4,
-      "periodLabel": "گزارش روزانه جمعه ۲۰ شهریور",
-      "submittedAt": "۱۷:۱۰",
       "consultantId": "user-c101",
-      "managerRating": 5,
-      "managerStatus": "approved",
-      "consultantCode": "C-101",
       "consultantName": "علیرضا رضایی",
+      "consultantCode": "C-101",
+      "periodType": "daily",
+      "dateShamsi": "1405/06/20",
+      "periodLabel": "گزارش روزانه جمعه ۲۰ شهریور",
+      "summary": "تمرکز بر پرونده‌های معوق و حل چالش‌های کارفرمایان چاپ و بسته‌بندی در خصوص جرایم تأمین اجتماعی.",
       "keyAchievements": "حل شبهات کارفرما عباسی درباره سفته حسن انجام کار و ارجاع پرونده به وکیل مجموعه.",
+      "challengesOrBarriers": "مشغله شدید مدیران عامل قبل از ظهر؛ زمان بهینه تماس‌ها به بعد از ساعت ۱۴ منتقل شد.",
       "plansOrPriorities": "شروع مذاکرات با صنف قطعات خودرو.",
-      "challengesOrBarriers": "مشغله شدید مدیران عامل قبل از ظهر؛ زمان بهینه تماس‌ها به بعد از ساعت ۱۴ منتقل شد."
+      "selfRating": 4,
+      "submittedAt": "۱۷:۱۰",
+      "createdAt": "2026-09-11T11:22:40.438Z",
+      "managerStatus": "approved",
+      "managerRating": 5
     },
     {
       "id": "per-c103-daily-yesterday",
@@ -1390,97 +1463,97 @@
     },
     {
       "id": "per-c101-weekly-last",
-      "summary": "مجموع ۳۴ تماس موثر، ۴ جلسه ست‌شده و یک قرارداد قطعی با ارزش ۵۵ میلیون تومان در حوزه دعاوی کارگری.",
-      "createdAt": "2026-09-05T12:22:40.438Z",
-      "dateShamsi": "1405/06/12",
-      "periodType": "weekly",
-      "selfRating": 5,
-      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
-      "submittedAt": "۱۸:۰۰",
       "consultantId": "user-c101",
-      "managerRating": 5,
-      "managerStatus": "rewarded",
-      "consultantCode": "C-101",
       "consultantName": "علیرضا رضایی",
+      "consultantCode": "C-101",
+      "periodType": "weekly",
+      "dateShamsi": "1405/06/12",
+      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
+      "summary": "مجموع ۳۴ تماس موثر، ۴ جلسه ست‌شده و یک قرارداد قطعی با ارزش ۵۵ میلیون تومان در حوزه دعاوی کارگری.",
       "keyAchievements": "عقد قرارداد با شرکت تولیدی توس و جذب ۳ مشتری جدید در شهرک ماشین‌سازی.",
-      "managerFeedback": "بهترین عملکرد هفته در تیم مشاوره. پاداش انضباط و تحقق اهداف منظور شد.",
-      "plansOrPriorities": "نهایی‌سازی ۲ قرارداد جاری و تمرکز ویژه بر خدمات پیشگیرانه بازرسی اداره کار.",
+      "challengesOrBarriers": "رقابت با شرکت‌های سنتی حسابداری که مشاوره‌های نادرست به کارفرمایان ارائه می‌دهند.",
       "weeklyFocusGuilds": "تولید قطعات صنعتی، صنایع پلیمری، ریخته‌گری",
-      "challengesOrBarriers": "رقابت با شرکت‌های سنتی حسابداری که مشاوره‌های نادرست به کارفرمایان ارائه می‌دهند."
+      "plansOrPriorities": "نهایی‌سازی ۲ قرارداد جاری و تمرکز ویژه بر خدمات پیشگیرانه بازرسی اداره کار.",
+      "selfRating": 5,
+      "submittedAt": "۱۸:۰۰",
+      "createdAt": "2026-09-05T12:22:40.438Z",
+      "managerStatus": "rewarded",
+      "managerFeedback": "بهترین عملکرد هفته در تیم مشاوره. پاداش انضباط و تحقق اهداف منظور شد.",
+      "managerRating": 5
     },
     {
       "id": "per-c102-weekly-last",
-      "summary": "انجام ۲۹ تماس اولیه، ۸ پیگیری مرحله دوم و ۴ پیگیری مرحله سوم در صنف چاپ و صنایع غذایی.",
-      "createdAt": "2026-09-05T10:52:40.439Z",
-      "dateShamsi": "1405/06/12",
-      "periodType": "weekly",
-      "selfRating": 4,
-      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
-      "submittedAt": "۱۶:۳۰",
       "consultantId": "user-c102",
-      "managerRating": 4,
-      "managerStatus": "approved",
-      "consultantCode": "C-102",
       "consultantName": "سارا علیزاده",
+      "consultantCode": "C-102",
+      "periodType": "weekly",
+      "dateShamsi": "1405/06/12",
+      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
+      "summary": "انجام ۲۹ تماس اولیه، ۸ پیگیری مرحله دوم و ۴ پیگیری مرحله سوم در صنف چاپ و صنایع غذایی.",
       "keyAchievements": "۲ جلسه مشاوره حضوری برگزار شد و پیش‌نویس توافق‌نامه ایمنی کار ارسال گردید.",
-      "managerFeedback": "گزارش دقیق و مستند؛ پیگیری پرونده آرد خوشه در اولویت قرار گیرد.",
-      "plansOrPriorities": "تمرکز بر بستن قرارداد پرونده شرکت آرد خوشه طوس.",
+      "challengesOrBarriers": "عدم پاسخگویی کارفرمایان در روز چهارشنبه به دلیل سفر.",
       "weeklyFocusGuilds": "صنایع غذایی، بسته‌بندی، دارویی",
-      "challengesOrBarriers": "عدم پاسخگویی کارفرمایان در روز چهارشنبه به دلیل سفر."
+      "plansOrPriorities": "تمرکز بر بستن قرارداد پرونده شرکت آرد خوشه طوس.",
+      "selfRating": 4,
+      "submittedAt": "۱۶:۳۰",
+      "createdAt": "2026-09-05T10:52:40.439Z",
+      "managerStatus": "approved",
+      "managerFeedback": "گزارش دقیق و مستند؛ پیگیری پرونده آرد خوشه در اولویت قرار گیرد.",
+      "managerRating": 4
     },
     {
       "id": "per-c104-weekly-last",
-      "summary": "تمرکز صددرصدی بر شرکت‌های فناور و پارک علم و فناوری. جذب ۲ پرونده تنظیم آیین‌نامه انضباطی کارگاهی.",
-      "createdAt": "2026-09-05T12:02:40.438Z",
-      "dateShamsi": "1405/06/12",
-      "periodType": "weekly",
-      "selfRating": 5,
-      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
-      "submittedAt": "۱۷:۴۰",
       "consultantId": "user-c104",
-      "managerRating": 5,
-      "managerStatus": "rewarded",
-      "consultantCode": "C-104",
       "consultantName": "ندا کریمی",
+      "consultantCode": "C-104",
+      "periodType": "weekly",
+      "dateShamsi": "1405/06/12",
+      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
+      "summary": "تمرکز صددرصدی بر شرکت‌های فناور و پارک علم و فناوری. جذب ۲ پرونده تنظیم آیین‌نامه انضباطی کارگاهی.",
       "keyAchievements": "عقد قرارداد با شرکت راهکارهای ابری پایا به مبلغ ۶۰ میلیون تومان.",
+      "weeklyFocusGuilds": "فناوری اطلاعات، فین‌تک، دانش‌بنیان",
+      "selfRating": 5,
+      "submittedAt": "۱۷:۴۰",
+      "createdAt": "2026-09-05T12:02:40.438Z",
+      "managerStatus": "rewarded",
       "managerFeedback": "ورود به بازار دانش‌بنیان بسیار هوشمندانه و با بازدهی عالی بود. تبریک.",
-      "weeklyFocusGuilds": "فناوری اطلاعات، فین‌تک، دانش‌بنیان"
+      "managerRating": 5
     },
     {
       "id": "per-c101-monthly-mordad",
-      "summary": "تحقق ۱۰۸ درصدی تارگت ماهانه با ثبت ۱۲۸ تماس و عقد ۴ قرارداد جامع سالانه بازبینی قراردادهای کار.",
-      "createdAt": "2026-08-23T10:52:40.439Z",
-      "dateShamsi": "1405/05/31",
-      "periodType": "monthly",
-      "selfRating": 5,
-      "periodLabel": "گزارش ماهانه مرداد ۱۴۰۵",
-      "submittedAt": "۱۸:۴۵",
       "consultantId": "user-c101",
-      "managerRating": 5,
-      "managerStatus": "rewarded",
-      "consultantCode": "C-101",
       "consultantName": "علیرضا رضایی",
+      "consultantCode": "C-101",
+      "periodType": "monthly",
+      "dateShamsi": "1405/05/31",
+      "periodLabel": "گزارش ماهانه مرداد ۱۴۰۵",
+      "summary": "تحقق ۱۰۸ درصدی تارگت ماهانه با ثبت ۱۲۸ تماس و عقد ۴ قرارداد جامع سالانه بازبینی قراردادهای کار.",
       "keyAchievements": "رشد ۴۰ درصدی تعامل با صنف ریخته‌گری و ارتقای رضایت مراجعین به ۴.۹ از ۵.",
-      "managerFeedback": "الگوی انضباط گزارش‌دهی و تعهد تیمی. مشمول پاداش ویژه ماهانه.",
       "challengesOrBarriers": "نیاز به کاتالوگ‌های اختصاصی‌تر برای صنایع با بیش از ۵۰ پرسنل.",
-      "monthlyStrategicNotes": "پیشنهاد می‌شود یک وبینار تخصصی برای مدیران منابع انسانی شرکت‌های پیمانکاری تدارک دیده شود."
+      "monthlyStrategicNotes": "پیشنهاد می‌شود یک وبینار تخصصی برای مدیران منابع انسانی شرکت‌های پیمانکاری تدارک دیده شود.",
+      "selfRating": 5,
+      "submittedAt": "۱۸:۴۵",
+      "createdAt": "2026-08-23T10:52:40.439Z",
+      "managerStatus": "rewarded",
+      "managerFeedback": "الگوی انضباط گزارش‌دهی و تعهد تیمی. مشمول پاداش ویژه ماهانه.",
+      "managerRating": 5
     },
     {
       "id": "per-c102-monthly-mordad",
-      "summary": "پوشش ۸۵ کارفرما در طول ماه با ثبت ۳ قرارداد نهایی و نرخ تبدیل ۱۲ درصدی.",
-      "createdAt": "2026-08-23T09:37:40.439Z",
-      "dateShamsi": "1405/05/31",
-      "periodType": "monthly",
-      "selfRating": 4,
-      "periodLabel": "گزارش ماهانه مرداد ۱۴۰۵",
-      "submittedAt": "۱۸:۱۵",
       "consultantId": "user-c102",
-      "managerRating": 4,
-      "managerStatus": "approved",
-      "consultantCode": "C-102",
       "consultantName": "سارا علیزاده",
+      "consultantCode": "C-102",
+      "periodType": "monthly",
+      "dateShamsi": "1405/05/31",
+      "periodLabel": "گزارش ماهانه مرداد ۱۴۰۵",
+      "summary": "پوشش ۸۵ کارفرما در طول ماه با ثبت ۳ قرارداد نهایی و نرخ تبدیل ۱۲ درصدی.",
       "keyAchievements": "ورود موفق به صنف کارخانجات آرد و غلات شرق کشور.",
-      "monthlyStrategicNotes": "افزایش بودجه تبلیغاتی در لینکدین می‌تواند منجر به لیدهای باکیفیت‌تری شود."
+      "monthlyStrategicNotes": "افزایش بودجه تبلیغاتی در لینکدین می‌تواند منجر به لیدهای باکیفیت‌تری شود.",
+      "selfRating": 4,
+      "submittedAt": "۱۸:۱۵",
+      "createdAt": "2026-08-23T09:37:40.439Z",
+      "managerStatus": "approved",
+      "managerRating": 4
     },
     {
       "id": "per-c103-monthly-mordad",
@@ -1639,10 +1712,10 @@
       "fileName": "تحلیلی_روزانه_1405-06-21.xlsx",
       "dateShamsi": "1405/06/21",
       "dayOfWeek": "شنبه",
-      "timestamp": "2026-09-12T12:32:29.130Z",
+      "timestamp": "2026-09-12T14:08:17.480Z",
       "archiveType": "periodic_daily",
       "periodTitle": "تحلیلی روزانه عملکرد مشاورین",
-      "totalConsultants": 4,
+      "totalConsultants": 6,
       "totalClientsContacted": 0,
       "topConcerns": [],
       "reports": [],
@@ -1666,6 +1739,46 @@
           "managerFeedback": "عملکرد عالی و پیگیری‌های منضبط؛ جلسه حضوری شنبه پیگیری شود.",
           "managerRating": 5,
           "managerReviewedAt": "2026-09-12T12:22:40.438Z"
+        },
+        {
+          "id": "per-897-daily-14050621",
+          "consultantId": "user-1788870918188",
+          "consultantName": "اصغر",
+          "consultantCode": "897",
+          "periodType": "daily",
+          "dateShamsi": "1405/06/21",
+          "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+          "summary": "asghar",
+          "keyAchievements": "asghar",
+          "challengesOrBarriers": "asghar",
+          "plansOrPriorities": "asghar",
+          "hasSetMeeting": false,
+          "autoFollowUpEnabled": true,
+          "selfRating": 3,
+          "submittedAt": "۱۷:۳۸",
+          "createdAt": "2026-09-12T14:08:08.226Z",
+          "managerStatus": "pending",
+          "updatedAt": "2026-09-12T14:08:08.230Z"
+        },
+        {
+          "id": "per-C-103-daily-14050621",
+          "consultantId": "user-c103",
+          "consultantName": "سعید حسینی",
+          "consultantCode": "C-103",
+          "periodType": "daily",
+          "dateShamsi": "1405/06/21",
+          "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+          "summary": "karino2026",
+          "keyAchievements": "karino2026",
+          "challengesOrBarriers": "karino2026",
+          "plansOrPriorities": "karino2026",
+          "hasSetMeeting": false,
+          "autoFollowUpEnabled": true,
+          "selfRating": 2,
+          "submittedAt": "۱۷:۲۱",
+          "createdAt": "2026-09-12T13:51:20.418Z",
+          "managerStatus": "pending",
+          "updatedAt": "2026-09-12T13:51:20.420Z"
         },
         {
           "id": "per-c102-daily-today",
@@ -1692,17 +1805,17 @@
           "periodType": "daily",
           "dateShamsi": "1405/06/21",
           "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
-          "summary": "شنبلیله",
-          "keyAchievements": "شنبلیله",
-          "challengesOrBarriers": "شنبلیله",
-          "plansOrPriorities": "شنبلیله",
+          "summary": "شنبلیله 12",
+          "keyAchievements": "شنبلیله 12",
+          "challengesOrBarriers": "شنبلیله 12",
+          "plansOrPriorities": "شنبلیله 12",
           "hasSetMeeting": false,
           "autoFollowUpEnabled": true,
           "selfRating": 5,
-          "submittedAt": "۱۶:۰۲",
-          "createdAt": "2026-09-12T12:32:18.175Z",
+          "submittedAt": "۱۷:۰۱",
+          "createdAt": "2026-09-12T13:31:03.614Z",
           "managerStatus": "pending",
-          "updatedAt": "2026-09-12T12:32:18.177Z"
+          "updatedAt": "2026-09-12T13:31:03.616Z"
         },
         {
           "id": "per-c104-daily-today",
@@ -1997,7 +2110,7 @@
       "fileName": "تماس‌های_روزانه_1405-06-19.xlsx",
       "dateShamsi": "1405/06/19",
       "dayOfWeek": "پنج‌شنبه",
-      "timestamp": "2026-09-12T13:26:44.351Z",
+      "timestamp": "2026-09-12T14:07:21.473Z",
       "archiveType": "calls_daily",
       "periodTitle": "بایگانی روزانه تماس‌ها و پیگیری‌ها",
       "totalConsultants": 1,
@@ -2484,7 +2597,7 @@
       "fileName": "تماس‌های_روزانه_1405-06-17.xlsx",
       "dateShamsi": "1405/06/17",
       "dayOfWeek": "سه‌شنبه",
-      "timestamp": "2026-09-12T13:35:11.689Z",
+      "timestamp": "2026-09-12T14:12:19.687Z",
       "archiveType": "calls_daily",
       "periodTitle": "بایگانی روزانه تماس‌ها و پیگیری‌ها",
       "totalConsultants": 3,
@@ -3759,7 +3872,7 @@
       ],
       "fileName": "تماس‌های_روزانه_1405-06-10.xlsx",
       "dayOfWeek": "سه‌شنبه",
-      "timestamp": "2026-09-12T13:24:21.914Z",
+      "timestamp": "2026-09-12T14:04:44.965Z",
       "dateShamsi": "1405/06/10",
       "archiveType": "calls_daily",
       "periodTitle": "بایگانی روزانه تماس‌ها و پیگیری‌ها",
@@ -3969,6 +4082,51 @@
       ],
       "totalConsultants": 3,
       "totalClientsContacted": 0
+    },
+    {
+      "id": "arch-calls-14040619",
+      "fileName": "تماس‌های_روزانه_1404-06-19.xlsx",
+      "dateShamsi": "1404/06/19",
+      "dayOfWeek": "چهارشنبه",
+      "timestamp": "2026-09-12T14:12:19.559Z",
+      "archiveType": "calls_daily",
+      "periodTitle": "بایگانی روزانه تماس‌ها و پیگیری‌ها",
+      "totalConsultants": 1,
+      "totalClientsContacted": 1,
+      "topConcerns": [
+        {
+          "name": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+          "count": 1
+        }
+      ],
+      "reports": [
+        {
+          "id": "rep-test-relational-1789222328348",
+          "consultantId": "user-105",
+          "consultantName": "علی زارع",
+          "consultantCode": "C-105",
+          "dateShamsi": "۱۴۰۴/۰۶/۱۹",
+          "dayOfWeekShamsi": "چهارشنبه",
+          "submittedAt": "17:42",
+          "guild": "اصناف و بنگاه‌های اقتصادی",
+          "personalOpinion": "تست معماری رابطه‌ای و ارسال اتمیک",
+          "rows": [
+            {
+              "id": "row-1",
+              "clientName": "آزمایشگاه کنترل همروندی کارینو",
+              "activityField": "فناوری اطلاعات",
+              "phone": "09121234567",
+              "address": "تهران، خیابان ولیعصر",
+              "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+              "followUp1": "✓",
+              "followUp1Date": "2026-09-12T14:12:08.348Z",
+              "followUp1DateShamsi": "۱۴۰۴/۰۶/۱۹",
+              "followUpResult": "مذاکره اولیه با موفقیت انجام شد"
+            }
+          ]
+        }
+      ],
+      "autoGenerated": true
     }
   ],
   "concerns": [
@@ -4000,54 +4158,76 @@
   ],
   "directives": [
     {
-      "id": "dir-1789217766017",
-      "content": "همکار گرامی جناب/سرکار اصغر (کد 897)، موعد قانونی ثبت گزارش عملکرد شما در بازه «این هفته (هفتگی)» سپری گردیده و گزارشی واصل نشده است. این عدم ارسال در پرونده انضباطی و شاخص KPI منظور می‌گردد. لطفاً در صورت داشتن عذر موجه، فوراً به مدیریت اعلام فرمایید.",
-      "authorId": "user-ceo",
-      "priority": "high",
-      "createdAt": "2026-09-12T12:56:06.017Z",
+      "id": "dir-1789222213869",
       "authorName": "مدیریت کارینو (CEO)",
-      "dateShamsi": "1405/06/21",
+      "authorId": "user-ceo",
+      "content": "همکار گرامی جناب/سرکار اصغر (کد 897)، موعد قانونی ثبت گزارش عملکرد شما در بازه «این هفته (هفتگی)» سپری گردیده و گزارشی واصل نشده است. این عدم ارسال در پرونده انضباطی و شاخص KPI منظور می‌گردد. لطفاً در صورت داشتن عذر موجه، فوراً به مدیریت اعلام فرمایید.",
+      "priority": "high",
       "targetConsultantId": "user-1788870918188",
-      "targetConsultantName": "اصغر"
+      "targetConsultantName": "اصغر",
+      "createdAt": "2026-09-12T14:10:13.869Z",
+      "dateShamsi": "1405/06/21"
+    },
+    {
+      "id": "dir-1789220331683",
+      "authorName": "مدیریت کارینو (CEO)",
+      "authorId": "user-ceo",
+      "content": "همکار گرامی جناب/سرکار سعید حسینی (کد C-103)، موعد قانونی ثبت گزارش عملکرد شما در بازه «امروز (روزانه)» سپری گردیده و گزارشی واصل نشده است. این عدم ارسال در پرونده انضباطی و شاخص KPI منظور می‌گردد. لطفاً در صورت داشتن عذر موجه، فوراً به مدیریت اعلام فرمایید.",
+      "priority": "high",
+      "targetConsultantId": "user-c103",
+      "targetConsultantName": "سعید حسینی",
+      "createdAt": "2026-09-12T13:38:51.683Z",
+      "dateShamsi": "1405/06/21"
+    },
+    {
+      "id": "dir-1789217766017",
+      "authorName": "مدیریت کارینو (CEO)",
+      "authorId": "user-ceo",
+      "content": "همکار گرامی جناب/سرکار اصغر (کد 897)، موعد قانونی ثبت گزارش عملکرد شما در بازه «این هفته (هفتگی)» سپری گردیده و گزارشی واصل نشده است. این عدم ارسال در پرونده انضباطی و شاخص KPI منظور می‌گردد. لطفاً در صورت داشتن عذر موجه، فوراً به مدیریت اعلام فرمایید.",
+      "priority": "high",
+      "targetConsultantId": "user-1788870918188",
+      "targetConsultantName": "اصغر",
+      "createdAt": "2026-09-12T12:56:06.017Z",
+      "dateShamsi": "1405/06/21"
     },
     {
       "id": "dir-seed-1",
+      "targetConsultantId": "user-c101",
+      "targetConsultantName": "علیرضا رضایی",
+      "authorName": "مدیریت کارینو (CEO)",
       "content": "پرونده کریمی و صنایع ریخته‌گری توس فولاد رو در اولویت قطعی امروز قرار بده.",
       "priority": "high",
       "createdAt": "2026-09-12T12:22:39.378Z",
-      "authorName": "مدیریت کارینو (CEO)",
-      "dateShamsi": "امروز",
-      "targetConsultantId": "user-c101",
-      "targetConsultantName": "علیرضا رضایی"
+      "dateShamsi": "امروز"
     },
     {
       "id": "dir-seed-2",
+      "targetConsultantId": "all",
+      "authorName": "مدیریت کارینو (CEO)",
       "content": "تمرکز تماس‌های این هفته بر روی عارضه‌یابی قراردادهای کار و پیشگیری از جرایم بازرسی تأمین اجتماعی است.",
       "priority": "normal",
       "createdAt": "2026-09-12T12:22:39.378Z",
-      "authorName": "مدیریت کارینو (CEO)",
-      "dateShamsi": "امروز",
-      "targetConsultantId": "all"
+      "dateShamsi": "امروز"
     },
     {
       "id": "dir-seed-3",
+      "targetConsultantId": "user-c102",
+      "targetConsultantName": "مریم محمدی",
+      "authorName": "مدیریت کارینو (CEO)",
       "content": "جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.",
       "priority": "high",
       "createdAt": "2026-09-12T12:22:39.378Z",
-      "authorName": "مدیریت کارینو (CEO)",
-      "dateShamsi": "امروز",
-      "targetConsultantId": "user-c102",
-      "targetConsultantName": "مریم محمدی"
+      "dateShamsi": "امروز"
     },
     {
       "id": "dir-seed-4",
+      "targetConsultantId": "user-c103",
+      "targetConsultantName": "سعید حسینی",
+      "authorName": "مدیریت کارینو (CEO)",
       "content": "تمرکز تماس‌های امروز بر مبالغ سفته و تضامین پرسنلی ویزیتورها و رانندگان پخش باشد.",
       "priority": "normal",
       "createdAt": "2026-09-12T12:22:39.378Z",
-      "authorName": "مدیریت کارینو (CEO)",
-      "dateShamsi": "امروز",
-      "targetConsultantId": "user-c103",
-      "targetConsultantName": "سعید حسینی"
+      "dateShamsi": "امروز"
     },
     {
       "id": "dir-1788861935011",
@@ -4072,300 +4252,444 @@
   ],
   "logs": [
     {
-      "id": "log-1789220224394-8f98",
-      "timestamp": "2026-09-12T13:37:04.394Z",
-      "timeShamsi": "ورود موفق به سامانه",
-      "category": "AUTH",
-      "level": "INFO",
-      "message": "کاربر «مدیر فاوا و فناوری اطلاعات» با کد پرسنلی «KARINO-IT» وارد سیستم شد."
+      "id": "log-1789222350473-ej0l",
+      "timestamp": "2026-09-12T14:12:30.473Z",
+      "timeShamsi": "بازخورد مدیریت",
+      "category": "DATABASE",
+      "level": "SUCCESS",
+      "message": "بازخورد و امتیاز مدیریت به گزارش مشاور «علی زارع» ثبت شد."
     },
     {
-      "id": "log-1789220223868-1aie",
-      "timestamp": "2026-09-12T13:37:03.868Z",
-      "timeShamsi": "ورود موفق به سامانه",
-      "category": "AUTH",
+      "id": "log-1789222339720-iadt",
+      "timestamp": "2026-09-12T14:12:19.721Z",
+      "timeShamsi": "1405/06/17",
+      "category": "SYSTEM",
       "level": "INFO",
-      "message": "کاربر «علی زارع» با کد پرسنلی «110» وارد سیستم شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
     },
     {
-      "id": "log-1789220207844-ffgc",
+      "id": "log-1789222339630-k71i",
+      "timestamp": "2026-09-12T14:12:19.630Z",
+      "timeShamsi": "1405/06/19",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد."
+    },
+    {
+      "id": "log-1789222339578-ylqi",
+      "timestamp": "2026-09-12T14:12:19.578Z",
+      "timeShamsi": "1404/06/19",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1404-06-19.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+    },
+    {
+      "id": "log-1789222339559-xhz0",
+      "timestamp": "2026-09-12T14:12:19.559Z",
+      "timeShamsi": "1405/06/10",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+    },
+    {
+      "id": "log-1789222339541-gxiy",
+      "timestamp": "2026-09-12T14:12:19.541Z",
+      "timeShamsi": "1405/06/11",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+    },
+    {
+      "id": "log-1789222339518-w8ii",
+      "timestamp": "2026-09-12T14:12:19.518Z",
+      "timeShamsi": "1405/06/12",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+    },
+    {
+      "id": "log-1789222339488-2l2b",
+      "timestamp": "2026-09-12T14:12:19.488Z",
+      "timeShamsi": "1405/06/15",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+    },
+    {
+      "id": "log-1789222339473-ost1",
+      "timestamp": "2026-09-12T14:12:19.473Z",
+      "timeShamsi": "1405/06/17",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+    },
+    {
+      "id": "log-1789222328548-wn8e",
+      "timestamp": "2026-09-12T14:12:08.548Z",
+      "timeShamsi": "۱۴۰۴/۰۶/۱۹",
+      "category": "DATABASE",
+      "level": "SUCCESS",
+      "message": "گزارش روزانه مشاور «علی زارع» با 1 رکورد در پایگاه داده ذخیره شد."
+    },
+    {
+      "id": "log-1789222131514-dbbj",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:08:51.514Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789222131445-sryc",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:08:51.445Z",
+      "timeShamsi": "1405/06/19"
+    },
+    {
+      "id": "log-1789222131378-u2jh",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:08:51.378Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789222131342-l503",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:08:51.342Z",
+      "timeShamsi": "1405/06/11"
+    },
+    {
+      "id": "log-1789222131321-nuux",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:08:51.321Z",
+      "timeShamsi": "1405/06/12"
+    },
+    {
+      "id": "log-1789222131297-ax9o",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:08:51.297Z",
+      "timeShamsi": "1405/06/15"
+    },
+    {
+      "id": "log-1789222131274-y0nb",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:08:51.274Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789222124217-yd2q",
       "level": "INFO",
       "message": "کاربر «مدیریت کارینو (CEO)» با کد پرسنلی «KARINO-CEO» وارد سیستم شد.",
       "category": "AUTH",
-      "timestamp": "2026-09-12T13:36:47.844Z",
+      "timestamp": "2026-09-12T14:08:44.217Z",
       "timeShamsi": "ورود موفق به سامانه"
     },
     {
-      "id": "log-1789220112055-jcn5",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:35:12.055Z",
-      "timeShamsi": "1405/06/17"
-    },
-    {
-      "id": "log-1789220111992-xlv0",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:35:11.992Z",
-      "timeShamsi": "1405/06/19"
-    },
-    {
-      "id": "log-1789220111772-cn1j",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:35:11.772Z",
-      "timeShamsi": "1405/06/10"
-    },
-    {
-      "id": "log-1789220111689-a20l",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:35:11.689Z",
-      "timeShamsi": "1405/06/11"
-    },
-    {
-      "id": "log-1789220111654-508w",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:35:11.654Z",
-      "timeShamsi": "1405/06/12"
-    },
-    {
-      "id": "log-1789220111627-srpu",
+      "id": "log-1789222117541-q8wp",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:35:11.627Z",
+      "timestamp": "2026-09-12T14:08:37.541Z",
       "timeShamsi": "1405/06/15"
     },
     {
-      "id": "log-1789220111525-7h2r",
+      "id": "log-1789222117522-7g7f",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:35:11.525Z",
+      "timestamp": "2026-09-12T14:08:37.522Z",
       "timeShamsi": "1405/06/17"
     },
     {
-      "id": "log-1789220097886-4ra3",
+      "id": "log-1789222097743-1f0g",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:34:57.886Z",
+      "timestamp": "2026-09-12T14:08:17.743Z",
       "timeShamsi": "1405/06/17"
     },
     {
-      "id": "log-1789220097865-i6pz",
+      "id": "log-1789222097707-3syw",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-21.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:34:57.865Z",
-      "timeShamsi": "1405/06/17"
+      "timestamp": "2026-09-12T14:08:17.707Z",
+      "timeShamsi": "1405/06/21"
     },
     {
-      "id": "log-1789220091739-i7jg",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:34:51.739Z",
-      "timeShamsi": "1405/06/17"
-    },
-    {
-      "id": "log-1789220091660-127r",
+      "id": "log-1789222097538-lfy0",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:34:51.660Z",
+      "timestamp": "2026-09-12T14:08:17.538Z",
       "timeShamsi": "1405/06/19"
     },
     {
-      "id": "log-1789220091563-j5bb",
+      "id": "log-1789222097510-rxor",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:34:51.563Z",
+      "timestamp": "2026-09-12T14:08:17.510Z",
       "timeShamsi": "1405/06/10"
     },
     {
-      "id": "log-1789220091507-v21x",
+      "id": "log-1789222097490-5chq",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:34:51.507Z",
+      "timestamp": "2026-09-12T14:08:17.490Z",
       "timeShamsi": "1405/06/11"
     },
     {
-      "id": "log-1789220091411-z6jf",
+      "id": "log-1789222097467-jjjg",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:34:51.411Z",
+      "timestamp": "2026-09-12T14:08:17.467Z",
       "timeShamsi": "1405/06/12"
     },
     {
-      "id": "log-1789220091310-fnh1",
+      "id": "log-1789222097451-8bxo",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:34:51.310Z",
+      "timestamp": "2026-09-12T14:08:17.451Z",
       "timeShamsi": "1405/06/15"
     },
     {
-      "id": "log-1789220091254-yxto",
+      "id": "log-1789222097436-hqsy",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:34:51.254Z",
+      "timestamp": "2026-09-12T14:08:17.436Z",
       "timeShamsi": "1405/06/17"
     },
     {
-      "id": "log-1789219811899-efmc",
+      "id": "log-1789222053876-4a5s",
       "level": "INFO",
-      "message": "کاربر «علی زارع» با کد پرسنلی «110» وارد سیستم شد.",
+      "message": "کاربر «اصغر» با کد پرسنلی «897» وارد سیستم شد.",
       "category": "AUTH",
-      "timestamp": "2026-09-12T13:30:11.899Z",
+      "timestamp": "2026-09-12T14:07:33.876Z",
       "timeShamsi": "ورود موفق به سامانه"
     },
     {
-      "id": "log-1789219779027-roow",
+      "id": "log-1789222041609-rzx4",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:29:39.027Z",
+      "timestamp": "2026-09-12T14:07:21.610Z",
       "timeShamsi": "1405/06/17"
     },
     {
-      "id": "log-1789219778915-xx6y",
+      "id": "log-1789222041595-hwcw",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:29:38.915Z",
+      "timestamp": "2026-09-12T14:07:21.595Z",
       "timeShamsi": "1405/06/19"
     },
     {
-      "id": "log-1789219778823-hs0g",
+      "id": "log-1789222041573-kzz9",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:29:38.823Z",
+      "timestamp": "2026-09-12T14:07:21.573Z",
       "timeShamsi": "1405/06/10"
     },
     {
-      "id": "log-1789219778697-6rm6",
+      "id": "log-1789222041557-tqtm",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:29:38.697Z",
+      "timestamp": "2026-09-12T14:07:21.557Z",
       "timeShamsi": "1405/06/11"
     },
     {
-      "id": "log-1789219778610-0mic",
+      "id": "log-1789222041540-ruf0",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:29:38.610Z",
+      "timestamp": "2026-09-12T14:07:21.540Z",
       "timeShamsi": "1405/06/12"
     },
     {
-      "id": "log-1789219778563-wa2l",
+      "id": "log-1789222041524-sq88",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:29:38.563Z",
+      "timestamp": "2026-09-12T14:07:21.524Z",
       "timeShamsi": "1405/06/15"
     },
     {
-      "id": "log-1789219778526-vcnx",
+      "id": "log-1789222041508-ii56",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:29:38.526Z",
+      "timestamp": "2026-09-12T14:07:21.508Z",
       "timeShamsi": "1405/06/17"
     },
     {
-      "id": "log-1789219606733-gu6j",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:26:46.733Z",
-      "timeShamsi": "1405/06/17"
-    },
-    {
-      "id": "log-1789219606028-1o7c",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:26:46.028Z",
-      "timeShamsi": "1405/06/19"
-    },
-    {
-      "id": "log-1789219605907-828k",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:26:45.908Z",
-      "timeShamsi": "1405/06/10"
-    },
-    {
-      "id": "log-1789219605825-ukr8",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:26:45.825Z",
-      "timeShamsi": "1405/06/11"
-    },
-    {
-      "id": "log-1789219604642-suhl",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:26:44.642Z",
-      "timeShamsi": "1405/06/12"
-    },
-    {
-      "id": "log-1789219604555-bagp",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:26:44.555Z",
-      "timeShamsi": "1405/06/15"
-    },
-    {
-      "id": "log-1789219604517-we2f",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:26:44.517Z",
-      "timeShamsi": "1405/06/17"
-    },
-    {
-      "id": "log-1789219604478-ouj4",
+      "id": "log-1789222041487-lbb5",
       "level": "INFO",
       "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-19.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
       "category": "SYSTEM",
-      "timestamp": "2026-09-12T13:26:44.478Z",
+      "timestamp": "2026-09-12T14:07:21.487Z",
       "timeShamsi": "1405/06/19"
     },
     {
-      "id": "log-1789219604443-111i",
+      "id": "log-1789222025191-ydan",
       "level": "INFO",
-      "message": "کاربر «علیرضا رضایی» با کد پرسنلی «C-101» وارد سیستم شد.",
+      "message": "کاربر «اصغر» (consultant) در پایگاه داده ابری ذخیره شد.",
       "category": "AUTH",
-      "timestamp": "2026-09-12T13:26:44.443Z",
+      "timestamp": "2026-09-12T14:07:05.191Z",
+      "timeShamsi": "عملیات کاربر"
+    },
+    {
+      "id": "log-1789222004951-8y34",
+      "level": "INFO",
+      "message": "کاربر «مدیر فاوا و فناوری اطلاعات» با کد پرسنلی «KARINO-IT» وارد سیستم شد.",
+      "category": "AUTH",
+      "timestamp": "2026-09-12T14:06:44.951Z",
       "timeShamsi": "ورود موفق به سامانه"
     },
     {
-      "id": "log-1789219603802-cvht",
+      "id": "log-1789221660392-6atv",
       "level": "INFO",
-      "message": "کاربر «مدیریت کارینو (CEO)» با کد پرسنلی «KARINO-CEO» وارد سیستم شد.",
-      "category": "AUTH",
-      "timestamp": "2026-09-12T13:26:43.802Z",
-      "timeShamsi": "ورود موفق به سامانه"
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:01:00.392Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789221660384-1ik9",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-18.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:01:00.385Z",
+      "timeShamsi": "1405/06/18"
+    },
+    {
+      "id": "log-1789221660377-23av",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:01:00.377Z",
+      "timeShamsi": "1405/06/15"
+    },
+    {
+      "id": "log-1789221660369-xzzu",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T14:01:00.369Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789221060175-zqts",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-18.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:51:00.175Z",
+      "timeShamsi": "1405/06/18"
+    },
+    {
+      "id": "log-1789221060168-wkyv",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:51:00.168Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789221060161-scmi",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:51:00.161Z",
+      "timeShamsi": "1405/06/15"
+    },
+    {
+      "id": "log-1789221060153-2ixx",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:51:00.153Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789220437634-f3wy",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-18.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:40:37.634Z",
+      "timeShamsi": "1405/06/18"
+    },
+    {
+      "id": "log-1789220437344-lb7z",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:40:37.344Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789220437338-13g9",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:40:37.338Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789220437330-5tv0",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:40:37.330Z",
+      "timeShamsi": "1405/06/15"
+    },
+    {
+      "id": "log-1789219837468-jr6s",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:30:37.468Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789219837460-x30n",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-18.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:30:37.460Z",
+      "timeShamsi": "1405/06/18"
+    },
+    {
+      "id": "log-1789219837250-e94z",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:30:37.250Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789219837243-ays4",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-12T13:30:37.243Z",
+      "timeShamsi": "1405/06/15"
     },
     {
       "id": "log-1789219237365-gmcp",
@@ -4726,154 +5050,10 @@
       "category": "SYSTEM",
       "timestamp": "2026-09-12T11:41:41.261Z",
       "timeShamsi": "1405/06/10"
-    },
-    {
-      "id": "log-1789213301187-bibj",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:41:41.187Z",
-      "timeShamsi": "1405/06/17"
-    },
-    {
-      "id": "log-1789212701283-wwxl",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-18.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:31:41.283Z",
-      "timeShamsi": "1405/06/18"
-    },
-    {
-      "id": "log-1789212701274-yb6a",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:31:41.274Z",
-      "timeShamsi": "1405/06/10"
-    },
-    {
-      "id": "log-1789212701267-erez",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:31:41.267Z",
-      "timeShamsi": "1405/06/17"
-    },
-    {
-      "id": "log-1789212701224-pc61",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:31:41.224Z",
-      "timeShamsi": "1405/06/15"
-    },
-    {
-      "id": "log-1789212101168-2aeg",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-18.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:21:41.168Z",
-      "timeShamsi": "1405/06/18"
-    },
-    {
-      "id": "log-1789212101162-scpc",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:21:41.162Z",
-      "timeShamsi": "1405/06/10"
-    },
-    {
-      "id": "log-1789212101150-l1ad",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:21:41.150Z",
-      "timeShamsi": "1405/06/15"
-    },
-    {
-      "id": "log-1789212101141-xtdo",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:21:41.141Z",
-      "timeShamsi": "1405/06/17"
-    },
-    {
-      "id": "log-1789211501849-j9x2",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-18.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:11:41.849Z",
-      "timeShamsi": "1405/06/18"
-    },
-    {
-      "id": "log-1789211501770-mggm",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:11:41.770Z",
-      "timeShamsi": "1405/06/10"
-    },
-    {
-      "id": "log-1789211501757-y50a",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:11:41.757Z",
-      "timeShamsi": "1405/06/15"
-    },
-    {
-      "id": "log-1789211501538-602d",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:11:41.538Z",
-      "timeShamsi": "1405/06/17"
-    },
-    {
-      "id": "log-1789210901782-bzzr",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-18.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:01:41.782Z",
-      "timeShamsi": "1405/06/18"
-    },
-    {
-      "id": "log-1789210901774-kzsv",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:01:41.774Z",
-      "timeShamsi": "1405/06/10"
-    },
-    {
-      "id": "log-1789210901765-p0p4",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:01:41.765Z",
-      "timeShamsi": "1405/06/15"
-    },
-    {
-      "id": "log-1789210901756-9fri",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T11:01:41.756Z",
-      "timeShamsi": "1405/06/17"
-    },
-    {
-      "id": "log-1789210300635-5pfb",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-12T10:51:40.635Z",
-      "timeShamsi": "1405/06/17"
     }
   ],
   "stats": {
     "lastBackup": "2026-09-03T12:00:00.000Z",
-    "totalWrites": 1125
+    "totalWrites": 1167
   }
 }
