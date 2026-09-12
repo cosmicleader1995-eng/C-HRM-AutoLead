@@ -1471,7 +1471,12 @@ async function runServerNightlyArchiver() {
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { 
+        middlewareMode: true,
+        watch: {
+          ignored: ['**/data/**', '**/data/db.json', '**/db.json', '**/.system_generated/**', '**/*.log']
+        }
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);
