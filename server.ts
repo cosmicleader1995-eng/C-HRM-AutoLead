@@ -126,6 +126,73 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
+// ----------------------------------------------------
+// 3. ENTERPRISE RATE LIMITING & BRUTE-FORCE DEFENSE
+// ----------------------------------------------------
+interface RateLimitRecord {
+  count: number;
+  resetAt: number;
+}
+const rateLimitMap = new Map<string, RateLimitRecord>();
+
+function createRateLimiter(options: { max: number; windowMs: number; message?: string }) {
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const rawIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() ||
+                  req.socket.remoteAddress || 'unknown-ip';
+    const key = `${req.baseUrl || ''}${req.path}:${rawIp}`;
+    const now = Date.now();
+    const record = rateLimitMap.get(key);
+
+    if (!record || now > record.resetAt) {
+      rateLimitMap.set(key, { count: 1, resetAt: now + options.windowMs });
+      res.setHeader('X-RateLimit-Limit', options.max);
+      res.setHeader('X-RateLimit-Remaining', options.max - 1);
+      return next();
+    }
+
+    if (record.count >= options.max) {
+      const retryAfterSec = Math.ceil((record.resetAt - now) / 1000);
+      res.setHeader('Retry-After', retryAfterSec);
+      res.setHeader('X-RateLimit-Limit', options.max);
+      res.setHeader('X-RateLimit-Remaining', 0);
+      return res.status(429).json({
+        error: options.message || 'تعداد درخواست‌های ارسالی بیش از حد مجاز است. لطفاً کمی بعد دوباره تلاش کنید.',
+        retryAfter: retryAfterSec
+      });
+    }
+
+    record.count++;
+    res.setHeader('X-RateLimit-Limit', options.max);
+    res.setHeader('X-RateLimit-Remaining', Math.max(0, options.max - record.count));
+    next();
+  };
+}
+
+// 10 login attempts per minute per IP to prevent brute-force attacks
+const loginRateLimiter = createRateLimiter({
+  max: 10,
+  windowMs: 60 * 1000,
+  message: 'تعداد دفعات تلاش برای ورود بیش از حد مجاز است. لطفاً پس از ۱ دقیقه مجدداً تلاش فرمایید.'
+});
+
+// 120 API write requests per minute per IP to prevent flood/DoS
+const apiWriteRateLimiter = createRateLimiter({
+  max: 120,
+  windowMs: 60 * 1000,
+  message: 'تعداد درخواست‌های ارسالی به سرور بیش از حد مجاز است. لطفاً لحظاتی تامل فرمایید.'
+});
+
+// Periodic cleanup of expired rate limit entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, record] of rateLimitMap.entries()) {
+    if (now > record.resetAt) {
+      rateLimitMap.delete(key);
+    }
+  }
+}, 5 * 60 * 1000);
+
+
 // Server-side persistent database path
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
@@ -694,8 +761,8 @@ async function syncReportToSupabaseRelational(report: any): Promise<void> {
 // ----------------------------------------------------
 
 
-// Direct Real-time Authentication & Login Endpoint (100% Reliable Cross-Device Auth)
-app.post('/api/auth/login', async (req, res) => {
+// Direct Real-time Authentication & Login Endpoint (100% Reliable Cross-Device Auth with Rate Limiting)
+app.post('/api/auth/login', loginRateLimiter, async (req, res) => {
   const { usernameOrCode, password, role } = req.body;
   if (!usernameOrCode || !password) {
     return res.status(400).json({ success: false, message: 'نام کاربری/کد پرسنلی و کلمه عبور الزامی است.' });
@@ -1040,7 +1107,7 @@ app.get('/api/db/reports', async (req, res) => {
   res.json({ success: true, total, count: filtered.length, reports: filtered });
 });
 
-app.post('/api/db/reports', async (req, res) => {
+app.post('/api/db/reports', apiWriteRateLimiter, async (req, res) => {
   const report = req.body;
   if (!report || !report.consultantId || !Array.isArray(report.rows)) {
     return res.status(400).json({ error: 'ساختار گزارش نامعتبر است.' });
@@ -1441,6 +1508,42 @@ app.get('/api/health', async (req, res) => {
       archivesCount: db.archives.length
     },
     timestamp: new Date().toISOString()
+  });
+});
+
+// Production System Metrics & Telemetry for IT Ops Dashboard
+app.get('/api/system/metrics', async (req, res) => {
+  const mem = process.memoryUsage();
+  const uptimeSec = Math.floor(process.uptime());
+  const db = await getDB();
+
+  res.json({
+    status: 'operational',
+    serverTime: new Date().toISOString(),
+    uptimeSeconds: uptimeSec,
+    uptimeHuman: `${Math.floor(uptimeSec / 3600)}h ${Math.floor((uptimeSec % 3600) / 60)}m ${uptimeSec % 60}s`,
+    nodeVersion: process.version,
+    memory: {
+      rssMB: Math.round(mem.rss / 1024 / 1024 * 10) / 10,
+      heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024 * 10) / 10,
+      heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024 * 10) / 10
+    },
+    database: {
+      usersCount: db.users?.length || 0,
+      reportsCount: db.reports?.length || 0,
+      archivesCount: db.archives?.length || 0,
+      directivesCount: db.directives?.length || 0,
+      concernsCount: db.concerns?.length || 0,
+      periodicReportsCount: db.overallReports?.length || 0,
+      logsCount: db.logs?.length || 0,
+      totalWrites: db.stats?.totalWrites || 0
+    },
+    resilience: {
+      cloudConnected: isCloudConnected,
+      mutexLocked: (dbMutex as any).locked || false,
+      concurrencyQueueLength: (dbMutex as any).queue?.length || 0,
+      rateLimitTrackerCount: rateLimitMap.size
+    }
   });
 });
 

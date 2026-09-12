@@ -70,6 +70,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
   const [aiEngineStatus, setAiEngineStatus] = useState<'online' | 'fallback_ready'>('online');
   const [systemUptime, setSystemUptime] = useState('99.98%');
   const [lastSelfTestTime, setLastSelfTestTime] = useState<string>(getCurrentTimeFormatted());
+  const [systemMetrics, setSystemMetrics] = useState<any>(null);
 
   // User Management
   const [userSearch, setUserSearch] = useState('');
@@ -126,10 +127,23 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
     setStorageKB(calculateStorageSize());
   };
 
-  // Listen to live database sync from server
+  // Fetch telemetry metrics
+  const fetchMetrics = async () => {
+    try {
+      const res = await fetch('/api/system/metrics');
+      if (res.ok) {
+        const data = await res.json();
+        setSystemMetrics(data);
+      }
+    } catch {}
+  };
+
+  // Listen to live database sync from server and fetch initial metrics
   useEffect(() => {
+    fetchMetrics();
     const handleSync = () => {
       reloadData();
+      fetchMetrics();
     };
     window.addEventListener('karino_db_synced', handleSync);
     return () => window.removeEventListener('karino_db_synced', handleSync);
@@ -153,6 +167,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
         setApiHealthStatus('error');
         addLog('API', 'ERROR', 'پاسخ نامتعارف از اندپوینت سلامت سرور.');
       }
+      await fetchMetrics();
     } catch (e: any) {
       const end = performance.now();
       setPingLatency(Math.round(end - start));
@@ -530,6 +545,59 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
 
             </div>
           </div>
+
+          {/* Live Enterprise Telemetry & Concurrency Monitor */}
+          {systemMetrics && (
+            <div className="navy-card-glass rounded-2xl border border-indigo-500/30 p-5 shadow-xl space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <Cpu className="w-4 h-4 text-indigo-400" />
+                  <h3 className="text-sm font-bold text-white">
+                    پایشگر زنده همروندی و تلمتری سرور (Server Telemetry & Concurrency)
+                  </h3>
+                </div>
+                <span className="text-[11px] text-indigo-300 font-mono">
+                  آپ‌تایم سرور: {toPersianDigits(systemMetrics.uptimeHuman || '')}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <div className="p-3.5 rounded-xl bg-[#081525] border border-slate-800 space-y-1">
+                  <div className="text-[11px] text-slate-400">مصرف حافظه رم (RSS)</div>
+                  <div className="text-base font-black text-emerald-400 font-mono">
+                    {toPersianDigits(systemMetrics.memory?.rssMB || 0)} MB
+                  </div>
+                  <div className="text-[10px] text-slate-500">Heap: {toPersianDigits(systemMetrics.memory?.heapUsedMB || 0)} MB</div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#081525] border border-slate-800 space-y-1">
+                  <div className="text-[11px] text-slate-400">موتور همروندی اتمیک (Mutex)</div>
+                  <div className="text-base font-black text-blue-400 font-mono flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span>{systemMetrics.resilience?.mutexLocked ? 'در حال نوشتن' : 'آماده به کار'}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500">طول صف انتظار: {toPersianDigits(systemMetrics.resilience?.concurrencyQueueLength || 0)}</div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#081525] border border-slate-800 space-y-1">
+                  <div className="text-[11px] text-slate-400">سپر ضد اسپم و بروت‌فورس</div>
+                  <div className="text-base font-black text-purple-400 font-mono flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-purple-400" />
+                    <span>فعال (Rate Limited)</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500">IPهای فعال در رصد: {toPersianDigits(systemMetrics.resilience?.rateLimitTrackerCount || 0)}</div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#081525] border border-slate-800 space-y-1">
+                  <div className="text-[11px] text-slate-400">کانتینرسازی پروداکشن (Docker)</div>
+                  <div className="text-base font-black text-amber-300 font-mono">
+                    Node {systemMetrics.nodeVersion || 'v22'}
+                  </div>
+                  <div className="text-[10px] text-emerald-400">Alpine Multi-Stage Ready</div>
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
       )}

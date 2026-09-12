@@ -16,6 +16,7 @@ import {
   isReportSubmittedBeforeWindow,
   isReportSubmittedPastDeadline
 } from '../utils/shamsi';
+import { enqueueOfflineRequest } from './offlineQueue';
 
 export { isReportSubmittedBeforeWindow, isReportSubmittedPastDeadline };
 
@@ -813,13 +814,14 @@ export function saveReport(report: DailyReport): void {
   localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(sortedReports));
   notifyDbListeners();
 
-  // Atomic Point-to-Point Persistence via Server API (eliminates Race Conditions)
+  // Atomic Point-to-Point Persistence via Server API (with Offline Queue fallback)
   fetch('/api/db/reports', {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(enrichedReport)
   }).catch(err => {
-    console.warn('[Storage] API report save network error:', err);
+    console.warn('[Storage] API report save network error, enqueuing to offline IndexedDB:', err);
+    enqueueOfflineRequest('/api/db/reports', 'POST', enrichedReport, getAuthHeaders()).catch(() => {});
   });
 }
 
@@ -843,17 +845,19 @@ export function updateReportStatus(
     localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(reports));
     notifyDbListeners();
 
-    // Atomic feedback submission
+    // Atomic feedback submission (with Offline Queue fallback)
+    const feedbackPayload = {
+      status,
+      managerFeedback: feedback,
+      managerRating: rating
+    };
     fetch(`/api/db/reports/${reportId}/feedback`, {
       method: 'PUT',
       headers: getAuthHeaders(),
-      body: JSON.stringify({
-        status,
-        managerFeedback: feedback,
-        managerRating: rating
-      })
+      body: JSON.stringify(feedbackPayload)
     }).catch(err => {
-      console.warn('[Storage] API feedback save network error:', err);
+      console.warn('[Storage] API feedback save network error, enqueuing to offline IndexedDB:', err);
+      enqueueOfflineRequest(`/api/db/reports/${reportId}/feedback`, 'PUT', feedbackPayload, getAuthHeaders()).catch(() => {});
     });
   }
 }
