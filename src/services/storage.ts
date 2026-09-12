@@ -10,9 +10,14 @@ import {
   PERSIAN_WEEK_DAYS, 
   toEnglishDigits,
   isThursday,
+  isFriday,
   isLastWorkingDayOfShamsiMonth,
-  getTehranTimeInfo
+  getTehranTimeInfo,
+  isReportSubmittedBeforeWindow,
+  isReportSubmittedPastDeadline
 } from '../utils/shamsi';
+
+export { isReportSubmittedBeforeWindow, isReportSubmittedPastDeadline };
 
 const STORAGE_KEYS = {
   USERS: 'karino_users_v2',
@@ -705,12 +710,21 @@ export function saveReport(report: DailyReport): void {
   const reports = getStoredReports();
   const existingIdx = reports.findIndex(r => r.id === report.id);
 
-  // Strict 19:00 cutoff validation for new daily reports:
-  // No report of any kind can be submitted past 19:00
+  // Strict 17:00 - 19:00 submission window validation for new daily reports:
+  // Policy rule: Reporting is strictly locked before 17:00 and past 19:00
   if (existingIdx < 0) {
     const tehranTime = getTehranTimeInfo();
-    if (tehranTime.hours >= 19) {
+    if (isFriday(report.dateShamsi)) {
+      throw new Error('امروز جمعه و تعطیل رسمی اداری است. نیازی به ثبت و ارسال گزارش روزانه وجود ندارد.');
+    }
+    if (tehranTime.totalMinutes < 17 * 60) {
+      throw new Error('پنجره ارسال گزارش عملکرد هنوز فعال نشده است. ثبت و ارسال گزارش تنها بین ساعت ۱۷:۰۰ الی ۱۹:۰۰ عصر به وقت تهران مجاز می‌باشد.');
+    }
+    if (tehranTime.totalMinutes > 19 * 60) {
       throw new Error('مهلت قانونی ارسال گزارش روزانه (ساعت ۱۹:۰۰ به وقت تهران) به پایان رسیده است و سیستم مسدود گردید. وضعیت شما به عنوان عدم ارسال گزارش ثبت شد.');
+    }
+    if (isReportSubmittedBeforeWindow(report.submittedAt)) {
+      throw new Error('گزارش‌های ثبت‌شده پیش از ساعت ۱۷:۰۰ پذیرفته نمی‌شوند.');
     }
     if (isReportSubmittedPastDeadline(report.submittedAt)) {
       throw new Error('گزارش‌های ثبت‌شده پس از ساعت ۱۹:۰۰ پذیرفته نمی‌شوند و مشمول عدم ارسال گزارش می‌گردند.');
@@ -1369,21 +1383,7 @@ export function getDirectivesForConsultant(consultantId: string, consultantCode?
   );
 }
 
-// -----------------------------------------------------------
-// Helper to strictly reject and filter out any report submitted at or after 19:00
-// Policy rule: No report (daily, weekly, monthly) can be accepted past 19:00 Tehran time.
-// -----------------------------------------------------------
-export function isReportSubmittedPastDeadline(submittedAt?: string): boolean {
-  if (!submittedAt) return false;
-  const eng = toEnglishDigits(submittedAt).trim();
-  const match = eng.match(/^(\d{1,2}):(\d{2})$/);
-  if (!match) return false;
-  const h = parseInt(match[1], 10);
-  const m = parseInt(match[2], 10);
-  // Cutoff is 19:00 sharp. Any submission with hours >= 19 (e.g. 19:00, 19:01, 19:15, 19:45, 21:00...)
-  // or after 19 is strictly late and forbidden.
-  return h > 19 || (h === 19 && m > 0);
-}
+
 
 // -----------------------------------------------------------
 // PERIODIC OVERALL REPORTS (Daily, Weekly, Monthly)
@@ -1437,10 +1437,23 @@ export function getStoredPeriodicReports(): PeriodicOverallReport[] {
 }
 
 export function savePeriodicReport(report: PeriodicOverallReport): void {
-  // Strict 19:00 cutoff validation:
-  // No report of any kind (daily, weekly, monthly) can be registered even 1 minute past 19:00
+  // Strict window validation:
+  // 1. Daily periodic reports are strictly locked before 17:00 and past 19:00
+  // 2. All periodic reports (weekly/monthly/daily) are strictly locked past 19:00
   const tehranTime = getTehranTimeInfo();
-  if (tehranTime.hours >= 19) {
+  if (report.periodType === 'daily') {
+    if (isFriday(report.dateShamsi)) {
+      throw new Error('امروز جمعه و تعطیل رسمی اداری است. ثبت گزارش دوره‌ای روزانه غیرمجاز است.');
+    }
+    if (tehranTime.totalMinutes < 17 * 60) {
+      throw new Error('پنجره ارسال گزارش روزانه هنوز فعال نشده است. موعد مجاز ثبت گزارش روزانه ۱۷:۰۰ الی ۱۹:۰۰ عصر است.');
+    }
+    if (isReportSubmittedBeforeWindow(report.submittedAt)) {
+      throw new Error('ثبت گزارش روزانه قبل از ساعت ۱۷:۰۰ پذیرفته نمی‌شود.');
+    }
+  }
+
+  if (tehranTime.totalMinutes > 19 * 60) {
     throw new Error('مهلت قانونی ارسال گزارش (ساعت ۱۹:۰۰ به وقت تهران) به پایان رسیده است و سیستم مسدود گردید. وضعیت شما به عنوان عدم ارسال گزارش ثبت شد.');
   }
 

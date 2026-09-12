@@ -22,7 +22,9 @@ import {
   shamsiToDate, 
   normalizeShamsiDate, 
   compareReportsLatestFirst,
-  formatStandardReportTitle
+  formatStandardReportTitle,
+  getDailyReportWindowStatus,
+  isFriday
 } from '../../utils/shamsi';
 import { exportAggregatedReportsToExcel, exportSingleReportToExcel, exportArchiveToExcel, printOfficialReport } from '../../utils/export';
 import { FollowUpBadge } from '../common/FollowUpBadge';
@@ -206,6 +208,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
   }, [selectedReportDetail, selectedConsultantDetail, quickFlyout]);
 
   const todayShamsiInfo = useMemo(() => getCurrentShamsiDate(), []);
+  const windowStatus = useMemo(() => getDailyReportWindowStatus(todayShamsiInfo.formatted), [todayShamsiInfo]);
 
   const handleAddDirective = (e: React.FormEvent) => {
     e.preventDefault();
@@ -473,8 +476,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
         c.guild = c.latestReport.guild;
       }
 
-      // Check if submitted OR updated today (e.g. follow-ups 2-4 submitted today)
-      c.hasSubmittedToday = c.reports.some(r => {
+      // Check if submitted OR updated today (either call report or periodic daily report)
+      const hasCallReportToday = c.reports.some(r => {
         // 1. Check if dateShamsi is today
         const rParsed = parseShamsiDate(r.dateShamsi);
         if (rParsed) {
@@ -513,6 +516,16 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
         }
         return false;
       });
+
+      // Also check if consultant submitted a periodic daily report today
+      const storedPeriodic = getStoredPeriodicReports();
+      const hasPeriodicDailyToday = storedPeriodic.some(pr => 
+        pr.periodType === 'daily' && 
+        (pr.consultantId === c.consultantId || (c.consultantCode && pr.consultantCode?.toUpperCase() === c.consultantCode.toUpperCase())) &&
+        pr.dateShamsi === todayShamsiInfo.formatted
+      );
+
+      c.hasSubmittedToday = hasCallReportToday || hasPeriodicDailyToday;
 
       return c;
     });
@@ -1103,79 +1116,136 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
         <div className="space-y-6 animate-fadeIn">
           
           {/* 1. INSTANT STATUS ALERT BANNER */}
-          <div className={`p-4 sm:p-5 rounded-3xl border transition-all shadow-sm ${
-            unsubmittedConsultants.length === 0 
-              ? 'bg-gradient-to-r from-[#D8F3DC]/70 via-[#E8F5E9]/80 to-[#D8F3DC]/70 border-[#B7E4C7] text-[#1B4332]' 
-              : 'bg-gradient-to-r from-[#FFEBEE]/80 via-[#FFF3E0]/70 to-[#FFEBEE]/80 border-[#FFCDD2] text-[#B71C1C]'
-          }`}>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-start sm:items-center gap-3">
-                <span className={`p-2.5 rounded-2xl shadow-xs shrink-0 ${
-                  unsubmittedConsultants.length === 0 ? 'bg-[#2D6A4F] text-white' : 'bg-[#D32F2F] text-white animate-pulse'
-                }`}>
-                  {unsubmittedConsultants.length === 0 ? (
-                    <CheckCircle2 className="w-5 h-5" />
-                  ) : (
-                    <AlertTriangle className="w-5 h-5" />
-                  )}
-                </span>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-black text-sm sm:text-base">
-                      {unsubmittedConsultants.length === 0
-                        ? `وضعیت انضباطی عالی: تمامی مشاوران (${toPersianDigits(consultantsAggregatedList.length)} نفر) گزارش خود را ثبت کرده‌اند`
-                        : `توجه مدیریت: ${toPersianDigits(unsubmittedConsultants.length)} مشاور هنوز گزارش خود را در بازه «${periodLabels[timePeriod].label}» ارسال نکرده‌اند`
-                      }
+          {(() => {
+            const isToday = timePeriod === 'today';
+            const isFridayToday = isToday && windowStatus.isFriday;
+            const isBeforeWindowToday = isToday && windowStatus.isBeforeSubmissionWindow;
+            const isInsideWindowToday = isToday && windowStatus.isInsideSubmissionWindow;
+            const isPastDeadlineToday = isToday && windowStatus.isPastDeadline;
+
+            let bannerStyle = 'bg-gradient-to-r from-[#D8F3DC]/70 via-[#E8F5E9]/80 to-[#D8F3DC]/70 border-[#B7E4C7] text-[#1B4332]';
+            let iconBadge = <CheckCircle2 className="w-5 h-5 text-white" />;
+            let badgeBg = 'bg-[#2D6A4F]';
+            let mainTitle = `وضعیت انضباطی عالی: تمامی مشاوران (${toPersianDigits(consultantsAggregatedList.length)} نفر) گزارش خود را ثبت کرده‌اند`;
+            let subText = `تمامی مشاوران فعال در بازه «${periodLabels[timePeriod].label}» گزارشات موظفی خود را تحویل داده‌اند.`;
+            let showWarningButton = false;
+            let warningBtnText = '⚡ شلیک تذکر رسمی به غایبین';
+
+            if (isFridayToday) {
+              bannerStyle = 'bg-gradient-to-r from-[#FAF7F2] via-[#F5EDE2] to-[#FAF7F2] border-[#DEC8B0] text-[#6F4E37]';
+              badgeBg = 'bg-[#7F4F24]';
+              iconBadge = <Clock className="w-5 h-5 text-white" />;
+              mainTitle = 'امروز جمعه و روز تعطیل اداری است';
+              subText = 'طبق ضوابط سازمانی کارینو، در روزهای جمعه الزامی برای ارسال گزارش روزانه وجود ندارد.';
+            } else if (isBeforeWindowToday) {
+              bannerStyle = 'bg-gradient-to-r from-[#EBF8FF] via-[#F0F9FF] to-[#EBF8FF] border-[#BEE3F8] text-[#2B6CB0]';
+              badgeBg = 'bg-[#2B6CB0]';
+              iconBadge = <Clock className="w-5 h-5 text-white" />;
+              mainTitle = `ساعت کاری اداری در حال اجراست (ساعت تهران: ${windowStatus.tehranTimeString})`;
+              subText = `موعد رسمی ارسال گزارش عملکرد روزانه مشاوران از ساعت ۱۷:۰۰ الی ۱۹:۰۰ عصر است. هم‌اکنون ساعت کاری عادی برقرار است و قبل از ۱۷:۰۰ هیچ مشاوری غایب محسوب نمی‌شود.`;
+              showWarningButton = false;
+            } else if (isInsideWindowToday) {
+              if (unsubmittedConsultants.length > 0) {
+                bannerStyle = 'bg-gradient-to-r from-[#FFFBEB] via-[#FEF3C7] to-[#FFFBEB] border-[#FDE68A] text-[#92400E]';
+                badgeBg = 'bg-[#D97706]';
+                iconBadge = <AlertTriangle className="w-5 h-5 text-white animate-pulse" />;
+                mainTitle = `⚡ موعد رسمی ثبت گزارش روزانه فعال است (مهلت قانونی تا ۱۹:۰۰)`;
+                subText = `${toPersianDigits(unsubmittedConsultants.length)} مشاور هنوز گزارش عملکرد امروز خود را ارسال نکرده‌اند (مهلت ارسال رأس ساعت ۱۹:۰۰ بسته می‌شود).`;
+                showWarningButton = true;
+                warningBtnText = '📢 ارسال یادآوری ثبت گزارش (تا ۱۹:۰۰)';
+              } else {
+                bannerStyle = 'bg-gradient-to-r from-[#D8F3DC]/70 via-[#E8F5E9]/80 to-[#D8F3DC]/70 border-[#B7E4C7] text-[#1B4332]';
+                badgeBg = 'bg-[#2D6A4F]';
+                iconBadge = <CheckCircle2 className="w-5 h-5 text-white" />;
+                mainTitle = '۱۰۰٪ گزارش‌های امروز در موعد قانونی دریافت شد';
+                subText = 'تمام مشاوران گزارش عملکرد امروز خود را قبل از پایان مهلت ارسال نموده‌اند.';
+              }
+            } else if (isPastDeadlineToday) {
+              if (unsubmittedConsultants.length > 0) {
+                bannerStyle = 'bg-gradient-to-r from-[#FFEBEE]/90 via-[#FFF5F5] to-[#FFEBEE]/90 border-[#FFCDD2] text-[#B71C1C]';
+                badgeBg = 'bg-[#D32F2F]';
+                iconBadge = <AlertTriangle className="w-5 h-5 text-white animate-pulse" />;
+                mainTitle = `⛔ مهلت قانونی ثبت گزارش پایان یافت (ساعت ۱۹:۰۰ به وقت تهران) • ثبت غیبت انضباطی`;
+                subText = `${toPersianDigits(unsubmittedConsultants.length)} مشاور غایب قطعی بوده و گزارش امروز را ارسال نکرده‌اند (مشمول کسر امتیاز KPI و جریمه انضباطی).`;
+                showWarningButton = true;
+                warningBtnText = '⚡ شلیک تذکر رسمی به غایبین قطعی';
+              }
+            } else if (unsubmittedConsultants.length > 0) {
+              bannerStyle = 'bg-gradient-to-r from-[#FFEBEE]/80 via-[#FFF3E0]/70 to-[#FFEBEE]/80 border-[#FFCDD2] text-[#B71C1C]';
+              badgeBg = 'bg-[#D32F2F]';
+              iconBadge = <AlertTriangle className="w-5 h-5 text-white animate-pulse" />;
+              mainTitle = `توجه مدیریت: ${toPersianDigits(unsubmittedConsultants.length)} مشاور هنوز گزارش خود را در بازه «${periodLabels[timePeriod].label}» ارسال نکرده‌اند`;
+              subText = `جهت حفظ انضباط کاری و پایش مستمر، پیگیری وضعیت مشاوران زیر ضروری است.`;
+              showWarningButton = true;
+              warningBtnText = '⚡ شلیک تذکر رسمی به غایبین';
+            }
+
+            return (
+              <div className={`p-4 sm:p-5 rounded-3xl border transition-all shadow-sm ${bannerStyle}`}>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-start sm:items-center gap-3">
+                    <span className={`p-2.5 rounded-2xl shadow-xs shrink-0 ${badgeBg}`}>
+                      {iconBadge}
                     </span>
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/70 border border-current/20">
-                      بازه {periodLabels[timePeriod].label}
-                    </span>
-                  </div>
-                  {unsubmittedConsultants.length > 0 && (
-                    <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                      <span className="text-xs font-semibold text-[#5C4033]">مشاوران فاقد گزارش:</span>
-                      {unsubmittedConsultants.map(c => (
-                        <span key={c.consultantId} className="px-2 py-0.5 rounded-xl bg-white text-[#C62828] border border-[#FFCDD2] font-bold text-[11px] shadow-2xs">
-                          {c.consultantName} ({c.consultantCode})
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-black text-sm sm:text-base">
+                          {mainTitle}
                         </span>
-                      ))}
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/70 border border-current/20">
+                          بازه {periodLabels[timePeriod].label}
+                        </span>
+                      </div>
+                      <p className="text-xs opacity-90 leading-relaxed font-medium">
+                        {subText}
+                      </p>
+                      {unsubmittedConsultants.length > 0 && !isBeforeWindowToday && !isFridayToday && (
+                        <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                          <span className="text-xs font-semibold text-[#5C4033]">مشاوران فاقد گزارش:</span>
+                          {unsubmittedConsultants.map(c => (
+                            <span key={c.consultantId} className="px-2 py-0.5 rounded-xl bg-white text-[#C62828] border border-[#FFCDD2] font-bold text-[11px] shadow-2xs">
+                              {c.consultantName} ({c.consultantCode})
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
+
+                  {/* Action Buttons inside Banner */}
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                    {showWarningButton && unsubmittedConsultants.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          unsubmittedConsultants.forEach(c => handleSendQuickWarning(c));
+                        }}
+                        className="px-3.5 py-2 rounded-2xl bg-[#D32F2F] hover:bg-[#B71C1C] text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                        title="ارسال تذکر انضباطی رسمی به تمام مشاوران غایب"
+                      >
+                        <Zap className="w-3.5 h-3.5" />
+                        <span>{warningBtnText}</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setQuickFlyout({
+                        type: 'unsubmitted',
+                        title: isBeforeWindowToday ? 'وضعیت مشاوران در ساعات کاری' : 'پایش انضباطی و وضعیت گزارشات مشاوران',
+                        subtitle: `بررسی تفکیکی وضعیت ارسال در بازه ${periodLabels[timePeriod].label}`,
+                        badgeCount: unsubmittedConsultants.length
+                      })}
+                      className="px-3.5 py-2 rounded-2xl bg-white hover:bg-[#FAF7F2] text-[#2B1810] border border-[#DEC8B0] text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-[#9C6644]" />
+                      <span>{isBeforeWindowToday ? 'وضعیت حضور مشاوران' : `نقطه‌زنی انضباطی (${toPersianDigits(unsubmittedConsultants.length)})`}</span>
+                      <ExternalLink className="w-3 h-3 text-[#8D5B4C]" />
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              {/* Action Buttons inside Banner */}
-              <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                {unsubmittedConsultants.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      unsubmittedConsultants.forEach(c => handleSendQuickWarning(c));
-                    }}
-                    className="px-3.5 py-2 rounded-2xl bg-[#D32F2F] hover:bg-[#B71C1C] text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
-                    title="ارسال همزمان تذکر انضباطی رسمی به تمام مشاوران غایب"
-                  >
-                    <Zap className="w-3.5 h-3.5" />
-                    <span>⚡ شلیک تذکر رسمی به غایبین</span>
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setQuickFlyout({
-                    type: 'unsubmitted',
-                    title: 'پایش انضباطی و وضعیت گزارشات مشاوران',
-                    subtitle: `بررسی تفکیکی وضعیت ارسال در بازه ${periodLabels[timePeriod].label}`,
-                    badgeCount: unsubmittedConsultants.length
-                  })}
-                  className="px-3.5 py-2 rounded-2xl bg-white hover:bg-[#FAF7F2] text-[#2B1810] border border-[#DEC8B0] text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
-                >
-                  <FileText className="w-3.5 h-3.5 text-[#9C6644]" />
-                  <span>نقطه‌زنی انضباطی ({toPersianDigits(unsubmittedConsultants.length)})</span>
-                  <ExternalLink className="w-3 h-3 text-[#8D5B4C]" />
-                </button>
-              </div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* 2. SYMMETRICAL 6-CARD INTERACTIVE EXECUTIVE KPI GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
@@ -1184,20 +1254,24 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
             <div 
               onClick={() => setQuickFlyout({
                 type: 'unsubmitted',
-                title: 'پایش انضباطی و وضعیت گزارشات مشاوران',
+                title: timePeriod === 'today' && windowStatus.isBeforeSubmissionWindow ? 'وضعیت مشاوران در ساعات کاری' : 'پایش انضباطی و وضعیت گزارشات مشاوران',
                 subtitle: `بررسی تفکیکی وضعیت ارسال در بازه ${periodLabels[timePeriod].label}`,
                 badgeCount: unsubmittedConsultants.length
               })}
               className={`rounded-3xl border p-4 sm:p-5 shadow-sm hover:shadow-md transition-all space-y-2 cursor-pointer group relative overflow-hidden ${
-                unsubmittedConsultants.length > 0 
-                  ? 'bg-gradient-to-b from-white to-[#FFF5F5] border-[#FFCDD2] hover:border-[#E57373]' 
-                  : 'bg-gradient-to-b from-white to-[#F9FBF9] border-[#C8E6C9] hover:border-[#81C784]'
+                timePeriod === 'today' && windowStatus.isBeforeSubmissionWindow
+                  ? 'bg-gradient-to-b from-white to-[#F0F9FF] border-[#BEE3F8] hover:border-[#90CDF4]'
+                  : unsubmittedConsultants.length > 0 
+                    ? 'bg-gradient-to-b from-white to-[#FFF5F5] border-[#FFCDD2] hover:border-[#E57373]' 
+                    : 'bg-gradient-to-b from-white to-[#F9FBF9] border-[#C8E6C9] hover:border-[#81C784]'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-[#5C4033]">انضباط و ثبت گزارش</span>
                 <span className={`p-2 rounded-2xl transition-transform group-hover:scale-110 ${
-                  unsubmittedConsultants.length > 0 ? 'bg-[#FFEBEE] text-[#C62828]' : 'bg-[#E8F5E9] text-[#2E7D32]'
+                  timePeriod === 'today' && windowStatus.isBeforeSubmissionWindow
+                    ? 'bg-[#EBF8FF] text-[#2B6CB0]'
+                    : unsubmittedConsultants.length > 0 ? 'bg-[#FFEBEE] text-[#C62828]' : 'bg-[#E8F5E9] text-[#2E7D32]'
                 }`}>
                   <FileText className="w-4 h-4" />
                 </span>
@@ -1207,10 +1281,25 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                 <span className="text-xs text-[#8D5B4C] font-semibold mr-1">از {toPersianDigits(consultantsAggregatedList.length)}</span>
               </div>
               <div className="text-[11px] font-bold truncate">
-                {unsubmittedConsultants.length > 0 ? (
+                {timePeriod === 'today' && windowStatus.isFriday ? (
+                  <span className="text-[#2E7D32] flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 shrink-0" />
+                    جمعه تعطیل اداری است
+                  </span>
+                ) : timePeriod === 'today' && windowStatus.isBeforeSubmissionWindow ? (
+                  <span className="text-[#2B6CB0] flex items-center gap-1">
+                    <Clock className="w-3 h-3 shrink-0" />
+                    ساعت کاری • موعد: ۱۷ تا ۱۹
+                  </span>
+                ) : timePeriod === 'today' && windowStatus.isInsideSubmissionWindow ? (
+                  <span className="text-[#D97706] flex items-center gap-1">
+                    <Clock className="w-3 h-3 shrink-0" />
+                    در حال دریافت • مهلت تا ۱۹:۰۰
+                  </span>
+                ) : unsubmittedConsultants.length > 0 ? (
                   <span className="text-[#C62828] flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3 shrink-0" />
-                    {toPersianDigits(unsubmittedConsultants.length)} مشاور بدون گزارش
+                    {toPersianDigits(unsubmittedConsultants.length)} مشاور غایب (بدون گزارش)
                   </span>
                 ) : (
                   <span className="text-[#2E7D32] flex items-center gap-1">
@@ -1220,7 +1309,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                 )}
               </div>
               <div className="text-[10px] text-[#9C6644] font-bold flex items-center gap-0.5 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span>مشاهده غایبین و تذکر</span>
+                <span>{timePeriod === 'today' && windowStatus.isBeforeSubmissionWindow ? 'مشاهده وضعیت مشاوران' : 'مشاهده غایبین و تذکر'}</span>
                 <ExternalLink className="w-3 h-3" />
               </div>
             </div>
@@ -3302,43 +3391,84 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                       <p className="font-bold text-sm">وضعیت انضباطی ۱۰۰٪ مطلوب است؛ هیچ مشاوری بدون گزارش نیست.</p>
                     </div>
                   ) : (
-                    unsubmittedConsultants.map((consultant) => (
-                      <div key={consultant.consultantId} className="p-4 rounded-2xl bg-[#FFF5F5] border border-[#FFCDD2] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-black text-sm shrink-0">
-                            {consultant.consultantCode}
-                          </div>
-                          <div>
-                            <h4 className="font-black text-sm text-[#2B1810]">{consultant.consultantName}</h4>
-                            <p className="text-xs text-rose-700 font-semibold mt-0.5">
-                              عدم ثبت گزارش در بازه {periodLabels[timePeriod].label}
-                            </p>
-                          </div>
-                        </div>
+                    unsubmittedConsultants.map((consultant) => {
+                      const isToday = timePeriod === 'today';
+                      const isBeforeWindow = isToday && windowStatus.isBeforeSubmissionWindow;
+                      const isInsideWindow = isToday && windowStatus.isInsideSubmissionWindow;
+                      const isPast = isToday && windowStatus.isPastDeadline;
 
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <button
-                            type="button"
-                            onClick={() => handleSendQuickWarning(consultant)}
-                            className="px-3.5 py-2 rounded-xl bg-[#D32F2F] hover:bg-[#B71C1C] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
-                          >
-                            <Zap className="w-3.5 h-3.5" />
-                            <span>⚡ ارسال تذکر انضباطی</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedConsultantDetail(consultant);
-                              setQuickFlyout(null);
-                            }}
-                            className="px-3 py-2 rounded-xl bg-white hover:bg-[#FAF7F2] text-[#5C4033] border border-[#DEC8B0] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
-                          >
-                            <span>مشاهده پرونده</span>
-                            <ChevronLeft className="w-3.5 h-3.5" />
-                          </button>
+                      return (
+                        <div 
+                          key={consultant.consultantId} 
+                          className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs ${
+                            isBeforeWindow 
+                              ? 'bg-[#F0F9FF] border-[#BEE3F8]' 
+                              : isInsideWindow
+                                ? 'bg-[#FFFBEB] border-[#FDE68A]'
+                                : 'bg-[#FFF5F5] border-[#FFCDD2]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shrink-0 ${
+                              isBeforeWindow 
+                                ? 'bg-blue-100 text-blue-700' 
+                                : isInsideWindow
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-rose-100 text-rose-700'
+                            }`}>
+                              {consultant.consultantCode}
+                            </div>
+                            <div>
+                              <h4 className="font-black text-sm text-[#2B1810]">{consultant.consultantName}</h4>
+                              <p className={`text-xs font-semibold mt-0.5 ${
+                                isBeforeWindow 
+                                  ? 'text-blue-700' 
+                                  : isInsideWindow 
+                                    ? 'text-amber-800' 
+                                    : 'text-rose-700'
+                              }`}>
+                                {isBeforeWindow 
+                                  ? `در حال فعالیت اداری • موعد ارسال: ۱۷:۰۰ الی ۱۹:۰۰` 
+                                  : isInsideWindow
+                                    ? `در موعد ارسال گزارش روزانه (مهلت تا ۱۹:۰۰)`
+                                    : isPast
+                                      ? `⛔ غیبت قطعی: مهلت ۱۹:۰۰ پایان یافت و قفل شد (مشمول کسر امتیاز)`
+                                      : `عدم ثبت گزارش در بازه ${periodLabels[timePeriod].label}`
+                                }
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {!isBeforeWindow && (
+                              <button
+                                type="button"
+                                onClick={() => handleSendQuickWarning(consultant)}
+                                className={`px-3.5 py-2 rounded-xl text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                                  isInsideWindow 
+                                    ? 'bg-[#D97706] hover:bg-[#B45309]' 
+                                    : 'bg-[#D32F2F] hover:bg-[#B71C1C]'
+                                }`}
+                              >
+                                <Zap className="w-3.5 h-3.5" />
+                                <span>{isInsideWindow ? '📢 ارسال یادآوری' : '⚡ ارسال تذکر انضباطی'}</span>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedConsultantDetail(consultant);
+                                setQuickFlyout(null);
+                              }}
+                              className="px-3 py-2 rounded-xl bg-white hover:bg-[#FAF7F2] text-[#5C4033] border border-[#DEC8B0] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                            >
+                              <span>مشاهده پرونده</span>
+                              <ChevronLeft className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               )}

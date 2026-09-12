@@ -394,6 +394,24 @@ export function isFriday(dateInput?: string | Date): boolean {
  * Returns current Tehran time components
  */
 export function getTehranTimeInfo(): { hours: number; minutes: number; totalMinutes: number; timeString: string } {
+  // Support optional testing simulation stored in session/global
+  if (typeof window !== 'undefined') {
+    const simH = window.sessionStorage?.getItem('karino_sim_hour');
+    const simM = window.sessionStorage?.getItem('karino_sim_minute');
+    if (simH !== null && simH !== undefined) {
+      const hours = parseInt(simH, 10) || 0;
+      const minutes = parseInt(simM || '0', 10) || 0;
+      const hStr = String(hours).padStart(2, '0');
+      const mStr = String(minutes).padStart(2, '0');
+      return {
+        hours,
+        minutes,
+        totalMinutes: hours * 60 + minutes,
+        timeString: `${toPersianDigits(hStr)}:${toPersianDigits(mStr)}`
+      };
+    }
+  }
+
   try {
     const tehranString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Tehran' });
     const tehranDate = new Date(tehranString);
@@ -427,33 +445,65 @@ export function getTehranTimeInfo(): { hours: number; minutes: number; totalMinu
   }
 }
 
+/**
+ * Checks if a submitted report's time is strictly before 17:00 Tehran time (< 17:00)
+ */
+export function isReportSubmittedBeforeWindow(submittedAt?: string): boolean {
+  if (!submittedAt) return false;
+  const eng = toEnglishDigits(submittedAt).trim();
+  const match = eng.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return false;
+  const h = parseInt(match[1], 10);
+  const m = parseInt(match[2], 10);
+  return (h * 60 + m) < (17 * 60);
+}
+
+/**
+ * Checks if a submitted report's time is strictly past 19:00 Tehran time (> 19:00, e.g. 19:01+)
+ */
+export function isReportSubmittedPastDeadline(submittedAt?: string): boolean {
+  if (!submittedAt) return false;
+  const eng = toEnglishDigits(submittedAt).trim();
+  const match = eng.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return false;
+  const h = parseInt(match[1], 10);
+  const m = parseInt(match[2], 10);
+  // Cutoff is 19:00 sharp. Even 1 minute past 19:00 (19:01+) is forbidden and late!
+  return (h * 60 + m) > (19 * 60);
+}
+
 export interface DailyReportWindowStatus {
   isFriday: boolean;
   isBeforeSubmissionWindow: boolean; // < 17:00 on non-Friday
   isInsideSubmissionWindow: boolean; // 17:00 - 19:00 on non-Friday
-  isPastDeadline: boolean; // >= 19:00 on non-Friday
+  isPastDeadline: boolean; // > 19:00 on non-Friday (19:01+)
   tehranTimeString: string;
   tehranHours: number;
+  tehranMinutes: number;
 }
 
 export function getDailyReportWindowStatus(dateShamsi?: string): DailyReportWindowStatus {
   const friday = isFriday(dateShamsi);
+  const tehran = getTehranTimeInfo();
   if (friday) {
-    const tehran = getTehranTimeInfo();
     return {
       isFriday: true,
       isBeforeSubmissionWindow: false,
       isInsideSubmissionWindow: false,
       isPastDeadline: false,
       tehranTimeString: tehran.timeString,
-      tehranHours: tehran.hours
+      tehranHours: tehran.hours,
+      tehranMinutes: tehran.minutes
     };
   }
 
-  const tehran = getTehranTimeInfo();
-  const isBefore = tehran.hours < 17;
-  const isInside = tehran.hours >= 17 && tehran.hours < 19;
-  const isPast = tehran.hours >= 19;
+  const totalMins = tehran.totalMinutes;
+  const startMins = 17 * 60; // 17:00:00
+  const endMins = 19 * 60;   // 19:00:00
+
+  const isBefore = totalMins < startMins;
+  const isInside = totalMins >= startMins && totalMins <= endMins;
+  const isPast = totalMins > endMins; // > 19:00 (i.e. 19:01 and beyond)
 
   return {
     isFriday: false,
@@ -461,7 +511,8 @@ export function getDailyReportWindowStatus(dateShamsi?: string): DailyReportWind
     isInsideSubmissionWindow: isInside,
     isPastDeadline: isPast,
     tehranTimeString: tehran.timeString,
-    tehranHours: tehran.hours
+    tehranHours: tehran.hours,
+    tehranMinutes: tehran.minutes
   };
 }
 

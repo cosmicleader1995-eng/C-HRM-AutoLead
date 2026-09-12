@@ -10,8 +10,10 @@ import {
   getCurrentShamsiDate, 
   getArchiveFileName, 
   isThursday, 
+  isFriday,
   isLastWorkingDayOfShamsiMonth, 
-  normalizeShamsiDate 
+  normalizeShamsiDate,
+  getTehranTimeInfo
 } from './src/utils/shamsi';
 
 dotenv.config();
@@ -816,6 +818,20 @@ app.post('/api/db/reports', async (req, res) => {
   const db = await getDB();
   const existingIdx = db.reports.findIndex((r: any) => r.id === report.id);
 
+  // Strict 17:00 - 19:00 submission window validation on server
+  if (existingIdx < 0) {
+    const tehranTime = getTehranTimeInfo();
+    if (isFriday(report.dateShamsi)) {
+      return res.status(403).json({ error: 'امروز جمعه و تعطیل رسمی اداری است. ثبت گزارش روزانه مجاز نیست.' });
+    }
+    if (tehranTime.totalMinutes < 17 * 60) {
+      return res.status(403).json({ error: 'پنجره ارسال گزارش عملکرد هنوز فعال نشده است. موعد مجاز ثبت گزارش ۱۷:۰۰ الی ۱۹:۰۰ عصر به وقت تهران است.' });
+    }
+    if (tehranTime.totalMinutes > 19 * 60) {
+      return res.status(403).json({ error: 'مهلت قانونی ارسال گزارش روزانه (ساعت ۱۹:۰۰ به وقت تهران) به پایان رسیده است و سیستم مسدود گردید.' });
+    }
+  }
+
   if (existingIdx >= 0) {
     db.reports[existingIdx] = report;
   } else {
@@ -942,6 +958,23 @@ app.post('/api/db/periodic-reports', async (req, res) => {
   const db = await getDB();
   if (!Array.isArray(db.overallReports)) db.overallReports = [];
   const idx = db.overallReports.findIndex((r: any) => r.id === report.id);
+
+  // Strict window validation on server for periodic reports
+  if (idx < 0) {
+    const tehranTime = getTehranTimeInfo();
+    if (report.periodType === 'daily') {
+      if (isFriday(report.dateShamsi)) {
+        return res.status(403).json({ error: 'امروز جمعه و تعطیل رسمی اداری است.' });
+      }
+      if (tehranTime.totalMinutes < 17 * 60) {
+        return res.status(403).json({ error: 'پنجره ارسال گزارش روزانه هنوز فعال نشده است (موعد: ۱۷:۰۰ الی ۱۹:۰۰).' });
+      }
+    }
+    if (tehranTime.totalMinutes > 19 * 60) {
+      return res.status(403).json({ error: 'مهلت قانونی ارسال گزارشات پایان یافته است (ساعت ۱۹:۰۰ به وقت تهران).' });
+    }
+  }
+
   if (idx >= 0) {
     db.overallReports[idx] = { ...db.overallReports[idx], ...report, updatedAt: new Date().toISOString() };
   } else {

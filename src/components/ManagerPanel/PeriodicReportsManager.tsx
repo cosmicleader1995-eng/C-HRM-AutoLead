@@ -133,12 +133,17 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
   // Map consultants to their periodic report status
   const consultantComplianceList = useMemo(() => {
     return consultants.map(c => {
-      // Find today's daily report
-      const dailyRep = periodicReports.find(r => 
+      // Find today's daily report (check both periodic reports and daily call reports)
+      const dailyPeriodicRep = periodicReports.find(r => 
         (r.consultantId === c.id || (c.consultantCode && r.consultantCode?.toUpperCase() === c.consultantCode.toUpperCase())) &&
         r.periodType === 'daily' &&
         r.dateShamsi === curShamsi.formatted
       );
+      const dailyCallRep = allDailyReports.find(r => 
+        (r.consultantId === c.id || (c.consultantCode && r.consultantCode?.toUpperCase() === c.consultantCode.toUpperCase())) &&
+        r.dateShamsi === curShamsi.formatted
+      );
+      const dailyRep: any = dailyPeriodicRep || dailyCallRep;
 
       // Find this week's weekly report
       const weeklyRep = periodicReports.find(r => 

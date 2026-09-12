@@ -97,6 +97,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
   // Even 1 minute past 19:00 is forbidden by organization policy.
   const isSubmissionLocked = useMemo(() => {
     if (periodType === 'daily' && windowStatus.isFriday) return true; // Friday is holiday!
+    if (periodType === 'daily' && windowStatus.isBeforeSubmissionWindow) return true; // Before 17:00 is locked!
     if (windowStatus.isPastDeadline) return true; // Past 19:00 is strictly locked for ALL reports!
     return false;
   }, [periodType, windowStatus]);
@@ -126,6 +127,10 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
     // Strict cutoff rules across all report types:
     if (periodType === 'daily' && windowStatus.isFriday) {
       alert('امروز جمعه و روز تعطیل رسمی است. نیازی به ارسال گزارش روزانه وجود ندارد.');
+      return;
+    }
+    if (periodType === 'daily' && windowStatus.isBeforeSubmissionWindow) {
+      alert('پنجره ارسال گزارش روزانه هنوز باز نشده است. موعد مجاز ثبت گزارش روزانه، صرفاً بین ساعت ۱۷:۰۰ الی ۱۹:۰۰ عصر است.');
       return;
     }
     if (windowStatus.isPastDeadline) {
@@ -596,7 +601,9 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
                   <span>
                     {windowStatus.isFriday && periodType === 'daily'
                       ? 'جمعه تعطیل رسمی است (بدون الزام گزارش)' 
-                      : 'قفل شد: مهلت قانونی (۱۹:۰۰) پایان یافت'}
+                      : windowStatus.isBeforeSubmissionWindow && periodType === 'daily'
+                        ? 'قفل اداری: موعد ارسال روزانه ۱۷:۰۰ تا ۱۹:۰۰ است'
+                        : 'قفل شد: مهلت قانونی (۱۹:۰۰) پایان یافت'}
                   </span>
                 </>
               ) : (

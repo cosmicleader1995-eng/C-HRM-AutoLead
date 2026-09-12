@@ -105,10 +105,11 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
   const [autoSavedTime, setAutoSavedTime] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Check if daily submission is locked due to Friday holiday or past 19:00
-  // Policy rule: past 19:00 Tehran time is strictly locked for all submissions
+  // Check if daily submission is locked:
+  // Policy rule: strictly locked before 17:00, past 19:00, and on Fridays
   const isDailyCallSubmissionLocked = useMemo(() => {
     if (windowStatus.isFriday) return true;
+    if (windowStatus.isBeforeSubmissionWindow) return true;
     if (windowStatus.isPastDeadline) return true;
     return false;
   }, [windowStatus]);
@@ -427,6 +428,10 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
 
     if (windowStatus.isFriday) {
       alert('امروز جمعه و روز تعطیل رسمی است. نیازی به ارسال گزارش روزانه وجود ندارد.');
+      return;
+    }
+    if (windowStatus.isBeforeSubmissionWindow) {
+      alert('پنجره ارسال گزارش عملکرد هنوز باز نشده است. موعد قانونی ثبت گزارش، صرفاً بین ساعت ۱۷:۰۰ الی ۱۹:۰۰ عصر به وقت تهران است.');
       return;
     }
     if (windowStatus.isPastDeadline) {
@@ -915,11 +920,13 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
               </div>
             </div>
           ) : windowStatus.isBeforeSubmissionWindow && !todayDailyCallReport && !editingReportId ? (
-            <div className="p-3.5 rounded-2xl bg-blue-950/40 border border-blue-500/30 text-blue-200 text-xs flex items-center gap-2.5">
-              <Clock className="w-4 h-4 text-blue-400 shrink-0" />
-              <div>
-                <span className="font-bold text-white">ساعت کاری اداری در حال اجراست (ساعت تهران: {windowStatus.tehranTimeString})</span>
-                <span className="block text-[11px] text-blue-300 mt-0.5">موعد رسمی ارسال گزارش روزانه از ساعت ۱۷:۰۰ الی ۱۹:۰۰ می‌باشد.</span>
+            <div className="p-4 rounded-2xl bg-amber-950/40 border-2 border-amber-500/50 text-amber-200 text-xs sm:text-sm flex items-start gap-3 shadow-lg">
+              <Clock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <span className="font-bold text-white block">ساعت کاری اداری در حال اجراست (ساعت فعلی تهران: {windowStatus.tehranTimeString})</span>
+                <p className="text-xs text-amber-300/90 leading-relaxed">
+                  طبق آیین‌نامه انضباطی سازمان کارینو، پنجره ثبت و ارسال گزارش عملکرد روزانه <strong>صرفاً بین ساعت ۱۷:۰۰ الی ۱۹:۰۰ عصر</strong> فعال خواهد بود. پیش از ساعت ۱۷:۰۰ امکان ثبت گزارش وجود ندارد.
+                </p>
               </div>
             </div>
           ) : null}
@@ -1269,7 +1276,13 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
                 {isDailyCallSubmissionLocked ? (
                   <>
                     <Lock className="w-4 h-4" />
-                    <span>{windowStatus.isFriday ? 'جمعه تعطیل است (بدون نیاز به گزارش)' : 'قفل شد: مهلت ثبت (۱۹:۰۰) پایان یافت'}</span>
+                    <span>
+                      {windowStatus.isFriday 
+                        ? 'جمعه تعطیل است (بدون نیاز به گزارش)' 
+                        : windowStatus.isBeforeSubmissionWindow
+                          ? 'قفل اداری: موعد ارسال ساعت ۱۷:۰۰ تا ۱۹:۰۰ است'
+                          : 'قفل شد: پایان مهلت قانونی (۱۹:۰۰)'}
+                    </span>
                   </>
                 ) : (
                   <>
