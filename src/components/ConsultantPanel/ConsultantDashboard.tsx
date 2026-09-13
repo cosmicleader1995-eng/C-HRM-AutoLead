@@ -1213,12 +1213,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <button
                 type="submit"
-                disabled={completionPercentage < 100}
-                className={`w-full sm:w-auto px-8 py-3 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl transition-all ${
-                  completionPercentage === 100
-                    ? 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-amber-500/30 cursor-pointer hover:scale-105'
-                    : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-60 border border-slate-700'
-                }`}
+                className="w-full sm:w-auto px-8 py-3 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-amber-500/30 cursor-pointer hover:scale-105 transition-all"
               >
                 <Send className="w-4 h-4" />
                 <span>{editingReportId ? 'ذخیره تغییرات و تکمیل گزارش' : 'ثبت نهایی و ارسال به سرپرست'}</span>
