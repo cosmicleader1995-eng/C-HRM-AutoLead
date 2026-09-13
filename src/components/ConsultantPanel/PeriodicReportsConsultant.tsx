@@ -581,7 +581,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
           </div>
 
           {/* Submit Button */}
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 pb-4 px-1">
             <span className="text-xs text-slate-400">
               * این گزارش بلافاصله در داشبورد نظارتی سرپرست و ماتریس انضباطی منعکس می‌گردد.
             </span>
@@ -589,10 +589,10 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
             <button
               type="submit"
               disabled={isSubmissionLocked}
-              className={`px-8 py-3.5 rounded-2xl font-black text-sm flex items-center gap-2 transition-all ${
+              className={`px-8 py-3.5 rounded-2xl font-black text-sm flex items-center gap-2 transition-all duration-200 shrink-0 ${
                 isSubmissionLocked
                   ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700 opacity-60'
-                  : 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-xl shadow-amber-500/25 cursor-pointer hover:scale-105'
+                  : 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-xl shadow-amber-500/25 cursor-pointer hover:shadow-2xl hover:shadow-amber-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]'
               }`}
             >
               {isSubmissionLocked ? (

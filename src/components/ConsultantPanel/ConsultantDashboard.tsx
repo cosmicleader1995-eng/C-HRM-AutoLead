@@ -1205,15 +1205,15 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
           </div>
 
           {/* Action Buttons Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 pb-4 px-1">
             <div className="text-xs text-slate-400">
               * پس از ثبت، گزارش در پنل نظارتی سرپرست جهت بررسی، امتیازدهی و آرشیو قرار می‌گیرد.
             </div>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
               <button
                 type="submit"
-                className="w-full sm:w-auto px-8 py-3 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-amber-500/30 cursor-pointer hover:scale-105 transition-all"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-amber-500/25 cursor-pointer hover:shadow-2xl hover:shadow-amber-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200"
               >
                 <Send className="w-4 h-4" />
                 <span>{editingReportId ? 'ذخیره تغییرات و تکمیل گزارش' : 'ثبت نهایی و ارسال به سرپرست'}</span>
