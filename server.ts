@@ -486,11 +486,14 @@ function mergeServerDBs(local: DatabaseSchema, remote: DatabaseSchema): Database
         }
       }
 
+      const newerUser = existingTime >= remoteTime ? existing : u;
+      const olderUser = existingTime >= remoteTime ? u : existing;
+
       userMap.set(key, {
-        ...existing,
-        ...u,
+        ...olderUser,
+        ...newerUser,
         password: effectivePassword,
-        updatedAt: remoteTime >= existingTime ? (u.updatedAt || existing.updatedAt) : existing.updatedAt
+        updatedAt: newerUser.updatedAt || olderUser.updatedAt
       });
     } else {
       userMap.set(key, { ...u });
