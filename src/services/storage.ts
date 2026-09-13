@@ -758,27 +758,6 @@ export function saveReport(report: DailyReport): void {
   const reports = getStoredReports();
   const existingIdx = reports.findIndex(r => r.id === report.id);
 
-  // Strict 17:00 - 19:00 submission window validation for new daily reports:
-  // Policy rule: Reporting is strictly locked before 17:00 and past 19:00
-  if (existingIdx < 0) {
-    const tehranTime = getTehranTimeInfo();
-    if (isFriday(report.dateShamsi)) {
-      throw new Error('امروز جمعه و تعطیل رسمی اداری است. نیازی به ثبت و ارسال گزارش روزانه وجود ندارد.');
-    }
-    if (tehranTime.totalMinutes < 17 * 60) {
-      throw new Error('پنجره ارسال گزارش عملکرد هنوز فعال نشده است. ثبت و ارسال گزارش تنها بین ساعت ۱۷:۰۰ الی ۱۹:۰۰ عصر به وقت تهران مجاز می‌باشد.');
-    }
-    if (tehranTime.totalMinutes > 19 * 60) {
-      throw new Error('مهلت قانونی ارسال گزارش روزانه (ساعت ۱۹:۰۰ به وقت تهران) به پایان رسیده است و سیستم مسدود گردید. وضعیت شما به عنوان عدم ارسال گزارش ثبت شد.');
-    }
-    if (isReportSubmittedBeforeWindow(report.submittedAt)) {
-      throw new Error('گزارش‌های ثبت‌شده پیش از ساعت ۱۷:۰۰ پذیرفته نمی‌شوند.');
-    }
-    if (isReportSubmittedPastDeadline(report.submittedAt)) {
-      throw new Error('گزارش‌های ثبت‌شده پس از ساعت ۱۹:۰۰ پذیرفته نمی‌شوند و مشمول عدم ارسال گزارش می‌گردند.');
-    }
-  }
-
   // Normalize row follow-up dates into Shamsi
   const normalizedRows: ReportRow[] = (report.rows || []).map(row => {
     const r = { ...row };

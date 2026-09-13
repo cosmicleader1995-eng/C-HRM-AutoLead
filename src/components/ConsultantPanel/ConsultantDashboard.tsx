@@ -104,15 +104,6 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
   const [personalOpinion, setPersonalOpinion] = useState('');
   const [autoSavedTime, setAutoSavedTime] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-
-  // Check if daily submission is locked:
-  // Policy rule: strictly locked before 17:00, past 19:00, and on Fridays
-  const isDailyCallSubmissionLocked = useMemo(() => {
-    if (windowStatus.isFriday) return true;
-    if (windowStatus.isBeforeSubmissionWindow) return true;
-    if (windowStatus.isPastDeadline) return true;
-    return false;
-  }, [windowStatus]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [customConcernInput, setCustomConcernInput] = useState<{ [rowId: string]: string }>({});
 
@@ -425,19 +416,6 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
   // Submit new or edited report
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (windowStatus.isFriday) {
-      alert('امروز جمعه و روز تعطیل رسمی است. نیازی به ارسال گزارش روزانه وجود ندارد.');
-      return;
-    }
-    if (windowStatus.isBeforeSubmissionWindow) {
-      alert('پنجره ارسال گزارش عملکرد هنوز باز نشده است. موعد قانونی ثبت گزارش، صرفاً بین ساعت ۱۷:۰۰ الی ۱۹:۰۰ عصر به وقت تهران است.');
-      return;
-    }
-    if (windowStatus.isPastDeadline) {
-      alert('مهلت قانونی ارسال گزارش عملکرد (ساعت ۱۹:۰۰ به وقت تهران) به پایان رسیده است و سیستم مسدود گردید. امکان ثبت گزارش وجود ندارد و برای شما وضعیت عدم ارسال گزارش در KPI ثبت شد.');
-      return;
-    }
 
     const errors = checkCompleteness();
     if (errors.length > 0) {
@@ -887,49 +865,18 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
             </div>
           </div>
 
-          {/* Daily Report Window Status Banner */}
-          {windowStatus.isFriday ? (
-            <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs sm:text-sm flex items-center gap-3">
-              <Clock className="w-6 h-6 text-amber-400 shrink-0" />
-              <div>
-                <span className="font-bold block text-sm text-white">امروز جمعه است (تعطیل رسمی اداری)</span>
-                <span>طبق قوانین سازمانی، روزهای جمعه تعطیل رسمی بوده و نیازی به ثبت و ارسال فرم گزارش روزانه وجود ندارد.</span>
-              </div>
+          {/* Live Call Registration Status Banner */}
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-[#081525] border border-emerald-500/30 text-xs sm:text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+              <span className="font-bold text-white">ثبت و پایش لحظه‌ای تماس‌ها و پیگیری‌ها فعال است</span>
+              <span className="text-slate-400 text-xs hidden md:inline">| ثبت گام به گام در طول ساعات کاری بدون محدودیت زمانی</span>
             </div>
-          ) : windowStatus.isPastDeadline && !todayDailyCallReport && !editingReportId ? (
-            <div className="p-5 rounded-2xl bg-rose-950/70 border-2 border-rose-500 text-rose-200 text-xs sm:text-sm flex items-start gap-3 shadow-xl animate-fadeIn">
-              <AlertOctagon className="w-6 h-6 text-rose-400 shrink-0 mt-0.5 animate-pulse" />
-              <div className="space-y-1.5 leading-relaxed">
-                <span className="font-black block text-sm sm:text-base text-rose-300">
-                  ⛔ قفل اداری: پایان مهلت قانونی ثبت گزارش روزانه (ساعت ۱۹:۰۰ به وقت تهران)
-                </span>
-                <p>
-                  همکار گرامی، طبق آیین‌نامه انضباطی سازمان، حداکثر مهلت ثبت گزارش روزانه تا ساعت ۱۹:۰۰ عصر بوده است. هم‌اکنون ساعت <strong>{windowStatus.tehranTimeString}</strong> به وقت تهران می‌باشد و دسترسی ثبت گزارش برای امروز قفل گردید.
-                </p>
-                <p className="text-xs text-rose-300 font-bold bg-rose-900/60 p-2.5 rounded-xl border border-rose-700/60">
-                  عدم ارسال گزارش در سیستم پایش KPI سرپرست به عنوان کسر امتیاز و جریمه انضباطی ثبت گردید. در صورت داشتن هماهنگی قبلی یا عذر موجه، با سرپرست تماس بگیرید.
-                </p>
-              </div>
+            <div className="text-emerald-300 font-mono text-xs flex items-center gap-1.5 bg-emerald-950/40 px-3 py-1 rounded-xl border border-emerald-500/20">
+              <Clock className="w-3.5 h-3.5 text-emerald-400" />
+              <span>زمان فعلی: {windowStatus.tehranTimeString}</span>
             </div>
-          ) : windowStatus.isInsideSubmissionWindow && !todayDailyCallReport && !editingReportId ? (
-            <div className="p-4 rounded-2xl bg-amber-500/20 border-2 border-amber-500 text-amber-200 text-xs sm:text-sm flex items-center gap-3 animate-pulse">
-              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
-              <div>
-                <span className="font-black block text-sm text-white">⚡ موعد رسمی ارسال گزارش روزانه فعال است (مهلت تا ۱۹:۰۰)</span>
-                <span>ساعت کاری رسمی خاتمه یافته است (ساعت تهران: {windowStatus.tehranTimeString}). لطفاً قبل از ساعت ۱۹:۰۰ گزارش خود را ارسال فرمایید؛ رأس ساعت ۱۹ سامانه قفل خواهد شد.</span>
-              </div>
-            </div>
-          ) : windowStatus.isBeforeSubmissionWindow && !todayDailyCallReport && !editingReportId ? (
-            <div className="p-4 rounded-2xl bg-amber-950/40 border-2 border-amber-500/50 text-amber-200 text-xs sm:text-sm flex items-start gap-3 shadow-lg">
-              <Clock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <span className="font-bold text-white block">ساعت کاری اداری در حال اجراست (ساعت فعلی تهران: {windowStatus.tehranTimeString})</span>
-                <p className="text-xs text-amber-300/90 leading-relaxed">
-                  طبق آیین‌نامه انضباطی سازمان، پنجره ثبت و ارسال گزارش عملکرد روزانه <strong>صرفاً بین ساعت ۱۷:۰۰ الی ۱۹:۰۰ عصر</strong> فعال خواهد بود. پیش از ساعت ۱۷:۰۰ امکان ثبت گزارش وجود ندارد.
-                </p>
-              </div>
-            </div>
-          ) : null}
+          </div>
 
           {/* Standard 5 Symbols Guide */}
           <div className="bg-[#081525]/90 border border-slate-800 rounded-2xl p-4 space-y-2">
@@ -1266,30 +1213,15 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <button
                 type="submit"
-                disabled={completionPercentage < 100 || isDailyCallSubmissionLocked}
+                disabled={completionPercentage < 100}
                 className={`w-full sm:w-auto px-8 py-3 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl transition-all ${
-                  completionPercentage === 100 && !isDailyCallSubmissionLocked
+                  completionPercentage === 100
                     ? 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-amber-500/30 cursor-pointer hover:scale-105'
                     : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-60 border border-slate-700'
                 }`}
               >
-                {isDailyCallSubmissionLocked ? (
-                  <>
-                    <Lock className="w-4 h-4" />
-                    <span>
-                      {windowStatus.isFriday 
-                        ? 'جمعه تعطیل است (بدون نیاز به گزارش)' 
-                        : windowStatus.isBeforeSubmissionWindow
-                          ? 'قفل اداری: موعد ارسال ساعت ۱۷:۰۰ تا ۱۹:۰۰ است'
-                          : 'قفل شد: پایان مهلت قانونی (۱۹:۰۰)'}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>{editingReportId ? 'ذخیره تغییرات و تکمیل گزارش' : 'ثبت نهایی و ارسال به سرپرست'}</span>
-                  </>
-                )}
+                <Send className="w-4 h-4" />
+                <span>{editingReportId ? 'ذخیره تغییرات و تکمیل گزارش' : 'ثبت نهایی و ارسال به سرپرست'}</span>
               </button>
             </div>
           </div>
