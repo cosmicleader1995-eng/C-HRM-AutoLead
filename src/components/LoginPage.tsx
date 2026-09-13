@@ -307,42 +307,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 )}
               </button>
 
-              {/* Test Accounts Quick Select */}
-              <div className="pt-2 border-t border-slate-800/80 space-y-1.5">
-                <span className="text-[10px] text-slate-400 font-bold block text-center">
-                  دسترسی سریع به حساب‌های تستی مشاورین:
-                </span>
-                <div className="grid grid-cols-2 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => { setCUsername('rezaei'); setCPassword('1234'); }}
-                    className="px-2 py-1.5 bg-[#0d1f35] hover:bg-[#132c4b] border border-amber-500/20 rounded-lg text-[11px] text-amber-200 text-right transition-colors"
-                  >
-                    علیرضا رضایی (C-101)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setCUsername('mohammadi'); setCPassword('1234'); }}
-                    className="px-2 py-1.5 bg-[#0d1f35] hover:bg-[#132c4b] border border-amber-500/20 rounded-lg text-[11px] text-amber-200 text-right transition-colors"
-                  >
-                    مریم محمدی (C-102)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setCUsername('hosseini'); setCPassword('1234'); }}
-                    className="px-2 py-1.5 bg-[#0d1f35] hover:bg-[#132c4b] border border-amber-500/20 rounded-lg text-[11px] text-amber-200 text-right transition-colors"
-                  >
-                    سعید حسینی (C-103)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setCUsername('karimi'); setCPassword('1234'); }}
-                    className="px-2 py-1.5 bg-[#0d1f35] hover:bg-[#132c4b] border border-amber-500/20 rounded-lg text-[11px] text-amber-200 text-right transition-colors"
-                  >
-                    ندا کریمی (C-104)
-                  </button>
-                </div>
-              </div>
+
 
               <div className="pt-1 text-center">
                 <button
@@ -403,15 +368,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 )}
               </button>
 
-              <div className="pt-2 text-center">
-                <button
-                  type="button"
-                  onClick={() => setMPassword('karino2026')}
-                  className="text-[11px] text-purple-300 hover:text-purple-200 bg-purple-950/60 hover:bg-purple-900/60 border border-purple-500/30 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                >
-                  تکمیل خودکار کلمه عبور پیش‌فرض (karino2026)
-                </button>
-              </div>
+
             </form>
           )}
 
@@ -462,15 +419,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 )}
               </button>
 
-              <div className="pt-2 text-center">
-                <button
-                  type="button"
-                  onClick={() => setItPassword('it2026')}
-                  className="text-[11px] text-blue-300 hover:text-blue-200 bg-blue-950/60 hover:bg-blue-900/60 border border-blue-500/30 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                >
-                  تکمیل خودکار کلمه عبور پیش‌فرض (it2026)
-                </button>
-              </div>
+
             </form>
           )}
 
