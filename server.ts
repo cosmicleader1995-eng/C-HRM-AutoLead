@@ -198,9 +198,31 @@ const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 const DB_BACKUP_FILE = path.join(DATA_DIR, 'db_backup.json');
 
-// Supabase Cloud Persistent Database Configuration
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://xwjodiszshqitcjanamo.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_KEY || 'sb_publishable_c4UXK09vyRD-MrO0Uk-rcQ_Ln7NylKN';
+// Supabase Cloud Persistent Database Configuration with Intelligent Placeholder Detection
+const DEFAULT_REAL_SUPABASE_URL = 'https://xwjodiszshqitcjanamo.supabase.co';
+const DEFAULT_REAL_SUPABASE_KEY = 'sb_publishable_c4UXK09vyRD-MrO0Uk-rcQ_Ln7NylKN';
+
+function resolveSupabaseCredentials(): { url: string; key: string } {
+  const envUrl = process.env.SUPABASE_URL?.trim();
+  const envKey = process.env.SUPABASE_KEY?.trim();
+
+  const isInvalidUrl = !envUrl || 
+    envUrl.includes('your-project') || 
+    envUrl.includes('example.com') || 
+    !envUrl.startsWith('http');
+
+  const isInvalidKey = !envKey || 
+    envKey.includes('your-supabase') || 
+    envKey.includes('placeholder') || 
+    envKey.length < 10;
+
+  return {
+    url: isInvalidUrl ? DEFAULT_REAL_SUPABASE_URL : envUrl,
+    key: isInvalidKey ? DEFAULT_REAL_SUPABASE_KEY : envKey
+  };
+}
+
+const { url: SUPABASE_URL, key: SUPABASE_KEY } = resolveSupabaseCredentials();
 
 // Default initial datasets
 const DEFAULT_SERVER_USERS = [

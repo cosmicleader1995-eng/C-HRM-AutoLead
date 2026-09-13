@@ -1,6 +1,6 @@
 {
   "version": "2.5",
-  "lastUpdated": "2026-09-13T13:06:49.658Z",
+  "lastUpdated": "2026-09-13T13:19:09.202Z",
   "users": [
     {
       "id": "user-ceo",
@@ -8,10 +8,10 @@
       "phone": "09120000000",
       "branch": "دفتر مرکزی کارینو",
       "fullName": "مدیریت کارینو (CEO)",
-      "username": "ceo",
-      "consultantCode": "KARINO-CEO",
       "password": "$2b$10$y/q9w.0cwCF/On1kk2LLS.MA.Ij/WGfWZ4kRbEUR40bd1kS638kR6",
-      "updatedAt": "2026-09-13T12:52:26.916Z"
+      "username": "ceo",
+      "updatedAt": "2026-09-13T12:52:26.916Z",
+      "consultantCode": "KARINO-CEO"
     },
     {
       "id": "user-it",
@@ -19,10 +19,10 @@
       "phone": "09120000001",
       "branch": "واحد فناوری اطلاعات",
       "fullName": "مدیر فاوا و فناوری اطلاعات",
-      "username": "it_admin",
-      "consultantCode": "KARINO-IT",
       "password": "$2b$10$mLfus36TEBeaKYzHPD5IEeq3ERd9zs6nc3vcKtyZCJ6zc6IOjGhL.",
-      "updatedAt": "2026-09-13T12:52:26.924Z"
+      "username": "it_admin",
+      "updatedAt": "2026-09-13T12:52:26.924Z",
+      "consultantCode": "KARINO-IT"
     },
     {
       "id": "user-c101",
@@ -30,10 +30,10 @@
       "phone": "09151112233",
       "branch": "تیم اجرایی مشهد",
       "fullName": "علیرضا رضایی",
-      "username": "rezaei",
-      "consultantCode": "C-101",
       "password": "$2b$10$7SsBkjowkYm9psJ6ycm.Des1zS1UyTO5mp9JKxTkhBLEU2HMFm7oS",
-      "updatedAt": "2026-09-13T12:52:26.924Z"
+      "username": "rezaei",
+      "updatedAt": "2026-09-13T12:52:26.924Z",
+      "consultantCode": "C-101"
     },
     {
       "id": "user-c102",
@@ -41,10 +41,10 @@
       "phone": "09152223344",
       "branch": "تیم اجرایی مشهد",
       "fullName": "مریم محمدی",
-      "username": "mohammadi",
-      "consultantCode": "C-102",
       "password": "$2b$10$pYWDKzOucZiaf3Om.MlpG.jM6eh/PWO9phaV3J91hSCFCii6/rHym",
-      "updatedAt": "2026-09-13T12:52:26.924Z"
+      "username": "mohammadi",
+      "updatedAt": "2026-09-13T12:52:26.924Z",
+      "consultantCode": "C-102"
     },
     {
       "id": "user-c103",
@@ -52,10 +52,10 @@
       "phone": "09123334455",
       "branch": "تیم اجرایی تهران",
       "fullName": "سعید حسینی",
-      "username": "hosseini",
-      "consultantCode": "C-103",
       "password": "$2b$10$P26A0mTisc9vSbmFq6Mjn.u05BI4N/6cwG74V5.7uDYnKrXWCrS.6",
-      "updatedAt": "2026-09-13T12:52:26.924Z"
+      "username": "hosseini",
+      "updatedAt": "2026-09-13T12:52:26.924Z",
+      "consultantCode": "C-103"
     },
     {
       "id": "user-c104",
@@ -63,10 +63,10 @@
       "phone": "09154445566",
       "branch": "تیم اجرایی مشهد",
       "fullName": "ندا کریمی",
-      "username": "karimi",
-      "consultantCode": "C-104",
       "password": "$2b$10$SiRpskWeeD765H0sVVQQR.TaxOXJzPtnN0oTv6rmCnCCWnoHOd.he",
-      "updatedAt": "2026-09-13T12:52:26.924Z"
+      "username": "karimi",
+      "updatedAt": "2026-09-13T12:52:26.924Z",
+      "consultantCode": "C-104"
     },
     {
       "id": "user-1788870728032",
@@ -74,10 +74,10 @@
       "phone": "",
       "branch": "تیم اجرایی مشهد",
       "fullName": "علی زارع",
-      "username": "a.z",
-      "consultantCode": "110",
       "password": "$2b$10$bxzwg5JwUFc2HCG8aYVe5uGFW8D2JBzhy4g3oeHtLU5VewRxXeOoG",
-      "updatedAt": "2026-09-13T12:52:26.924Z"
+      "username": "a.z",
+      "updatedAt": "2026-09-13T12:52:26.924Z",
+      "consultantCode": "110"
     },
     {
       "id": "user-1788870918188",
@@ -85,10 +85,10 @@
       "phone": "",
       "branch": "تیم اجرایی مشهد",
       "fullName": "اصغر",
-      "username": "asghar",
-      "consultantCode": "897",
       "password": "$2b$10$s7Yod4t7OWY1pMGr04W8ieufZBNkrOA/LXbLc40TM5.V1mehIEWyy",
-      "updatedAt": "2026-09-13T12:52:26.924Z"
+      "username": "asghar",
+      "updatedAt": "2026-09-13T12:52:26.924Z",
+      "consultantCode": "897"
     }
   ],
   "reports": [
@@ -146,9 +146,9 @@
           "followUpResult": "✓ (جلسه حضوری ست شد)",
           "personnelCount": 48,
           "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
-          "followUp1DateShamsi": "1405/06/21",
-          "followUp2DateShamsi": "1405/06/21",
-          "followUp3DateShamsi": "1405/06/21"
+          "followUp1DateShamsi": "1405/06/22",
+          "followUp2DateShamsi": "1405/06/22",
+          "followUp3DateShamsi": "1405/06/22"
         },
         {
           "id": "row-c101-today-2",
@@ -166,7 +166,7 @@
           "followUpResult": ". (در انتظار تماس مجدد)",
           "personnelCount": 14,
           "employerConcern": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی",
-          "followUp1DateShamsi": "1405/06/21"
+          "followUp1DateShamsi": "1405/06/22"
         },
         {
           "id": "row-c101-today-3",
@@ -184,7 +184,7 @@
           "followUpResult": "- (اعلام عدم نیاز فعلی)",
           "personnelCount": 9,
           "employerConcern": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)",
-          "followUp1DateShamsi": "1405/06/21"
+          "followUp1DateShamsi": "1405/06/22"
         },
         {
           "id": "row-c101-today-4",
@@ -284,16 +284,16 @@
       ],
       "guild": "تولیدی قطعات خودرو و ریخته‌گری",
       "status": "approved",
-      "createdAt": "2026-09-12T12:22:40.435Z",
-      "updatedAt": "2026-09-12T12:22:40.435Z",
-      "dateShamsi": "1405/06/21",
-      "reviewedAt": "2026-09-12T12:22:40.435Z",
+      "createdAt": "2026-09-13T13:04:22.407Z",
+      "updatedAt": "2026-09-13T13:04:22.407Z",
+      "dateShamsi": "1405/06/22",
+      "reviewedAt": "2026-09-13T13:04:22.407Z",
       "submittedAt": "۱۴:۳۰",
       "consultantId": "user-c101",
       "managerRating": 5,
       "consultantCode": "C-101",
       "consultantName": "علیرضا رضایی",
-      "dayOfWeekShamsi": "شنبه",
+      "dayOfWeekShamsi": "یکشنبه",
       "managerFeedback": "عملکرد بسیار عالی در برقراری ارتباط با صنایع ریخته‌گری توس فولاد. جلسه حضوری به خوبی هماهنگ شد.",
       "personalOpinion": "به دلیل افزایش نظارت و بازرسی‌های تأمین اجتماعی، کارفرمایان این صنف استقبال چشمگیری از خدمات بازبینی قراردادها و تراز مالی دارند."
     },
@@ -352,9 +352,9 @@
           "followUpResult": "✓ (جلسه آنلاین با هم‌بنیان‌گذار ست شد)",
           "personnelCount": 36,
           "employerConcern": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری",
-          "followUp1DateShamsi": "1405/06/21",
-          "followUp2DateShamsi": "1405/06/21",
-          "followUp3DateShamsi": "1405/06/21"
+          "followUp1DateShamsi": "1405/06/22",
+          "followUp2DateShamsi": "1405/06/22",
+          "followUp3DateShamsi": "1405/06/22"
         },
         {
           "id": "row-c102-today-1",
@@ -472,16 +472,16 @@
       ],
       "guild": "فناوری اطلاعات و تجارت الکترونیک",
       "status": "approved",
-      "createdAt": "2026-09-12T12:22:40.435Z",
-      "updatedAt": "2026-09-12T12:22:40.435Z",
-      "dateShamsi": "1405/06/21",
-      "reviewedAt": "2026-09-12T12:22:40.435Z",
+      "createdAt": "2026-09-13T13:04:22.407Z",
+      "updatedAt": "2026-09-13T13:04:22.407Z",
+      "dateShamsi": "1405/06/22",
+      "reviewedAt": "2026-09-13T13:04:22.407Z",
       "submittedAt": "۱۳:۱۵",
       "consultantId": "user-c102",
       "managerRating": 5,
       "consultantCode": "C-102",
       "consultantName": "مریم محمدی",
-      "dayOfWeekShamsi": "شنبه",
+      "dayOfWeekShamsi": "یکشنبه",
       "managerFeedback": "جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.",
       "personalOpinion": "شرکت‌های نرم‌افزاری به شدت نگران حفظ محرمانگی کدها و ترک ناگهانی برنامه‌نویسان ارشد هستند."
     },
@@ -1049,19 +1049,19 @@
           "followUpResult": "",
           "personnelCount": 22,
           "employerConcern": "ریسک‌های مالیاتی و حسابداری مرتبط با حقوق و دستمزد",
-          "followUp1DateShamsi": "1405/06/17"
+          "followUp1DateShamsi": "1405/06/18"
         }
       ],
       "guild": "صنعتی و مهندسی دقیق",
       "status": "submitted",
-      "createdAt": "2026-09-08T12:22:40.435Z",
-      "updatedAt": "2026-09-08T12:22:40.435Z",
-      "dateShamsi": "1405/06/17",
+      "createdAt": "2026-09-09T13:04:22.407Z",
+      "updatedAt": "2026-09-09T13:04:22.407Z",
+      "dateShamsi": "1405/06/18",
       "submittedAt": "۱۱:۴۰",
       "consultantId": "user-c101",
       "consultantCode": "C-101",
       "consultantName": "علیرضا رضایی",
-      "dayOfWeekShamsi": "سه‌شنبه",
+      "dayOfWeekShamsi": "چهارشنبه",
       "managerFeedback": "",
       "personalOpinion": "استقبال مدیرعامل در جلسه نخست امیدوارکننده بود."
     },
@@ -1084,21 +1084,21 @@
           "followUpResult": "",
           "personnelCount": 35,
           "employerConcern": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی",
-          "followUp1DateShamsi": "1405/06/15"
+          "followUp1DateShamsi": "1405/06/16"
         }
       ],
       "guild": "ماشین‌سازی و قطعه‌سازی خودرو",
       "status": "approved",
-      "createdAt": "2026-09-06T12:22:40.435Z",
-      "updatedAt": "2026-09-06T12:22:40.435Z",
-      "dateShamsi": "1405/06/15",
-      "reviewedAt": "2026-09-06T12:22:40.435Z",
+      "createdAt": "2026-09-07T13:04:22.407Z",
+      "updatedAt": "2026-09-07T13:04:22.407Z",
+      "dateShamsi": "1405/06/16",
+      "reviewedAt": "2026-09-07T13:04:22.407Z",
       "submittedAt": "۱۶:۱۵",
       "consultantId": "user-c101",
       "managerRating": 4,
       "consultantCode": "C-101",
       "consultantName": "علیرضا رضایی",
-      "dayOfWeekShamsi": "یکشنبه",
+      "dayOfWeekShamsi": "دوشنبه",
       "managerFeedback": "پرونده کارفرما احمدی را سریعاً تماس گرفته و تعیین تکلیف نمایید.",
       "personalOpinion": "کارفرمایان این گروه به دلیل چالش تضامین و قراردادهای کارگری نیازمند پیگیری منظم هستند."
     },
@@ -1118,27 +1118,27 @@
           "clientName": "کارفرما نوری (تولیدی قطعات آسانسور پارس نوری)",
           "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
           "activityField": "تولید درب و کابین آسانسور",
-          "followUp1Date": "2026-09-04T12:22:40.435Z",
-          "followUp2Date": "2026-09-08T12:22:40.435Z",
+          "followUp1Date": "2026-09-05T13:04:22.407Z",
+          "followUp2Date": "2026-09-09T13:04:22.407Z",
           "followUpResult": "",
           "personnelCount": 31,
           "employerConcern": "حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی",
-          "followUp1DateShamsi": "1405/06/13",
-          "followUp2DateShamsi": "1405/06/17"
+          "followUp1DateShamsi": "1405/06/14",
+          "followUp2DateShamsi": "1405/06/18"
         }
       ],
       "guild": "تولید تجهیزات بالابری و صنعتی",
       "status": "approved",
-      "createdAt": "2026-09-04T12:22:40.435Z",
-      "updatedAt": "2026-09-04T12:22:40.435Z",
-      "dateShamsi": "1405/06/13",
-      "reviewedAt": "2026-09-04T12:22:40.435Z",
+      "createdAt": "2026-09-05T13:04:22.407Z",
+      "updatedAt": "2026-09-05T13:04:22.407Z",
+      "dateShamsi": "1405/06/14",
+      "reviewedAt": "2026-09-05T13:04:22.407Z",
       "submittedAt": "۱۷:۲۰",
       "consultantId": "user-c101",
       "managerRating": 5,
       "consultantCode": "C-101",
       "consultantName": "علیرضا رضایی",
-      "dayOfWeekShamsi": "جمعه",
+      "dayOfWeekShamsi": "شنبه",
       "managerFeedback": "این پرونده شانس بالایی برای تبدیل به قرارداد سالانه دارد.",
       "personalOpinion": "نیاز جدی به استقرار نظام ایمنی و مسئولیت مدنی کارفرما دارند."
     },
@@ -1158,27 +1158,27 @@
           "clientName": "کارفرما رضایی (صنایع بسته‌بندی آرین نگین)",
           "meetingTopic": "تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی",
           "activityField": "تولید جعبه‌های دارویی و صادراتی",
-          "followUp1Date": "2026-09-03T12:22:40.435Z",
-          "followUp2Date": "2026-09-07T12:22:40.435Z",
+          "followUp1Date": "2026-09-04T13:04:22.407Z",
+          "followUp2Date": "2026-09-08T13:04:22.407Z",
           "followUpResult": "",
           "personnelCount": 52,
           "employerConcern": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری",
-          "followUp1DateShamsi": "1405/06/12",
-          "followUp2DateShamsi": "1405/06/16"
+          "followUp1DateShamsi": "1405/06/13",
+          "followUp2DateShamsi": "1405/06/17"
         }
       ],
       "guild": "صنایع چاپ و بسته‌بندی صادراتی",
       "status": "approved",
-      "createdAt": "2026-09-03T12:22:40.435Z",
-      "updatedAt": "2026-09-03T12:22:40.435Z",
-      "dateShamsi": "1405/06/12",
-      "reviewedAt": "2026-09-03T12:22:40.435Z",
+      "createdAt": "2026-09-04T13:04:22.407Z",
+      "updatedAt": "2026-09-04T13:04:22.407Z",
+      "dateShamsi": "1405/06/13",
+      "reviewedAt": "2026-09-04T13:04:22.407Z",
       "submittedAt": "۱۵:۰۰",
       "consultantId": "user-c101",
       "managerRating": 5,
       "consultantCode": "C-101",
       "consultantName": "علیرضا رضایی",
-      "dayOfWeekShamsi": "پنج‌شنبه",
+      "dayOfWeekShamsi": "جمعه",
       "managerFeedback": "پیگیری سوم کارفرما رضایی برای نهایی‌سازی قرارداد مشاوره بسیار حساس است.",
       "personalOpinion": "چاپخانه‌ها با مسائل بیمه تأمین اجتماعی کارگران شیفت شب درگیرند."
     },
@@ -1297,63 +1297,63 @@
   "overallReports": [
     {
       "id": "per-897-daily-14050621",
-      "consultantId": "user-1788870918188",
-      "consultantName": "اصغر",
-      "consultantCode": "897",
-      "periodType": "daily",
-      "dateShamsi": "1405/06/21",
-      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
       "summary": "asghar",
-      "keyAchievements": "asghar",
-      "challengesOrBarriers": "asghar",
-      "plansOrPriorities": "asghar",
-      "hasSetMeeting": false,
-      "autoFollowUpEnabled": true,
-      "selfRating": 3,
-      "submittedAt": "۱۷:۳۸",
       "createdAt": "2026-09-12T14:08:08.226Z",
+      "updatedAt": "2026-09-12T14:08:08.230Z",
+      "dateShamsi": "1405/06/21",
+      "periodType": "daily",
+      "selfRating": 3,
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "submittedAt": "۱۷:۳۸",
+      "consultantId": "user-1788870918188",
+      "hasSetMeeting": false,
       "managerStatus": "pending",
-      "updatedAt": "2026-09-12T14:08:08.230Z"
+      "consultantCode": "897",
+      "consultantName": "اصغر",
+      "keyAchievements": "asghar",
+      "plansOrPriorities": "asghar",
+      "autoFollowUpEnabled": true,
+      "challengesOrBarriers": "asghar"
     },
     {
       "id": "per-C-103-daily-14050621",
-      "consultantId": "user-c103",
-      "consultantName": "سعید حسینی",
-      "consultantCode": "C-103",
-      "periodType": "daily",
-      "dateShamsi": "1405/06/21",
-      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
       "summary": "karino2026",
-      "keyAchievements": "karino2026",
-      "challengesOrBarriers": "karino2026",
-      "plansOrPriorities": "karino2026",
-      "hasSetMeeting": false,
-      "autoFollowUpEnabled": true,
-      "selfRating": 2,
-      "submittedAt": "۱۷:۲۱",
       "createdAt": "2026-09-12T13:51:20.418Z",
+      "updatedAt": "2026-09-12T13:51:20.420Z",
+      "dateShamsi": "1405/06/21",
+      "periodType": "daily",
+      "selfRating": 2,
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "submittedAt": "۱۷:۲۱",
+      "consultantId": "user-c103",
+      "hasSetMeeting": false,
       "managerStatus": "pending",
-      "updatedAt": "2026-09-12T13:51:20.420Z"
+      "consultantCode": "C-103",
+      "consultantName": "سعید حسینی",
+      "keyAchievements": "karino2026",
+      "plansOrPriorities": "karino2026",
+      "autoFollowUpEnabled": true,
+      "challengesOrBarriers": "karino2026"
     },
     {
       "id": "per-110-daily-14050621",
-      "consultantId": "user-1788870728032",
-      "consultantName": "علی زارع",
-      "consultantCode": "110",
-      "periodType": "daily",
-      "dateShamsi": "1405/06/21",
-      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
       "summary": "شنبلیله 12",
-      "keyAchievements": "شنبلیله 12",
-      "challengesOrBarriers": "شنبلیله 12",
-      "plansOrPriorities": "شنبلیله 12",
-      "hasSetMeeting": false,
-      "autoFollowUpEnabled": true,
-      "selfRating": 5,
-      "submittedAt": "۱۷:۰۱",
       "createdAt": "2026-09-12T13:31:03.614Z",
+      "updatedAt": "2026-09-12T13:31:03.616Z",
+      "dateShamsi": "1405/06/21",
+      "periodType": "daily",
+      "selfRating": 5,
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "submittedAt": "۱۷:۰۱",
+      "consultantId": "user-1788870728032",
+      "hasSetMeeting": false,
       "managerStatus": "pending",
-      "updatedAt": "2026-09-12T13:31:03.616Z"
+      "consultantCode": "110",
+      "consultantName": "علی زارع",
+      "keyAchievements": "شنبلیله 12",
+      "plansOrPriorities": "شنبلیله 12",
+      "autoFollowUpEnabled": true,
+      "challengesOrBarriers": "شنبلیله 12"
     },
     {
       "id": "per-C-103-weekly-14050619",
@@ -1379,76 +1379,76 @@
     },
     {
       "id": "per-c101-daily-today",
-      "consultantId": "user-c101",
-      "consultantName": "علیرضا رضایی",
-      "consultantCode": "C-101",
-      "periodType": "daily",
-      "dateShamsi": "1405/06/21",
-      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
       "summary": "انجام ۷ تماس هدفمند با مدیران کارخانجات شهرک صنعتی طوس. استقبال صنایع دارویی و شیمیایی از خدمات حسابرسی بیمه بالا بود.",
-      "keyAchievements": "تنظیم پیش‌نویس توافق با شرکت پارت‌سازان و ست شدن جلسه حضوری شنبه ساعت ۱۰ با مدیر مالی.",
-      "challengesOrBarriers": "برخی کارفرمایان خواستار نمونه قراردادهای استاندارد محرمانگی بودند که نیاز به فرم‌های حقوقی تکمیلی دارد.",
-      "plansOrPriorities": "پیگیری مرحله سوم کارفرما رضایی و ارسال تاییدیه جلسه به کارفرما حسینی.",
-      "selfRating": 5,
-      "submittedAt": "۱۸:۵۹",
       "createdAt": "2026-09-12T12:22:40.438Z",
-      "managerStatus": "approved",
-      "managerFeedback": "عملکرد عالی و پیگیری‌های منضبط؛ جلسه حضوری شنبه پیگیری شود.",
+      "dateShamsi": "1405/06/21",
+      "periodType": "daily",
+      "selfRating": 5,
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "submittedAt": "۱۸:۵۹",
+      "consultantId": "user-c101",
       "managerRating": 5,
-      "managerReviewedAt": "2026-09-12T12:22:40.438Z"
+      "managerStatus": "approved",
+      "consultantCode": "C-101",
+      "consultantName": "علیرضا رضایی",
+      "keyAchievements": "تنظیم پیش‌نویس توافق با شرکت پارت‌سازان و ست شدن جلسه حضوری شنبه ساعت ۱۰ با مدیر مالی.",
+      "managerFeedback": "عملکرد عالی و پیگیری‌های منضبط؛ جلسه حضوری شنبه پیگیری شود.",
+      "managerReviewedAt": "2026-09-12T12:22:40.438Z",
+      "plansOrPriorities": "پیگیری مرحله سوم کارفرما رضایی و ارسال تاییدیه جلسه به کارفرما حسینی.",
+      "challengesOrBarriers": "برخی کارفرمایان خواستار نمونه قراردادهای استاندارد محرمانگی بودند که نیاز به فرم‌های حقوقی تکمیلی دارد."
     },
     {
       "id": "per-c102-daily-today",
-      "consultantId": "user-c102",
-      "consultantName": "سارا علیزاده",
-      "consultantCode": "C-102",
-      "periodType": "daily",
-      "dateShamsi": "1405/06/21",
-      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
       "summary": "مذاکره با ۵ مدیر ارشد هلدینگ‌های غذایی و دارویی در خصوص دعاوی ماده ۱۴۸ قانون کار و بازنشستگی پیش‌ازموعد.",
-      "keyAchievements": "جلب نظر مساعد مدیر منابع انسانی شرکت بهنام‌شهد و هماهنگی جلسه معارفه.",
-      "challengesOrBarriers": "عدم حضور مستقیم تصمیم‌گیرنده نهایی در برخی کارخانجات و لزوم پیگیری از طریق سرپرستان.",
-      "plansOrPriorities": "ارسال مدارک حقوقی کارینو و برقراری تماس دوم در چرخه ۴ روزه.",
-      "selfRating": 4,
-      "submittedAt": "۱۷:۰۵",
       "createdAt": "2026-09-12T11:22:40.438Z",
-      "managerStatus": "pending"
+      "dateShamsi": "1405/06/21",
+      "periodType": "daily",
+      "selfRating": 4,
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "submittedAt": "۱۷:۰۵",
+      "consultantId": "user-c102",
+      "managerStatus": "pending",
+      "consultantCode": "C-102",
+      "consultantName": "سارا علیزاده",
+      "keyAchievements": "جلب نظر مساعد مدیر منابع انسانی شرکت بهنام‌شهد و هماهنگی جلسه معارفه.",
+      "plansOrPriorities": "ارسال مدارک حقوقی کارینو و برقراری تماس دوم در چرخه ۴ روزه.",
+      "challengesOrBarriers": "عدم حضور مستقیم تصمیم‌گیرنده نهایی در برخی کارخانجات و لزوم پیگیری از طریق سرپرستان."
     },
     {
       "id": "per-c104-daily-today",
-      "consultantId": "user-c104",
-      "consultantName": "ندا کریمی",
-      "consultantCode": "C-104",
-      "periodType": "daily",
-      "dateShamsi": "1405/06/21",
-      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
       "summary": "تماس با ۶ شرکت نرم‌افزاری و شتاب‌دهنده پارک علم و فناوری خراسان. دغدغه اصلی قراردادهای عدم افشا (NDA) و تضامین پرسنلی است.",
-      "keyAchievements": "هماهنگی جلسه آنلاین برای دوشنبه با شتاب‌دهنده پرشین و بررسی پکیج قراردادهای استارتاپی.",
-      "challengesOrBarriers": "نبود مدل تعرفه ساعتی مشخص برای استارتاپ‌های کوچک.",
-      "plansOrPriorities": "آماده‌سازی پیش‌نویس پکیج ویژه دانش‌بنیان‌ها.",
-      "selfRating": 5,
-      "submittedAt": "۱۶:۰۰",
       "createdAt": "2026-09-12T10:22:40.438Z",
+      "dateShamsi": "1405/06/21",
+      "periodType": "daily",
+      "selfRating": 5,
+      "periodLabel": "گزارش روزانه شنبه ۲۱ شهریور",
+      "submittedAt": "۱۶:۰۰",
+      "consultantId": "user-c104",
+      "managerRating": 5,
       "managerStatus": "approved",
-      "managerRating": 5
+      "consultantCode": "C-104",
+      "consultantName": "ندا کریمی",
+      "keyAchievements": "هماهنگی جلسه آنلاین برای دوشنبه با شتاب‌دهنده پرشین و بررسی پکیج قراردادهای استارتاپی.",
+      "plansOrPriorities": "آماده‌سازی پیش‌نویس پکیج ویژه دانش‌بنیان‌ها.",
+      "challengesOrBarriers": "نبود مدل تعرفه ساعتی مشخص برای استارتاپ‌های کوچک."
     },
     {
       "id": "per-c101-daily-yesterday",
-      "consultantId": "user-c101",
-      "consultantName": "علیرضا رضایی",
-      "consultantCode": "C-101",
-      "periodType": "daily",
-      "dateShamsi": "1405/06/20",
-      "periodLabel": "گزارش روزانه جمعه ۲۰ شهریور",
       "summary": "تمرکز بر پرونده‌های معوق و حل چالش‌های کارفرمایان چاپ و بسته‌بندی در خصوص جرایم تأمین اجتماعی.",
-      "keyAchievements": "حل شبهات کارفرما عباسی درباره سفته حسن انجام کار و ارجاع پرونده به وکیل مجموعه.",
-      "challengesOrBarriers": "مشغله شدید مدیران عامل قبل از ظهر؛ زمان بهینه تماس‌ها به بعد از ساعت ۱۴ منتقل شد.",
-      "plansOrPriorities": "شروع مذاکرات با صنف قطعات خودرو.",
-      "selfRating": 4,
-      "submittedAt": "۱۷:۱۰",
       "createdAt": "2026-09-11T11:22:40.438Z",
+      "dateShamsi": "1405/06/20",
+      "periodType": "daily",
+      "selfRating": 4,
+      "periodLabel": "گزارش روزانه جمعه ۲۰ شهریور",
+      "submittedAt": "۱۷:۱۰",
+      "consultantId": "user-c101",
+      "managerRating": 5,
       "managerStatus": "approved",
-      "managerRating": 5
+      "consultantCode": "C-101",
+      "consultantName": "علیرضا رضایی",
+      "keyAchievements": "حل شبهات کارفرما عباسی درباره سفته حسن انجام کار و ارجاع پرونده به وکیل مجموعه.",
+      "plansOrPriorities": "شروع مذاکرات با صنف قطعات خودرو.",
+      "challengesOrBarriers": "مشغله شدید مدیران عامل قبل از ظهر؛ زمان بهینه تماس‌ها به بعد از ساعت ۱۴ منتقل شد."
     },
     {
       "id": "per-c103-daily-yesterday",
@@ -1471,97 +1471,97 @@
     },
     {
       "id": "per-c101-weekly-last",
-      "consultantId": "user-c101",
-      "consultantName": "علیرضا رضایی",
-      "consultantCode": "C-101",
-      "periodType": "weekly",
-      "dateShamsi": "1405/06/12",
-      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
       "summary": "مجموع ۳۴ تماس موثر، ۴ جلسه ست‌شده و یک قرارداد قطعی با ارزش ۵۵ میلیون تومان در حوزه دعاوی کارگری.",
-      "keyAchievements": "عقد قرارداد با شرکت تولیدی توس و جذب ۳ مشتری جدید در شهرک ماشین‌سازی.",
-      "challengesOrBarriers": "رقابت با شرکت‌های سنتی حسابداری که مشاوره‌های نادرست به کارفرمایان ارائه می‌دهند.",
-      "weeklyFocusGuilds": "تولید قطعات صنعتی، صنایع پلیمری، ریخته‌گری",
-      "plansOrPriorities": "نهایی‌سازی ۲ قرارداد جاری و تمرکز ویژه بر خدمات پیشگیرانه بازرسی اداره کار.",
-      "selfRating": 5,
-      "submittedAt": "۱۸:۰۰",
       "createdAt": "2026-09-05T12:22:40.438Z",
+      "dateShamsi": "1405/06/12",
+      "periodType": "weekly",
+      "selfRating": 5,
+      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
+      "submittedAt": "۱۸:۰۰",
+      "consultantId": "user-c101",
+      "managerRating": 5,
       "managerStatus": "rewarded",
+      "consultantCode": "C-101",
+      "consultantName": "علیرضا رضایی",
+      "keyAchievements": "عقد قرارداد با شرکت تولیدی توس و جذب ۳ مشتری جدید در شهرک ماشین‌سازی.",
       "managerFeedback": "بهترین عملکرد هفته در تیم مشاوره. پاداش انضباط و تحقق اهداف منظور شد.",
-      "managerRating": 5
+      "plansOrPriorities": "نهایی‌سازی ۲ قرارداد جاری و تمرکز ویژه بر خدمات پیشگیرانه بازرسی اداره کار.",
+      "weeklyFocusGuilds": "تولید قطعات صنعتی، صنایع پلیمری، ریخته‌گری",
+      "challengesOrBarriers": "رقابت با شرکت‌های سنتی حسابداری که مشاوره‌های نادرست به کارفرمایان ارائه می‌دهند."
     },
     {
       "id": "per-c102-weekly-last",
-      "consultantId": "user-c102",
-      "consultantName": "سارا علیزاده",
-      "consultantCode": "C-102",
-      "periodType": "weekly",
-      "dateShamsi": "1405/06/12",
-      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
       "summary": "انجام ۲۹ تماس اولیه، ۸ پیگیری مرحله دوم و ۴ پیگیری مرحله سوم در صنف چاپ و صنایع غذایی.",
-      "keyAchievements": "۲ جلسه مشاوره حضوری برگزار شد و پیش‌نویس توافق‌نامه ایمنی کار ارسال گردید.",
-      "challengesOrBarriers": "عدم پاسخگویی کارفرمایان در روز چهارشنبه به دلیل سفر.",
-      "weeklyFocusGuilds": "صنایع غذایی، بسته‌بندی، دارویی",
-      "plansOrPriorities": "تمرکز بر بستن قرارداد پرونده شرکت آرد خوشه طوس.",
-      "selfRating": 4,
-      "submittedAt": "۱۶:۳۰",
       "createdAt": "2026-09-05T10:52:40.439Z",
+      "dateShamsi": "1405/06/12",
+      "periodType": "weekly",
+      "selfRating": 4,
+      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
+      "submittedAt": "۱۶:۳۰",
+      "consultantId": "user-c102",
+      "managerRating": 4,
       "managerStatus": "approved",
+      "consultantCode": "C-102",
+      "consultantName": "سارا علیزاده",
+      "keyAchievements": "۲ جلسه مشاوره حضوری برگزار شد و پیش‌نویس توافق‌نامه ایمنی کار ارسال گردید.",
       "managerFeedback": "گزارش دقیق و مستند؛ پیگیری پرونده آرد خوشه در اولویت قرار گیرد.",
-      "managerRating": 4
+      "plansOrPriorities": "تمرکز بر بستن قرارداد پرونده شرکت آرد خوشه طوس.",
+      "weeklyFocusGuilds": "صنایع غذایی، بسته‌بندی، دارویی",
+      "challengesOrBarriers": "عدم پاسخگویی کارفرمایان در روز چهارشنبه به دلیل سفر."
     },
     {
       "id": "per-c104-weekly-last",
-      "consultantId": "user-c104",
-      "consultantName": "ندا کریمی",
-      "consultantCode": "C-104",
-      "periodType": "weekly",
-      "dateShamsi": "1405/06/12",
-      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
       "summary": "تمرکز صددرصدی بر شرکت‌های فناور و پارک علم و فناوری. جذب ۲ پرونده تنظیم آیین‌نامه انضباطی کارگاهی.",
-      "keyAchievements": "عقد قرارداد با شرکت راهکارهای ابری پایا به مبلغ ۶۰ میلیون تومان.",
-      "weeklyFocusGuilds": "فناوری اطلاعات، فین‌تک، دانش‌بنیان",
-      "selfRating": 5,
-      "submittedAt": "۱۷:۴۰",
       "createdAt": "2026-09-05T12:02:40.438Z",
+      "dateShamsi": "1405/06/12",
+      "periodType": "weekly",
+      "selfRating": 5,
+      "periodLabel": "گزارش هفتگی هفته دوم شهریور پنج‌شنبه ۱۲ شهریور",
+      "submittedAt": "۱۷:۴۰",
+      "consultantId": "user-c104",
+      "managerRating": 5,
       "managerStatus": "rewarded",
+      "consultantCode": "C-104",
+      "consultantName": "ندا کریمی",
+      "keyAchievements": "عقد قرارداد با شرکت راهکارهای ابری پایا به مبلغ ۶۰ میلیون تومان.",
       "managerFeedback": "ورود به بازار دانش‌بنیان بسیار هوشمندانه و با بازدهی عالی بود. تبریک.",
-      "managerRating": 5
+      "weeklyFocusGuilds": "فناوری اطلاعات، فین‌تک، دانش‌بنیان"
     },
     {
       "id": "per-c101-monthly-mordad",
-      "consultantId": "user-c101",
-      "consultantName": "علیرضا رضایی",
-      "consultantCode": "C-101",
-      "periodType": "monthly",
-      "dateShamsi": "1405/05/31",
-      "periodLabel": "گزارش ماهانه مرداد ۱۴۰۵",
       "summary": "تحقق ۱۰۸ درصدی تارگت ماهانه با ثبت ۱۲۸ تماس و عقد ۴ قرارداد جامع سالانه بازبینی قراردادهای کار.",
-      "keyAchievements": "رشد ۴۰ درصدی تعامل با صنف ریخته‌گری و ارتقای رضایت مراجعین به ۴.۹ از ۵.",
-      "challengesOrBarriers": "نیاز به کاتالوگ‌های اختصاصی‌تر برای صنایع با بیش از ۵۰ پرسنل.",
-      "monthlyStrategicNotes": "پیشنهاد می‌شود یک وبینار تخصصی برای مدیران منابع انسانی شرکت‌های پیمانکاری تدارک دیده شود.",
-      "selfRating": 5,
-      "submittedAt": "۱۸:۴۵",
       "createdAt": "2026-08-23T10:52:40.439Z",
+      "dateShamsi": "1405/05/31",
+      "periodType": "monthly",
+      "selfRating": 5,
+      "periodLabel": "گزارش ماهانه مرداد ۱۴۰۵",
+      "submittedAt": "۱۸:۴۵",
+      "consultantId": "user-c101",
+      "managerRating": 5,
       "managerStatus": "rewarded",
+      "consultantCode": "C-101",
+      "consultantName": "علیرضا رضایی",
+      "keyAchievements": "رشد ۴۰ درصدی تعامل با صنف ریخته‌گری و ارتقای رضایت مراجعین به ۴.۹ از ۵.",
       "managerFeedback": "الگوی انضباط گزارش‌دهی و تعهد تیمی. مشمول پاداش ویژه ماهانه.",
-      "managerRating": 5
+      "challengesOrBarriers": "نیاز به کاتالوگ‌های اختصاصی‌تر برای صنایع با بیش از ۵۰ پرسنل.",
+      "monthlyStrategicNotes": "پیشنهاد می‌شود یک وبینار تخصصی برای مدیران منابع انسانی شرکت‌های پیمانکاری تدارک دیده شود."
     },
     {
       "id": "per-c102-monthly-mordad",
-      "consultantId": "user-c102",
-      "consultantName": "سارا علیزاده",
-      "consultantCode": "C-102",
-      "periodType": "monthly",
-      "dateShamsi": "1405/05/31",
-      "periodLabel": "گزارش ماهانه مرداد ۱۴۰۵",
       "summary": "پوشش ۸۵ کارفرما در طول ماه با ثبت ۳ قرارداد نهایی و نرخ تبدیل ۱۲ درصدی.",
-      "keyAchievements": "ورود موفق به صنف کارخانجات آرد و غلات شرق کشور.",
-      "monthlyStrategicNotes": "افزایش بودجه تبلیغاتی در لینکدین می‌تواند منجر به لیدهای باکیفیت‌تری شود.",
-      "selfRating": 4,
-      "submittedAt": "۱۸:۱۵",
       "createdAt": "2026-08-23T09:37:40.439Z",
+      "dateShamsi": "1405/05/31",
+      "periodType": "monthly",
+      "selfRating": 4,
+      "periodLabel": "گزارش ماهانه مرداد ۱۴۰۵",
+      "submittedAt": "۱۸:۱۵",
+      "consultantId": "user-c102",
+      "managerRating": 4,
       "managerStatus": "approved",
-      "managerRating": 4
+      "consultantCode": "C-102",
+      "consultantName": "سارا علیزاده",
+      "keyAchievements": "ورود موفق به صنف کارخانجات آرد و غلات شرق کشور.",
+      "monthlyStrategicNotes": "افزایش بودجه تبلیغاتی در لینکدین می‌تواند منجر به لیدهای باکیفیت‌تری شود."
     },
     {
       "id": "per-c103-monthly-mordad",
@@ -2605,7 +2605,7 @@
       "fileName": "تماس‌های_روزانه_1405-06-17.xlsx",
       "dateShamsi": "1405/06/17",
       "dayOfWeek": "سه‌شنبه",
-      "timestamp": "2026-09-13T13:06:48.493Z",
+      "timestamp": "2026-09-13T13:09:15.827Z",
       "archiveType": "calls_daily",
       "periodTitle": "بایگانی روزانه تماس‌ها و پیگیری‌ها",
       "totalConsultants": 3,
@@ -2918,86 +2918,129 @@
       "autoGenerated": true
     },
     {
-      "id": "arch-14050616",
+      "id": "arch-calls-14050616",
       "reports": [
         {
-          "id": "rep-seed-3",
+          "id": "rep-c101-overdue-6d",
           "rows": [
             {
-              "id": "row-seed-3-1",
-              "notes": "مدیر اداری آقای رجبی بسیار پیگیر بودند؛ جلسه پنج‌شنبه ساعت ۱۱ صبح.",
-              "phone": "05135421100",
-              "address": "شهرک صنعتی چناران",
+              "id": "row-c101-ahmadi",
+              "notes": "در تماس اول بسیار مشتاق بودند؛ قرار شد بعد از ۴ روز برای ارسال پیش‌نویس تماس گرفته شود.",
+              "phone": "05138491122",
+              "address": "شهرک صنعتی توس، تلاش شمالی ۶",
               "followUp1": "+",
-              "followUp2": "✓",
+              "followUp2": "",
               "followUp3": "",
               "followUp4": "",
               "rowNumber": 1,
-              "clientName": "فرآورده‌های لبنی کوهستان مشهد",
-              "meetingTopic": "تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی",
-              "activityField": "تولید دوغ و ماست پاستوریزه",
-              "followUpResult": "✓ (جلسه حضوری با مدیر اداری ست شد)",
-              "personnelCount": 92,
-              "employerConcern": "پرونده‌های سخت و زیان‌آور و بازنشستگی‌های زودرس پیش‌بینی نشده"
-            },
+              "clientName": "کارفرما احمدی (گروه صنعتی پارت گستر)",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+              "activityField": "تولید قطعات پرسی بدنه خودرو",
+              "followUpResult": "",
+              "personnelCount": 35,
+              "employerConcern": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی",
+              "followUp1DateShamsi": "1405/06/16"
+            }
+          ],
+          "guild": "ماشین‌سازی و قطعه‌سازی خودرو",
+          "status": "approved",
+          "createdAt": "2026-09-07T13:04:22.407Z",
+          "updatedAt": "2026-09-07T13:04:22.407Z",
+          "dateShamsi": "1405/06/16",
+          "reviewedAt": "2026-09-07T13:04:22.407Z",
+          "submittedAt": "۱۶:۱۵",
+          "consultantId": "user-c101",
+          "managerRating": 4,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "دوشنبه",
+          "managerFeedback": "پرونده کارفرما احمدی را سریعاً تماس گرفته و تعیین تکلیف نمایید.",
+          "personalOpinion": "کارفرمایان این گروه به دلیل چالش تضامین و قراردادهای کارگری نیازمند پیگیری منظم هستند."
+        },
+        {
+          "id": "rep-c102-overdue",
+          "rows": [
             {
-              "id": "row-seed-3-2",
-              "notes": "مذاکره اولیه انجام شد؛ منتظر تماس مجدد در چرخه پیگیری هستند.",
+              "id": "row-c102-overdue-1",
+              "notes": "نیازمند تماس فوری پیگیری دوم (۲ روز معوق).",
               "phone": "05135413344",
               "address": "شهرک صنعتی توس، فاز ۲",
               "followUp1": "+",
-              "followUp2": "+",
+              "followUp2": "",
               "followUp3": "",
               "followUp4": "",
-              "rowNumber": 2,
-              "clientName": "صنایع بسته‌بندی ترنج سبز",
-              "meetingTopic": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما کاظمی (صنایع بسته‌بندی ترنج سبز)",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
               "activityField": "بسته‌بندی حبوبات و خشکبار صادراتی",
               "followUpResult": "",
               "personnelCount": 38,
-              "employerConcern": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ"
-            },
-            {
-              "id": "row-seed-3-3",
-              "notes": "مدیرعامل در جلسه بازرسی استاندارد بود.",
-              "phone": "05136517722",
-              "address": "شهرک صنعتی ماشین‌سازی",
-              "followUp1": ".",
-              "followUp2": ".",
-              "followUp3": "",
-              "followUp4": "",
-              "rowNumber": 3,
-              "clientName": "تولیدی کیک و کلوچه پردیس",
-              "meetingTopic": "",
-              "activityField": "شیرینی و بیسکویت صنعتی",
-              "followUpResult": "شاپسیان",
-              "personnelCount": 25,
-              "employerConcern": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری"
+              "employerConcern": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ",
+              "followUp1DateShamsi": "1405/06/16"
             }
           ],
-          "guild": "صنایع غذایی و بسته‌بندی",
+          "guild": "صنایع غذایی و کشاورزی",
           "status": "approved",
-          "createdAt": "2026-09-07T08:52:10.140Z",
-          "updatedAt": "2026-09-08T11:55:21.829Z",
+          "createdAt": "2026-09-07T13:04:22.407Z",
+          "updatedAt": "2026-09-07T13:04:22.407Z",
           "dateShamsi": "1405/06/16",
-          "reviewedAt": "2026-09-07T08:52:10.140Z",
-          "submittedAt": "۱۵:۲۵",
+          "reviewedAt": "2026-09-07T13:04:22.407Z",
+          "submittedAt": "۱۶:۰۰",
           "consultantId": "user-c102",
-          "managerRating": 5,
+          "managerRating": 4,
           "consultantCode": "C-102",
           "consultantName": "مریم محمدی",
           "dayOfWeekShamsi": "دوشنبه",
-          "managerFeedback": "نکات درج شده در خصوص شرکت فرآورده‌های لبنی کوهستان فوق‌العاده است. پشتیبانی کامل حقوقی داده شود.",
-          "personalOpinion": "صنایع غذایی به دلیل شیفت‌های گردشی و سختی کار، ریسک بسیار بالایی در پرونده‌های بازنشستگی پیش‌ازموعد دارند."
+          "managerFeedback": "پشتیبانی کامل حقوقی داده شود.",
+          "personalOpinion": "صنایع غذایی ریسک بسیار بالایی در پرونده‌های بازنشستگی پیش‌ازموعد دارند."
+        },
+        {
+          "id": "rep-c104-today",
+          "rows": [
+            {
+              "id": "row-c104-1",
+              "notes": "پیگیری معوق؛ تماس دوم باید فوری انجام شود.",
+              "phone": "05138447788",
+              "address": "مشهد، بلوار فلسطین، تقاطع خیام",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما ابراهیمی (شرکت ابنیه عمران گستر)",
+              "meetingTopic": "مشاوره دفاعیات پرونده‌های مطروحه در هیئت‌های حل اختلاف",
+              "activityField": "پیمانکاری پروژه‌های مسکونی و تجاری",
+              "followUpResult": "",
+              "personnelCount": 115,
+              "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+              "followUp1DateShamsi": "1405/06/16"
+            }
+          ],
+          "guild": "ساختمانی، انبوه‌سازی و تأسیسات",
+          "status": "approved",
+          "createdAt": "2026-09-07T13:04:22.407Z",
+          "updatedAt": "2026-09-07T13:04:22.407Z",
+          "dateShamsi": "1405/06/16",
+          "reviewedAt": "2026-09-07T13:04:22.407Z",
+          "submittedAt": "۱۲:۳۰",
+          "consultantId": "user-c104",
+          "managerRating": 4,
+          "consultantCode": "C-104",
+          "consultantName": "ندا کریمی",
+          "dayOfWeekShamsi": "دوشنبه",
+          "managerFeedback": "پکیج مشاوره آیین‌نامه انضباطی برای کارگاه‌های بالای ۲۰ نفر معرفی شود.",
+          "personalOpinion": "شرکت‌های پیمانکاری بیشترین حجم احضاریه‌های هیئت‌های تشخیص را دارند."
         }
       ],
       "fileName": "تماس‌های_روزانه_1405-06-16.xlsx",
       "dayOfWeek": "دوشنبه",
-      "timestamp": "2026-09-10T12:51:59.946Z",
+      "timestamp": "2026-09-13T13:04:22.476Z",
       "dateShamsi": "1405/06/16",
+      "archiveType": "calls_daily",
+      "periodTitle": "بایگانی روزانه تماس‌ها و پیگیری‌ها",
       "topConcerns": [
         {
-          "name": "پرونده‌های سخت و زیان‌آور و بازنشستگی‌های زودرس پیش‌بینی نشده",
+          "name": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی",
           "count": 1
         },
         {
@@ -3005,15 +3048,13 @@
           "count": 1
         },
         {
-          "name": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری",
+          "name": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
           "count": 1
         }
       ],
       "autoGenerated": true,
-      "totalConsultants": 1,
-      "totalClientsContacted": 3,
-      "archiveType": "calls_daily",
-      "periodTitle": "بایگانی روزانه تماس‌ها و پیگیری‌ها"
+      "totalConsultants": 3,
+      "totalClientsContacted": 3
     },
     {
       "id": "arch-calls-14050615",
@@ -4135,6 +4176,223 @@
         }
       ],
       "autoGenerated": true
+    },
+    {
+      "id": "arch-periodic_daily-14050622",
+      "reports": [],
+      "fileName": "تحلیلی_روزانه_1405-06-22.xlsx",
+      "dayOfWeek": "یکشنبه",
+      "timestamp": "2026-09-13T13:04:22.490Z",
+      "dateShamsi": "1405/06/22",
+      "archiveType": "periodic_daily",
+      "periodTitle": "تحلیلی روزانه عملکرد مشاورین",
+      "topConcerns": [],
+      "autoGenerated": true,
+      "overallReports": [
+        {
+          "id": "per-c101-daily-today",
+          "summary": "انجام ۷ تماس هدفمند با مدیران کارخانجات شهرک صنعتی طوس. استقبال صنایع دارویی و شیمیایی از خدمات حسابرسی بیمه بالا بود.",
+          "createdAt": "2026-09-13T13:04:22.425Z",
+          "dateShamsi": "1405/06/22",
+          "periodType": "daily",
+          "selfRating": 5,
+          "periodLabel": "گزارش روزانه یکشنبه ۲۲ شهریور",
+          "submittedAt": "۱۸:۵۹",
+          "consultantId": "user-c101",
+          "managerRating": 5,
+          "managerStatus": "approved",
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "keyAchievements": "تنظیم پیش‌نویس توافق با شرکت پارت‌سازان و ست شدن جلسه حضوری شنبه ساعت ۱۰ با مدیر مالی.",
+          "managerFeedback": "عملکرد عالی و پیگیری‌های منضبط؛ جلسه حضوری شنبه پیگیری شود.",
+          "managerReviewedAt": "2026-09-13T13:04:22.425Z",
+          "plansOrPriorities": "پیگیری مرحله سوم کارفرما رضایی و ارسال تاییدیه جلسه به کارفرما حسینی.",
+          "challengesOrBarriers": "برخی کارفرمایان خواستار نمونه قراردادهای استاندارد محرمانگی بودند که نیاز به فرم‌های حقوقی تکمیلی دارد."
+        },
+        {
+          "id": "per-c102-daily-today",
+          "summary": "مذاکره با ۵ مدیر ارشد هلدینگ‌های غذایی و دارویی در خصوص دعاوی ماده ۱۴۸ قانون کار و بازنشستگی پیش‌ازموعد.",
+          "createdAt": "2026-09-13T12:04:22.425Z",
+          "dateShamsi": "1405/06/22",
+          "periodType": "daily",
+          "selfRating": 4,
+          "periodLabel": "گزارش روزانه یکشنبه ۲۲ شهریور",
+          "submittedAt": "۱۷:۰۵",
+          "consultantId": "user-c102",
+          "managerStatus": "pending",
+          "consultantCode": "C-102",
+          "consultantName": "سارا علیزاده",
+          "keyAchievements": "جلب نظر مساعد مدیر منابع انسانی شرکت بهنام‌شهد و هماهنگی جلسه معارفه.",
+          "plansOrPriorities": "ارسال مدارک و برقراری تماس دوم در چرخه ۴ روزه.",
+          "challengesOrBarriers": "عدم حضور مستقیم تصمیم‌گیرنده نهایی در برخی کارخانجات و لزوم پیگیری از طریق سرپرستان."
+        },
+        {
+          "id": "per-c104-daily-today",
+          "summary": "تماس با ۶ شرکت نرم‌افزاری و شتاب‌دهنده پارک علم و فناوری خراسان. دغدغه اصلی قراردادهای عدم افشا (NDA) و تضامین پرسنلی است.",
+          "createdAt": "2026-09-13T11:04:22.425Z",
+          "dateShamsi": "1405/06/22",
+          "periodType": "daily",
+          "selfRating": 5,
+          "periodLabel": "گزارش روزانه یکشنبه ۲۲ شهریور",
+          "submittedAt": "۱۶:۰۰",
+          "consultantId": "user-c104",
+          "managerRating": 5,
+          "managerStatus": "approved",
+          "consultantCode": "C-104",
+          "consultantName": "ندا کریمی",
+          "keyAchievements": "هماهنگی جلسه آنلاین برای دوشنبه با شتاب‌دهنده پرشین و بررسی پکیج قراردادهای استارتاپی.",
+          "plansOrPriorities": "آماده‌سازی پیش‌نویس پکیج ویژه دانش‌بنیان‌ها.",
+          "challengesOrBarriers": "نبود مدل تعرفه ساعتی مشخص برای استارتاپ‌های کوچک."
+        }
+      ],
+      "totalConsultants": 3,
+      "totalClientsContacted": 0
+    },
+    {
+      "id": "arch-calls-14050622",
+      "reports": [
+        {
+          "id": "rep-c101-today",
+          "rows": [
+            {
+              "id": "row-c101-today-1",
+              "notes": "جلسه با مهندس صادقی (مدیرعامل) دوشنبه ساعت ۱۰:۰۰ در محل کارخانه تنظیم شد.",
+              "phone": "05138401122",
+              "address": "شهرک صنعتی توس، فاز ۱، تلاش جنوبی",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "صنایع ریخته‌گری توس فولاد",
+              "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+              "activityField": "تولید قطعات چدنی خودرو",
+              "followUpResult": "✓ (جلسه حضوری ست شد)",
+              "personnelCount": 48,
+              "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+              "followUp1DateShamsi": "1405/06/22",
+              "followUp2DateShamsi": "1405/06/22",
+              "followUp3DateShamsi": "1405/06/22"
+            },
+            {
+              "id": "row-c101-today-2",
+              "notes": "مدیر کارگاه در خط تولید بود؛ تماس مجدد هماهنگ خواهد شد.",
+              "phone": "05132456677",
+              "address": "بزرگراه آسیایی، آزادی ۱۲۵",
+              "followUp1": ".",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 2,
+              "clientName": "کارگاه تراشکاری نوین صنعت",
+              "meetingTopic": "",
+              "activityField": "تراشکاری قطعات برنجی",
+              "followUpResult": "",
+              "personnelCount": 14,
+              "employerConcern": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی",
+              "followUp1DateShamsi": "1405/06/22"
+            },
+            {
+              "id": "row-c101-today-3",
+              "notes": "کارفرما عنوان کرد فعلاً برنامه اصلاح ساختار ندارند.",
+              "phone": "05136518899",
+              "address": "شهرک صنعتی کلات",
+              "followUp1": "-",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 3,
+              "clientName": "قالب‌سازی دقیق البرز",
+              "meetingTopic": "",
+              "activityField": "طراحی قالب‌های سنبه ماتریس",
+              "followUpResult": "- (اعلام عدم نیاز فعلی)",
+              "personnelCount": 9,
+              "employerConcern": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)",
+              "followUp1DateShamsi": "1405/06/22"
+            }
+          ],
+          "guild": "تولیدی قطعات خودرو و ریخته‌گری",
+          "status": "approved",
+          "createdAt": "2026-09-13T13:04:22.407Z",
+          "updatedAt": "2026-09-13T13:04:22.407Z",
+          "dateShamsi": "1405/06/22",
+          "reviewedAt": "2026-09-13T13:04:22.407Z",
+          "submittedAt": "۱۴:۳۰",
+          "consultantId": "user-c101",
+          "managerRating": 5,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "یکشنبه",
+          "managerFeedback": "عملکرد بسیار عالی در برقراری ارتباط با صنایع ریخته‌گری توس فولاد. جلسه حضوری به خوبی هماهنگ شد.",
+          "personalOpinion": "به دلیل افزایش نظارت و بازرسی‌های تأمین اجتماعی، کارفرمایان این صنف استقبال چشمگیری از خدمات بازبینی قراردادها و تراز مالی دارند."
+        },
+        {
+          "id": "rep-c102-today",
+          "rows": [
+            {
+              "id": "row-c102-1",
+              "notes": "جلسه گوگل میت چهارشنبه ساعت ۱۴:۳۰ ست شد.",
+              "phone": "05138479900",
+              "address": "بلوار سجاد، خیابان بهار",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "شرکت دانش‌بنیان داده‌پردازان عصر نوین",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+              "activityField": "توسعه نرم‌افزارهای سازمانی و هوش مصنوعی",
+              "followUpResult": "✓ (جلسه آنلاین با هم‌بنیان‌گذار ست شد)",
+              "personnelCount": 36,
+              "employerConcern": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری",
+              "followUp1DateShamsi": "1405/06/22",
+              "followUp2DateShamsi": "1405/06/22",
+              "followUp3DateShamsi": "1405/06/22"
+            }
+          ],
+          "guild": "فناوری اطلاعات و تجارت الکترونیک",
+          "status": "approved",
+          "createdAt": "2026-09-13T13:04:22.407Z",
+          "updatedAt": "2026-09-13T13:04:22.407Z",
+          "dateShamsi": "1405/06/22",
+          "reviewedAt": "2026-09-13T13:04:22.407Z",
+          "submittedAt": "۱۳:۱۵",
+          "consultantId": "user-c102",
+          "managerRating": 5,
+          "consultantCode": "C-102",
+          "consultantName": "مریم محمدی",
+          "dayOfWeekShamsi": "یکشنبه",
+          "managerFeedback": "جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.",
+          "personalOpinion": "شرکت‌های نرم‌افزاری به شدت نگران حفظ محرمانگی کدها و ترک ناگهانی برنامه‌نویسان ارشد هستند."
+        }
+      ],
+      "fileName": "تماس‌های_روزانه_1405-06-22.xlsx",
+      "dayOfWeek": "یکشنبه",
+      "timestamp": "2026-09-13T13:04:22.481Z",
+      "dateShamsi": "1405/06/22",
+      "archiveType": "calls_daily",
+      "periodTitle": "بایگانی روزانه تماس‌ها و پیگیری‌ها",
+      "topConcerns": [
+        {
+          "name": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+          "count": 1
+        },
+        {
+          "name": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی",
+          "count": 1
+        },
+        {
+          "name": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)",
+          "count": 1
+        },
+        {
+          "name": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری",
+          "count": 1
+        }
+      ],
+      "autoGenerated": true,
+      "totalConsultants": 2,
+      "totalClientsContacted": 4
     }
   ],
   "concerns": [
@@ -4167,75 +4425,75 @@
   "directives": [
     {
       "id": "dir-1789222213869",
-      "authorName": "مدیریت کارینو (CEO)",
-      "authorId": "user-ceo",
       "content": "همکار گرامی جناب/سرکار اصغر (کد 897)، موعد قانونی ثبت گزارش عملکرد شما در بازه «این هفته (هفتگی)» سپری گردیده و گزارشی واصل نشده است. این عدم ارسال در پرونده انضباطی و شاخص KPI منظور می‌گردد. لطفاً در صورت داشتن عذر موجه، فوراً به مدیریت اعلام فرمایید.",
+      "authorId": "user-ceo",
       "priority": "high",
-      "targetConsultantId": "user-1788870918188",
-      "targetConsultantName": "اصغر",
       "createdAt": "2026-09-12T14:10:13.869Z",
-      "dateShamsi": "1405/06/21"
+      "authorName": "مدیریت کارینو (CEO)",
+      "dateShamsi": "1405/06/21",
+      "targetConsultantId": "user-1788870918188",
+      "targetConsultantName": "اصغر"
     },
     {
       "id": "dir-1789220331683",
-      "authorName": "مدیریت کارینو (CEO)",
-      "authorId": "user-ceo",
       "content": "همکار گرامی جناب/سرکار سعید حسینی (کد C-103)، موعد قانونی ثبت گزارش عملکرد شما در بازه «امروز (روزانه)» سپری گردیده و گزارشی واصل نشده است. این عدم ارسال در پرونده انضباطی و شاخص KPI منظور می‌گردد. لطفاً در صورت داشتن عذر موجه، فوراً به مدیریت اعلام فرمایید.",
+      "authorId": "user-ceo",
       "priority": "high",
-      "targetConsultantId": "user-c103",
-      "targetConsultantName": "سعید حسینی",
       "createdAt": "2026-09-12T13:38:51.683Z",
-      "dateShamsi": "1405/06/21"
+      "authorName": "مدیریت کارینو (CEO)",
+      "dateShamsi": "1405/06/21",
+      "targetConsultantId": "user-c103",
+      "targetConsultantName": "سعید حسینی"
     },
     {
       "id": "dir-1789217766017",
-      "authorName": "مدیریت کارینو (CEO)",
-      "authorId": "user-ceo",
       "content": "همکار گرامی جناب/سرکار اصغر (کد 897)، موعد قانونی ثبت گزارش عملکرد شما در بازه «این هفته (هفتگی)» سپری گردیده و گزارشی واصل نشده است. این عدم ارسال در پرونده انضباطی و شاخص KPI منظور می‌گردد. لطفاً در صورت داشتن عذر موجه، فوراً به مدیریت اعلام فرمایید.",
+      "authorId": "user-ceo",
       "priority": "high",
-      "targetConsultantId": "user-1788870918188",
-      "targetConsultantName": "اصغر",
       "createdAt": "2026-09-12T12:56:06.017Z",
-      "dateShamsi": "1405/06/21"
+      "authorName": "مدیریت کارینو (CEO)",
+      "dateShamsi": "1405/06/21",
+      "targetConsultantId": "user-1788870918188",
+      "targetConsultantName": "اصغر"
     },
     {
       "id": "dir-seed-1",
-      "targetConsultantId": "user-c101",
-      "targetConsultantName": "علیرضا رضایی",
-      "authorName": "مدیریت کارینو (CEO)",
       "content": "پرونده کریمی و صنایع ریخته‌گری توس فولاد رو در اولویت قطعی امروز قرار بده.",
       "priority": "high",
       "createdAt": "2026-09-12T12:22:39.378Z",
-      "dateShamsi": "امروز"
+      "authorName": "مدیریت کارینو (CEO)",
+      "dateShamsi": "امروز",
+      "targetConsultantId": "user-c101",
+      "targetConsultantName": "علیرضا رضایی"
     },
     {
       "id": "dir-seed-2",
-      "targetConsultantId": "all",
-      "authorName": "مدیریت کارینو (CEO)",
       "content": "تمرکز تماس‌های این هفته بر روی عارضه‌یابی قراردادهای کار و پیشگیری از جرایم بازرسی تأمین اجتماعی است.",
       "priority": "normal",
       "createdAt": "2026-09-12T12:22:39.378Z",
-      "dateShamsi": "امروز"
+      "authorName": "مدیریت کارینو (CEO)",
+      "dateShamsi": "امروز",
+      "targetConsultantId": "all"
     },
     {
       "id": "dir-seed-3",
-      "targetConsultantId": "user-c102",
-      "targetConsultantName": "مریم محمدی",
-      "authorName": "مدیریت کارینو (CEO)",
       "content": "جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.",
       "priority": "high",
       "createdAt": "2026-09-12T12:22:39.378Z",
-      "dateShamsi": "امروز"
+      "authorName": "مدیریت کارینو (CEO)",
+      "dateShamsi": "امروز",
+      "targetConsultantId": "user-c102",
+      "targetConsultantName": "مریم محمدی"
     },
     {
       "id": "dir-seed-4",
-      "targetConsultantId": "user-c103",
-      "targetConsultantName": "سعید حسینی",
-      "authorName": "مدیریت کارینو (CEO)",
       "content": "تمرکز تماس‌های امروز بر مبالغ سفته و تضامین پرسنلی ویزیتورها و رانندگان پخش باشد.",
       "priority": "normal",
       "createdAt": "2026-09-12T12:22:39.378Z",
-      "dateShamsi": "امروز"
+      "authorName": "مدیریت کارینو (CEO)",
+      "dateShamsi": "امروز",
+      "targetConsultantId": "user-c103",
+      "targetConsultantName": "سعید حسینی"
     },
     {
       "id": "dir-1788861935011",
@@ -4260,164 +4518,228 @@
   ],
   "logs": [
     {
-      "id": "log-1789304808504-z6h6",
-      "timestamp": "2026-09-13T13:06:48.504Z",
-      "timeShamsi": "1405/06/17",
-      "category": "SYSTEM",
+      "id": "log-1789304749516-r0eg",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "کاربر «مدیر فاوا و فناوری اطلاعات» با کد پرسنلی «KARINO-IT» وارد سیستم شد.",
+      "category": "AUTH",
+      "timestamp": "2026-09-13T13:05:49.516Z",
+      "timeShamsi": "ورود موفق به سامانه"
+    },
+    {
+      "id": "log-1789304955846-7zva",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:09:15.846Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789304955803-xonq",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:09:15.803Z",
+      "timeShamsi": "1405/06/19"
+    },
+    {
+      "id": "log-1789304955768-l5a3",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:09:15.768Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789304955731-3s7b",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:09:15.731Z",
+      "timeShamsi": "1405/06/11"
+    },
+    {
+      "id": "log-1789304955690-f41r",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:09:15.690Z",
+      "timeShamsi": "1405/06/12"
+    },
+    {
+      "id": "log-1789304955670-vllf",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:09:15.670Z",
+      "timeShamsi": "1405/06/15"
+    },
+    {
+      "id": "log-1789304955656-6kj6",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:09:15.656Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789304808504-z6h6",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:06:48.504Z",
+      "timeShamsi": "1405/06/17"
     },
     {
       "id": "log-1789304808477-ccjr",
-      "timestamp": "2026-09-13T13:06:48.477Z",
-      "timeShamsi": "1405/06/19",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:06:48.477Z",
+      "timeShamsi": "1405/06/19"
     },
     {
       "id": "log-1789304808448-y387",
-      "timestamp": "2026-09-13T13:06:48.448Z",
-      "timeShamsi": "1405/06/10",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:06:48.448Z",
+      "timeShamsi": "1405/06/10"
     },
     {
       "id": "log-1789304808420-lcct",
-      "timestamp": "2026-09-13T13:06:48.420Z",
-      "timeShamsi": "1405/06/11",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:06:48.420Z",
+      "timeShamsi": "1405/06/11"
     },
     {
       "id": "log-1789304808383-ghee",
-      "timestamp": "2026-09-13T13:06:48.383Z",
-      "timeShamsi": "1405/06/12",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:06:48.383Z",
+      "timeShamsi": "1405/06/12"
     },
     {
       "id": "log-1789304808363-nmzk",
-      "timestamp": "2026-09-13T13:06:48.363Z",
-      "timeShamsi": "1405/06/15",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:06:48.363Z",
+      "timeShamsi": "1405/06/15"
     },
     {
       "id": "log-1789304808344-p624",
-      "timestamp": "2026-09-13T13:06:48.344Z",
-      "timeShamsi": "1405/06/17",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:06:48.344Z",
+      "timeShamsi": "1405/06/17"
     },
     {
       "id": "log-1789304604033-gj6d",
-      "timestamp": "2026-09-13T13:03:24.033Z",
-      "timeShamsi": "1405/06/17",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:03:24.033Z",
+      "timeShamsi": "1405/06/17"
     },
     {
       "id": "log-1789304604013-tt3i",
-      "timestamp": "2026-09-13T13:03:24.013Z",
-      "timeShamsi": "1405/06/19",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:03:24.013Z",
+      "timeShamsi": "1405/06/19"
     },
     {
       "id": "log-1789304604004-ytis",
-      "timestamp": "2026-09-13T13:03:24.004Z",
-      "timeShamsi": "1405/06/10",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:03:24.004Z",
+      "timeShamsi": "1405/06/10"
     },
     {
       "id": "log-1789304603992-1r4u",
-      "timestamp": "2026-09-13T13:03:23.992Z",
-      "timeShamsi": "1405/06/11",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:03:23.992Z",
+      "timeShamsi": "1405/06/11"
     },
     {
       "id": "log-1789304603980-i5s0",
-      "timestamp": "2026-09-13T13:03:23.980Z",
-      "timeShamsi": "1405/06/12",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:03:23.980Z",
+      "timeShamsi": "1405/06/12"
     },
     {
       "id": "log-1789304603971-g0zr",
-      "timestamp": "2026-09-13T13:03:23.971Z",
-      "timeShamsi": "1405/06/15",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:03:23.971Z",
+      "timeShamsi": "1405/06/15"
     },
     {
       "id": "log-1789304603958-4cf0",
-      "timestamp": "2026-09-13T13:03:23.958Z",
-      "timeShamsi": "1405/06/17",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:03:23.958Z",
+      "timeShamsi": "1405/06/17"
     },
     {
       "id": "log-1789304542216-plo2",
-      "timestamp": "2026-09-13T13:02:22.216Z",
-      "timeShamsi": "1405/06/19",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:02:22.216Z",
+      "timeShamsi": "1405/06/19"
     },
     {
       "id": "log-1789304542202-ot2s",
-      "timestamp": "2026-09-13T13:02:22.202Z",
-      "timeShamsi": "1405/06/10",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:02:22.202Z",
+      "timeShamsi": "1405/06/10"
     },
     {
       "id": "log-1789304542187-3nvv",
-      "timestamp": "2026-09-13T13:02:22.187Z",
-      "timeShamsi": "1405/06/11",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:02:22.187Z",
+      "timeShamsi": "1405/06/11"
     },
     {
       "id": "log-1789304542173-mdfj",
-      "timestamp": "2026-09-13T13:02:22.173Z",
-      "timeShamsi": "1405/06/12",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:02:22.173Z",
+      "timeShamsi": "1405/06/12"
     },
     {
       "id": "log-1789304542155-w8bf",
-      "timestamp": "2026-09-13T13:02:22.155Z",
-      "timeShamsi": "1405/06/15",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:02:22.155Z",
+      "timeShamsi": "1405/06/15"
     },
     {
       "id": "log-1789304542119-cr8e",
-      "timestamp": "2026-09-13T13:02:22.119Z",
-      "timeShamsi": "1405/06/17",
-      "category": "SYSTEM",
       "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد."
+      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-13T13:02:22.119Z",
+      "timeShamsi": "1405/06/17"
     },
     {
       "id": "log-1789303942015-3yrs",
@@ -4994,74 +5316,10 @@
       "category": "SYSTEM",
       "timestamp": "2026-09-13T11:32:55.098Z",
       "timeShamsi": "1405/06/12"
-    },
-    {
-      "id": "log-1789299175081-4erp",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-13T11:32:55.081Z",
-      "timeShamsi": "1405/06/15"
-    },
-    {
-      "id": "log-1789299175065-hasz",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-13T11:32:55.065Z",
-      "timeShamsi": "1405/06/17"
-    },
-    {
-      "id": "log-1789298575195-zaqm",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تحلیلی_روزانه_1405-06-19.xlsx» (تحلیلی روزانه عملکرد مشاورین) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-13T11:22:55.195Z",
-      "timeShamsi": "1405/06/19"
-    },
-    {
-      "id": "log-1789298575163-m1po",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-10.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-13T11:22:55.163Z",
-      "timeShamsi": "1405/06/10"
-    },
-    {
-      "id": "log-1789298575147-i22y",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-11.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-13T11:22:55.147Z",
-      "timeShamsi": "1405/06/11"
-    },
-    {
-      "id": "log-1789298575124-omai",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-12.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-13T11:22:55.124Z",
-      "timeShamsi": "1405/06/12"
-    },
-    {
-      "id": "log-1789298575104-zm3w",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-15.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-13T11:22:55.104Z",
-      "timeShamsi": "1405/06/15"
-    },
-    {
-      "id": "log-1789298575061-eu3z",
-      "level": "INFO",
-      "message": "رکورد بایگانی مکانیزه «تماس‌های_روزانه_1405-06-17.xlsx» (بایگانی روزانه تماس‌ها و پیگیری‌ها) ذخیره و به‌روزرسانی شد.",
-      "category": "SYSTEM",
-      "timestamp": "2026-09-13T11:22:55.061Z",
-      "timeShamsi": "1405/06/17"
     }
   ],
   "stats": {
     "lastBackup": "2026-09-03T12:00:00.000Z",
-    "totalWrites": 1592
+    "totalWrites": 1607
   }
 }
