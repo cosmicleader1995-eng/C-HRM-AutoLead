@@ -12,7 +12,7 @@ import {
 } from '../utils/shamsi';
 import { getLatestFollowUpOutcome } from '../components/ManagerPanel/ManagerDashboard';
 
-describe('تبدیل اعداد و تقویم خورشیدی کارینو', () => {
+describe('تبدیل اعداد و تقویم خورشیدی سامانه', () => {
   it('تبدیل صحیح اعداد انگلیسی به فارسی و بالعکس', () => {
     expect(toPersianDigits('1404/06/19')).toBe('۱۴۰۴/۰۶/۱۹');
     expect(toEnglishDigits('۱۴۰۴/۰۶/۱۹')).toBe('1404/06/19');
@@ -70,14 +70,14 @@ describe('امنیت و هش رمزهای عبور با Bcrypt', () => {
   });
 });
 
-describe('عناوین استاندارد گزارشات کارینو', () => {
+describe('عناوین استاندارد گزارشات سامانه', () => {
   it('تولید عنوان استاندارد دوره‌ای', () => {
     const title = formatStandardReportTitle('weekly', '۱۴۰۴/۰۶/۱۹');
     expect(title).toContain('هفتگی');
   });
 });
 
-describe('تعیین آخرین نماد پیگیری در ریزگزارش و کارتابل مدیر', () => {
+describe('تعیین آخرین نماد پیگیری در ریزگزارش و کارتابل سرپرست', () => {
   it('استخراج آخرین مرحله ثبت‌شده به جای اولین مرحله', () => {
     const rowWithMultipleFollowUps = {
       followUp1: '+',

@@ -535,7 +535,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
               <div className="p-3.5 rounded-xl bg-[#081525] border border-slate-800 flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="text-xs font-bold text-slate-200">جداسازی سشن کاربران و امنیت داده‌ها</div>
-                  <div className="text-[11px] text-slate-400">تفکیک کامل پنل مشاوران و مدیریت در تمامی دیوایس‌ها</div>
+                  <div className="text-[11px] text-slate-400">تفکیک کامل پنل مشاوران و سرپرست در تمامی دیوایس‌ها</div>
                 </div>
                 <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5" />
@@ -634,7 +634,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                 {toPersianDigits(users.length)} <span className="text-xs text-slate-400 font-normal">کاربر</span>
               </div>
               <div className="text-[11px] text-slate-400">
-                مدیریت، فاوا و مشاورین
+                سرپرست، فاوا و مشاورین
               </div>
             </div>
 
@@ -759,7 +759,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                       ? 'bg-blue-950 text-blue-300 border border-blue-500/30' 
                       : 'bg-amber-950 text-amber-300 border border-amber-500/30'
                   }`}>
-                    {user.role === 'ceo' ? 'مدیریت' : user.role === 'it_admin' ? 'مدیر فاوا' : 'مشاور اجرایی'}
+                    {user.role === 'ceo' ? 'سرپرست' : user.role === 'it_admin' ? 'مدیر فاوا' : 'مشاور اجرایی'}
                   </span>
                 </div>
 
@@ -826,7 +826,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                             ? 'bg-blue-950 text-blue-300 border border-blue-500/30' 
                             : 'bg-amber-950 text-amber-300 border border-amber-500/30'
                         }`}>
-                          {user.role === 'ceo' ? 'مدیریت' : user.role === 'it_admin' ? 'مدیر فاوا' : 'مشاور اجرایی'}
+                          {user.role === 'ceo' ? 'سرپرست' : user.role === 'it_admin' ? 'مدیر فاوا' : 'مشاور اجرایی'}
                         </span>
                       </td>
                       <td className="py-2.5 px-3 text-slate-400">{user.branch || 'تیم اجرایی'}</td>
@@ -943,7 +943,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                         className="w-full bg-[#06111e] border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white outline-none"
                       >
                         <option value="consultant">مشاور اجرایی</option>
-                        <option value="ceo">مدیریت</option>
+                        <option value="ceo">سرپرست</option>
                         <option value="it_admin">مدیر فاوا</option>
                       </select>
                     </div>

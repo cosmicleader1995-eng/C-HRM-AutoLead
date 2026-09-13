@@ -419,7 +419,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
   // Open directive warning modal for missing reports
   const handleOpenWarningModal = (consultant: User, reason: string) => {
     setWarningModalTarget({ consultant, reason });
-    setWarningMessage(`همکار گرامی جناب/سرکار ${consultant.fullName}، موعد قانونی ثبت گزارش روزانه شما در تاریخ ${curShamsi.formatted} سپری شده و گزارشی واصل نگردیده است. این مورد مشمول عدم ارسال و کسر امتیاز در سیستم ارزیابی انضباطی و KPI کارینو می‌باشد. لطفاً در صورت داشتن عذر موجه فوراً به مدیریت اطلاع دهید.`);
+    setWarningMessage(`همکار گرامی جناب/سرکار ${consultant.fullName}، موعد قانونی ثبت گزارش روزانه شما در تاریخ ${curShamsi.formatted} سپری شده و گزارشی واصل نگردیده است. این مورد مشمول عدم ارسال و کسر امتیاز در سیستم ارزیابی انضباطی و KPI می‌باشد. لطفاً در صورت داشتن عذر موجه فوراً به سرپرست اطلاع دهید.`);
   };
 
   // Send directive/warning
@@ -428,7 +428,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
 
     const newDirective: ManagerDirective = {
       id: `dir-${Date.now()}`,
-      authorName: currentUser.fullName || 'مدیریت ارشد',
+      authorName: currentUser.fullName || 'سرپرست ارشد',
       authorId: currentUser.id,
       content: warningMessage.trim(),
       priority: 'high',
@@ -578,7 +578,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
                     مرکز پایش گزارشات دوره‌ای و نظارت ستادی
                   </h2>
                   <span className="text-xs bg-[#F5EDE2] border border-[#DEC8B0] text-[#7F4F24] px-3 py-1 rounded-full font-bold">
-                    نظارت ستادی مدیریت
+                    نظارت ستادی سرپرست
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-[#6F4E37] mt-1 leading-relaxed">
@@ -1048,7 +1048,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
                   rep.managerStatus === 'rewarded' ? { label: '🌟 تشویق و پاداش منظور شد', bg: 'bg-[#FFF8E1] text-[#B78103] border-[#FFE082]' } :
                   rep.managerStatus === 'approved' ? { label: '✅ تایید شده', bg: 'bg-[#E8F5E9] text-[#1B5E20] border-[#A5D6A7]' } :
                   rep.managerStatus === 'warned' ? { label: '⚠️ دارای تذکر / کسر امتیاز', bg: 'bg-[#FFEBEE] text-[#C62828] border-[#FFCDD2]' } :
-                  { label: '⏳ در انتظار بررسی مدیریت', bg: 'bg-[#FAF7F2] text-[#5C4033] border-[#DEC8B0]' };
+                  { label: '⏳ در انتظار بررسی سرپرست', bg: 'bg-[#FAF7F2] text-[#5C4033] border-[#DEC8B0]' };
 
                 return (
                   <div 
@@ -1158,7 +1158,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
 
                     {rep.managerFeedback && (
                       <div className="p-3 rounded-2xl bg-[#FFF8E1] border border-[#FFE082] text-xs text-[#7A4B00]">
-                        <span className="font-bold block text-[11px] text-[#B78103] mb-0.5">دیدگاه مدیریت:</span>
+                        <span className="font-bold block text-[11px] text-[#B78103] mb-0.5">دیدگاه سرپرست:</span>
                         <p className="leading-relaxed">{rep.managerFeedback}</p>
                       </div>
                     )}
@@ -1734,7 +1734,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
               <div>
                 <h3 className="text-base font-black text-[#2B1810] flex items-center gap-2">
                   <Star className="w-5 h-5 text-amber-500 fill-amber-400" />
-                  <span>ارزیابی و ثبت نظر مدیریت بر گزارش دوره‌ای</span>
+                  <span>ارزیابی و ثبت نظر سرپرست بر گزارش دوره‌ای</span>
                 </h3>
                 <span className="text-xs text-[#6F4E37] block mt-0.5">
                   {reviewingReport.consultantName} ({reviewingReport.consultantCode}) • {formatStandardReportTitle(reviewingReport.periodType, reviewingReport.dateShamsi, reviewingReport.periodLabel)}
@@ -1820,7 +1820,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
             {/* Manager Feedback Textarea */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[#6F4E37] block">
-                یادداشت و رهنمود مدیریت برای مشاور:
+                یادداشت و رهنمود سرپرست برای مشاور:
               </label>
               <textarea
                 rows={3}
@@ -1899,7 +1899,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
 
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[#6F4E37] block">
-                متن ابلاغیه / تذکر انضباطی مدیریت:
+                متن ابلاغیه / تذکر انضباطی سرپرست:
               </label>
               <textarea
                 rows={4}

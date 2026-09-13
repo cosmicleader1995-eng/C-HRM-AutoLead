@@ -217,7 +217,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
     const newDir: ManagerDirective = {
       id: `dir-${Date.now()}`,
       authorId: currentUser.id,
-      authorName: currentUser.fullName || 'مدیریت کارینو',
+      authorName: currentUser.fullName || 'سرپرست',
       targetConsultantId: newDirectiveTarget,
       content: newDirectiveContent.trim(),
       priority: newDirectivePriority,
@@ -356,7 +356,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
         consultantId: u.id,
         consultantName: u.fullName,
         consultantCode: u.consultantCode,
-        branch: u.branch || 'دفتر مرکزی کارینو',
+        branch: u.branch || 'دفتر مرکزی',
         reports: [],
         totalReportsCount: 0,
         totalClientsContacted: 0,
@@ -974,10 +974,10 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
     const name = consultant.consultantName || consultant.fullName || 'مشاور محترم';
     const cId = consultant.consultantId || consultant.id || 'all';
     const code = consultant.consultantCode || '—';
-    const content = `همکار گرامی جناب/سرکار ${name} (کد ${code})، موعد قانونی ثبت گزارش عملکرد شما در بازه «${periodLabels[timePeriod].label}» سپری گردیده و گزارشی واصل نشده است. این عدم ارسال در پرونده انضباطی و شاخص KPI منظور می‌گردد. لطفاً در صورت داشتن عذر موجه، فوراً به مدیریت اعلام فرمایید.`;
+    const content = `همکار گرامی جناب/سرکار ${name} (کد ${code})، موعد قانونی ثبت گزارش عملکرد شما در بازه «${periodLabels[timePeriod].label}» سپری گردیده و گزارشی واصل نشده است. این عدم ارسال در پرونده انضباطی و شاخص KPI منظور می‌گردد. لطفاً در صورت داشتن عذر موجه، فوراً به سرپرست اعلام فرمایید.`;
     const dir: ManagerDirective = {
       id: `dir-${Date.now()}`,
-      authorName: currentUser.fullName || 'مدیریت ارشد',
+      authorName: currentUser.fullName || 'سرپرست ارشد',
       authorId: currentUser.id,
       content,
       priority: 'high',
@@ -1005,15 +1005,15 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
               </span>
               <div>
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#2B1810] tracking-tight">
-                  داشبورد راهبردی مدیریت ارشد کارینو
+                  داشبورد راهبردی سرپرست ارشد
                 </h1>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-xs sm:text-sm font-bold text-[#6F4E37]">
-                    مجموعه حقوقی و مدیریت کارینو
+                    پایش لحظه‌ای کارکنان و مشتریان
                   </span>
                   <span className="text-[#9C6644]">•</span>
                   <span className="bg-[#E6DAC8] text-[#3E2723] text-xs px-2.5 py-0.5 rounded-full font-bold">
-                    پنل نظارتی مدیرعامل
+                    پنل نظارتی سرپرست
                   </span>
                 </div>
               </div>
@@ -1106,7 +1106,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
             { id: 'aggregated', label: `جدول کل گزارشات (${toPersianDigits(totalRowsCount)})`, icon: Layers },
             { id: 'gemini', label: 'تحلیل هوشمند بازار (AI)', icon: BrainCircuit, badge: 'هوشمند' },
             { id: 'archive', label: `بایگانی مکانیزه (${toPersianDigits(archives.length)})`, icon: Archive },
-            { id: 'settings', label: 'مدیریت سرفصل‌های دغدغه‌ها', icon: Settings },
+            { id: 'settings', label: 'ساماندهی سرفصل‌های دغدغه‌ها', icon: Settings },
           ]}
         />
       </div>
@@ -1136,7 +1136,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
               badgeBg = 'bg-[#7F4F24]';
               iconBadge = <Clock className="w-5 h-5 text-white" />;
               mainTitle = 'امروز جمعه و روز تعطیل اداری است';
-              subText = 'طبق ضوابط سازمانی کارینو، در روزهای جمعه الزامی برای ارسال گزارش روزانه وجود ندارد.';
+              subText = 'طبق ضوابط سازمانی، در روزهای جمعه الزامی برای ارسال گزارش روزانه وجود ندارد.';
             } else if (isBeforeWindowToday) {
               bannerStyle = 'bg-gradient-to-r from-[#EBF8FF] via-[#F0F9FF] to-[#EBF8FF] border-[#BEE3F8] text-[#2B6CB0]';
               badgeBg = 'bg-[#2B6CB0]';
@@ -1174,7 +1174,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
               bannerStyle = 'bg-gradient-to-r from-[#FFEBEE]/80 via-[#FFF3E0]/70 to-[#FFEBEE]/80 border-[#FFCDD2] text-[#B71C1C]';
               badgeBg = 'bg-[#D32F2F]';
               iconBadge = <AlertTriangle className="w-5 h-5 text-white animate-pulse" />;
-              mainTitle = `توجه مدیریت: ${toPersianDigits(unsubmittedConsultants.length)} مشاور هنوز گزارش خود را در بازه «${periodLabels[timePeriod].label}» ارسال نکرده‌اند`;
+              mainTitle = `توجه سرپرست: ${toPersianDigits(unsubmittedConsultants.length)} مشاور هنوز گزارش خود را در بازه «${periodLabels[timePeriod].label}» ارسال نکرده‌اند`;
               subText = `جهت حفظ انضباط کاری و پایش مستمر، پیگیری وضعیت مشاوران زیر ضروری است.`;
               showWarningButton = true;
               warningBtnText = '⚡ شلیک تذکر رسمی به غایبین';
@@ -1376,14 +1376,14 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
             <div 
               onClick={() => setQuickFlyout({
                 type: 'pending_feedback',
-                title: 'کارتابل بازخورد و دستورات مدیریت',
+                title: 'کارتابل بازخورد و دستورات سرپرست',
                 subtitle: `گزارش‌های منتظر بررسی و امتیازدهی در بازه ${periodLabels[timePeriod].label}`,
                 badgeCount: pendingFeedbackCount
               })}
               className="bg-gradient-to-b from-white to-[#FFFAF0] rounded-3xl border border-[#FEEBC8] p-4 sm:p-5 shadow-sm hover:shadow-md hover:border-[#FBD38D] transition-all space-y-2 cursor-pointer group relative overflow-hidden"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#7B341E]">بازخورد مدیریت</span>
+                <span className="text-xs font-bold text-[#7B341E]">بازخورد سرپرست</span>
                 <span className="p-2 rounded-2xl bg-[#FEEBC8] text-[#9C4221] transition-transform group-hover:scale-110">
                   <FileCheck className="w-4 h-4" />
                 </span>
@@ -1524,7 +1524,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                 </p>
               </div>
               <span className="text-xs font-bold text-[#5C4033] bg-[#F5EDE2] px-3 py-1 rounded-xl border border-[#E6DAC8] self-start">
-                مبنای تدوین بسته‌های خدمات حقوقی کارینو
+                مبنای تدوین بسته‌های خدمات تخصصی
               </span>
             </div>
 
@@ -1604,7 +1604,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
             <div className="bg-gradient-to-br from-white to-[#F5EDE2] rounded-3xl border border-[#E6DAC8] p-6 shadow-sm space-y-3">
               <h3 className="text-sm sm:text-base font-black text-[#2B1810] flex items-center gap-2 border-b border-[#E6DAC8] pb-3">
                 <Award className="w-5 h-5 text-[#9C6644]" />
-                <span>شاخص‌های کلیدی تصمیم‌گیری مدیریت</span>
+                <span>شاخص‌های کلیدی تصمیم‌گیری سرپرست</span>
               </h3>
               <ul className="space-y-2.5 text-xs sm:text-sm text-[#5C4033] font-medium leading-relaxed">
                 <li className="flex items-start gap-2 p-2 rounded-xl bg-white/80 border border-[#E6DAC8]">
@@ -1617,7 +1617,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                 </li>
                 <li className="flex items-start gap-2 p-2 rounded-xl bg-white/80 border border-[#E6DAC8]">
                   <span className="text-[#9C6644] font-black">•</span>
-                  <span><strong>ابلاغ بازخورد روزانه:</strong> جهت حفظ انگیزه و نظم تیم مشاوران، بازخورد مدیریت در همان روز ثبت شود.</span>
+                  <span><strong>ابلاغ بازخورد روزانه:</strong> جهت حفظ انگیزه و نظم تیم مشاوران، بازخورد سرپرست در همان روز ثبت شود.</span>
                 </li>
                 <li className="flex items-start gap-2 p-2 rounded-xl bg-white/80 border border-[#E6DAC8]">
                   <span className="text-[#9C6644] font-black">•</span>
@@ -1718,7 +1718,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                   </div>
 
                   <div className="p-3 rounded-2xl bg-[#FAF7F2] border border-[#E6DAC8] space-y-1">
-                    <span className="text-[#6F4E37] font-semibold block text-[11px]">میانگین امتیاز مدیریت:</span>
+                    <span className="text-[#6F4E37] font-semibold block text-[11px]">میانگین امتیاز سرپرست:</span>
                     <div className="flex items-center gap-1">
                       <Star className="w-3.5 h-3.5 text-[#9A6B00] fill-[#9A6B00]" />
                       <span className="text-base font-black text-[#2B1810]">
@@ -2091,12 +2091,12 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                       {isFeedbacked ? (
                         <>
                           <CheckCircle2 className="w-4 h-4 text-[#2D6A4F]" />
-                          <span>مشاهده و ویرایش بازخورد مدیر</span>
+                          <span>مشاهده و ویرایش بازخورد سرپرست</span>
                         </>
                       ) : (
                         <>
                           <Eye className="w-4 h-4" />
-                          <span>بررسی و ثبت بازخورد مدیریت</span>
+                          <span>بررسی و ثبت بازخورد سرپرست</span>
                         </>
                       )}
                     </button>
@@ -2239,7 +2239,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                   </span>
                   <div>
                     <h3 className="text-lg sm:text-xl font-black text-[#2B1810]">
-                      تحلیل استراتژیک هوش مصنوعی کارینو
+                      تحلیل هوشمند رفتار مشتریان
                     </h3>
                     <span className="text-xs text-[#6F4E37] font-bold">
                       پردازش هوشمند رفتار بازار، دغدغه‌های کارفرمایان و ارزیابی مشاوران
@@ -2247,7 +2247,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                   </div>
                 </div>
                 <p className="text-xs sm:text-sm text-[#5C4033] max-w-2xl leading-relaxed font-medium">
-                  هوش مصنوعی به صورت خودکار رکوردهای ورودی بازه انتخابی ({periodLabels[timePeriod].label}) را بررسی کرده و راهکارهای مدیریتی و نقاط قوت و ضعف عملکردی را استخراج می‌نماید.
+                  هوش مصنوعی به صورت خودکار رکوردهای ورودی بازه انتخابی ({periodLabels[timePeriod].label}) را بررسی کرده و راهکارهای عملیاتی و نقاط قوت و ضعف عملکردی را استخراج می‌نماید.
                 </p>
               </div>
 
@@ -2259,7 +2259,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                 {aiLoading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>در حال تدوین گزارش مدیریتی...</span>
+                    <span>در حال تدوین گزارش سرپرست...</span>
                   </>
                 ) : (
                   <>
@@ -2273,7 +2273,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
             {/* Custom Instruction Box */}
             <div className="space-y-1.5 pt-2 border-t border-[#E6DAC8]">
               <label className="text-xs sm:text-sm font-bold text-[#3E2723]">
-                زاویه دید خاص مدیریت برای تحلیل (اختیاری):
+                زاویه دید خاص سرپرست برای تحلیل (اختیاری):
               </label>
               <input
                 type="text"
@@ -2360,7 +2360,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
 
                       {/* Recommendation */}
                       <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#DEC8B0] text-xs sm:text-sm text-[#2B1810]">
-                        <strong className="block text-[#9C6644] font-black mb-1">توصیه راهبردی به مدیریت:</strong>
+                        <strong className="block text-[#9C6644] font-black mb-1">توصیه راهبردی به سرپرست:</strong>
                         <p className="font-medium leading-relaxed">{evalItem.aiRecommendation}</p>
                       </div>
 
@@ -3049,7 +3049,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                   <span className="text-xl font-black text-[#2D6A4F] block">{toPersianDigits(selectedConsultantDetail.successfulMeetingsCount)} مورد</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#E6DAC8] text-center space-y-1">
-                  <span className="text-xs text-[#6F4E37] font-semibold block">میانگین امتیاز مدیریت</span>
+                  <span className="text-xs text-[#6F4E37] font-semibold block">میانگین امتیاز سرپرست</span>
                   <span className="text-xl font-black text-[#9A6B00] block">{toPersianDigits(selectedConsultantDetail.averageRating)} ★</span>
                 </div>
               </div>
@@ -3124,7 +3124,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                             <div className="flex items-center justify-between">
                               <span className="font-bold text-[#2D6A4F] flex items-center gap-1">
                                 <CheckCircle2 className="w-3.5 h-3.5" />
-                                دستور و بازخورد ابلاغی مدیریت:
+                                دستور و بازخورد ابلاغی سرپرست:
                               </span>
                               {rep.managerRating && (
                                 <span className="font-bold text-[#9A6B00]">امتیاز: {toPersianDigits(rep.managerRating)} ★</span>
@@ -3283,8 +3283,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <span className="font-black text-[#2B1810] text-sm sm:text-base">
                     {(selectedReportDetail.status === 'approved' || !!selectedReportDetail.managerFeedback) 
-                      ? 'ویرایش یا به‌روزرسانی بازخورد مدیریت:' 
-                      : 'ثبت دستور و بازخورد مدیریت به مشاور:'}
+                      ? 'ویرایش یا به‌روزرسانی بازخورد سرپرست:' 
+                      : 'ثبت دستور و بازخورد سرپرست به مشاور:'}
                   </span>
                   
                   {/* Rating Stars */}
@@ -3307,7 +3307,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                   rows={3}
                   value={feedbackInput}
                   onChange={(e) => setFeedbackInput(e.target.value)}
-                  placeholder="دستور پیگیری، رهنمود حقوقی یا تشویق پرسنل توسط مدیریت..."
+                  placeholder="دستور پیگیری، رهنمود یا تشویق پرسنل توسط سرپرست..."
                   className="w-full bg-white border border-[#DEC8B0] focus:border-[#9C6644] rounded-2xl p-3.5 text-xs sm:text-sm text-[#2B1810] placeholder-[#8D5B4C] focus:outline-none font-medium"
                 />
 
@@ -3690,7 +3690,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
             {/* Modal Footer */}
             <div className="p-4 sm:p-5 bg-[#FAF7F2] border-t border-[#DEC8B0] flex items-center justify-between gap-3 shrink-0">
               <span className="text-xs text-[#8D5B4C] font-semibold hidden sm:inline">
-                سامانه مدیریت عملکرد و گزارشات اجرایی کارینو
+                سامانه پایش لحظه‌ای کارکنان و مشتریان
               </span>
 
               <div className="flex items-center gap-2 mr-auto">

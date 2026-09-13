@@ -80,7 +80,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     setMError('');
 
     if (!mPassword.trim()) {
-      setMError('لطفاً کلمه عبور مدیریت را وارد نمایید.');
+      setMError('لطفاً کلمه عبور سرپرست را وارد نمایید.');
       return;
     }
 
@@ -90,7 +90,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       if (result.success && result.user) {
         onLoginSuccess(result.user);
       } else {
-        setMError(result.message || 'کلمه عبور مدیریت نادرست است.');
+        setMError(result.message || 'کلمه عبور سرپرست نادرست است.');
       }
     } catch (err: any) {
       setMError('خطا در اعتبارسنجی سرور.');
@@ -182,13 +182,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           </div>
           
           <h1 className="text-xl font-black text-white font-['Playfair_Display'] tracking-wide">
-            KARINO
+            CRM
           </h1>
           <h2 className="text-sm font-bold gold-gradient-text mt-0.5">
-            مجموعه حقوقی و مدیریت کارینو
+            پایش لحظه‌ای کارکنان و مشتریان
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            سامانه ورود امن و مدیریت گزارشات اجرایی
+            سامانه ورود امن و پایش لحظه‌ای گزارشات اجرایی
           </p>
         </div>
 
@@ -217,7 +217,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             }`}
           >
             <Lock className="w-3.5 h-3.5" />
-            <span>مدیریت</span>
+            <span>سرپرست</span>
           </button>
 
           <button
@@ -321,22 +321,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             </form>
           )}
 
-          {/* TAB 2: MANAGEMENT (CEO) LOGIN */}
+          {/* TAB 2: SUPERVISOR LOGIN */}
           {activeTab === 'manager' && (
             <form onSubmit={handleManagerLogin} className="space-y-4">
               <div className="p-3 bg-purple-950/40 border border-purple-500/30 rounded-xl text-xs text-purple-200">
-                ورود به پنل استراتژیک مدیریت کارینو (Management Dashboard)
+                ورود به پنل استراتژیک سرپرست (Supervisor Dashboard)
               </div>
 
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-300">
-                  کلمه عبور مدیریت:
+                  کلمه عبور سرپرست:
                 </label>
                 <input
                   type="password"
                   value={mPassword}
                   onChange={(e) => setMPassword(e.target.value)}
-                  placeholder="کلمه عبور مدیریت"
+                  placeholder="کلمه عبور سرپرست"
                   className="w-full bg-[#06111e] border border-slate-700 focus:border-purple-400 focus:ring-1 focus:ring-purple-400 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none transition-all"
                   dir="ltr"
                   autoFocus
@@ -358,12 +358,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-white" />
-                    <span>در حال اعتبارسنجی مدیریت...</span>
+                    <span>در حال اعتبارسنجی سرپرست...</span>
                   </>
                 ) : (
                   <>
                     <Lock className="w-4 h-4" />
-                    <span>ورود به داشبورد مدیریت</span>
+                    <span>ورود به داشبورد سرپرست</span>
                   </>
                 )}
               </button>

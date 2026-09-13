@@ -61,9 +61,9 @@ export default function App() {
       {/* Footer */}
       <footer className="border-t border-slate-900 bg-[#050c14] py-4 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>سامانه مدیریت عملکرد و گزارشات اجرایی مجموعه حقوقی و مدیریت کارینو © ۱۴۰۳</span>
+          <span>سامانه پایش لحظه‌ای کارکنان و مشتریان © ۱۴۰۵</span>
           <div className="flex items-center gap-2 text-slate-400">
-            <span>طراحی شده برای انطباق ۱۰۰٪ با استانداردهای مدیریت</span>
+            <span>طراحی شده برای انطباق ۱۰۰٪ با استانداردهای نظارتی سرپرست</span>
             <span>•</span>
             <span className="text-blue-400 font-bold">واحد فناوری اطلاعات و فاوا</span>
           </div>

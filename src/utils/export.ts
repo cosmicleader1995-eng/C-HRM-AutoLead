@@ -119,7 +119,7 @@ export function exportAggregatedReportsToExcel(reports: DailyReport[], fileNameT
       'تاریخ پیگیری ۴': '-',
       'نتیجه پیگیری': '-',
       'موضوع جلسه': '-',
-      'نظر شخصی مشاور': 'سیستم بایگانی خودکار ۲۳:۰۰ کارینو'
+      'نظر شخصی مشاور': 'سیستم بایگانی خودکار ۲۳:۰۰'
     });
   }
 
@@ -192,11 +192,11 @@ export function exportPeriodicReportsToExcel(reports: PeriodicOverallReport[], f
         'موانع و چالش‌ها': rep.challengesOrBarriers || '-',
         'برنامه و اهداف دوره بعد': rep.plansOrPriorities || '-',
         'صنوف کانون توجه': rep.weeklyFocusGuilds || '-',
-        'پیشنهاد استراتژیک به مدیر': rep.monthlyStrategicNotes || '-',
+        'پیشنهاد استراتژیک به سرپرست': rep.monthlyStrategicNotes || '-',
         'خودارزیابی مشاور': rep.selfRating ? `${rep.selfRating} از ۵` : '-',
-        'وضعیت ارزیابی مدیریت': statusLabel,
-        'نمره مدیر': rep.managerRating ? `${rep.managerRating} از ۵` : '-',
-        'بازخورد مدیر': rep.managerFeedback || '-',
+        'وضعیت ارزیابی سرپرست': statusLabel,
+        'نمره سرپرست': rep.managerRating ? `${rep.managerRating} از ۵` : '-',
+        'بازخورد سرپرست': rep.managerFeedback || '-',
         'ساعت ثبت': rep.submittedAt || '-'
       });
     });
@@ -213,11 +213,11 @@ export function exportPeriodicReportsToExcel(reports: PeriodicOverallReport[], f
       'موانع و چالش‌ها': '-',
       'برنامه و اهداف دوره بعد': '-',
       'صنوف کانون توجه': '-',
-      'پیشنهاد استراتژیک به مدیر': '-',
+      'پیشنهاد استراتژیک به سرپرست': '-',
       'خودارزیابی مشاور': '-',
-      'وضعیت ارزیابی مدیریت': '-',
-      'نمره مدیر': '-',
-      'بازخورد مدیر': '-',
+      'وضعیت ارزیابی سرپرست': '-',
+      'نمره سرپرست': '-',
+      'بازخورد سرپرست': '-',
       'ساعت ثبت': '-'
     });
   }
@@ -236,11 +236,11 @@ export function exportPeriodicReportsToExcel(reports: PeriodicOverallReport[], f
     { wch: 28 }, // موانع
     { wch: 30 }, // برنامه دوره بعد
     { wch: 25 }, // صنوف کانون توجه
-    { wch: 30 }, // پیشنهاد به مدیر
+    { wch: 30 }, // پیشنهاد به سرپرست
     { wch: 16 }, // خودارزیابی
-    { wch: 18 }, // وضعیت مدیریت
-    { wch: 14 }, // نمره مدیر
-    { wch: 30 }, // بازخورد مدیر
+    { wch: 18 }, // وضعیت سرپرست
+    { wch: 14 }, // نمره سرپرست
+    { wch: 30 }, // بازخورد سرپرست
     { wch: 12 }  // ساعت ثبت
   ];
 
@@ -284,7 +284,7 @@ export function printOfficialReport(report: DailyReport) {
     <html lang="fa" dir="rtl">
     <head>
       <meta charset="utf-8">
-      <title>برگه رسمی گزارش عملکرد روزانه بخش اجرایی - کارینو</title>
+      <title>برگه رسمی گزارش عملکرد روزانه بخش اجرایی - سامانه پایش لحظه‌ای کارکنان و مشتریان</title>
       <style>
         @page { size: landscape; margin: 10mm; }
         body { font-family: Tahoma, 'Vazirmatn', sans-serif; font-size: 12px; color: #111; direction: rtl; margin: 0; padding: 15px; }
@@ -300,8 +300,8 @@ export function printOfficialReport(report: DailyReport) {
     <body>
       <div class="header">
         <div>
-          <h2 style="margin: 0; color: #0a192f;">مجموعه تخصصی کارینو</h2>
-          <small style="color: #666;">مهندسی ساختار، پایداری، حقوق کار و سیستم‌سازی مدیریتی</small>
+          <h2 style="margin: 0; color: #0a192f;">سامانه پایش لحظه‌ای کارکنان و مشتریان</h2>
+          <small style="color: #666;">سیستم جامع نظارت و گزارش‌دهی سازمانی</small>
         </div>
         <div class="title">گزارش عملکرد روزانه بخش اجرایی</div>
         <div style="text-align: left; font-size: 11px;">
@@ -347,7 +347,7 @@ export function printOfficialReport(report: DailyReport) {
 
       ${report.managerFeedback ? `
         <div class="opinion-box" style="border-right-color: #0a192f; background: #eef4fb; margin-top: 10px;">
-          <strong>بازخورد و دستورات مدیریت:</strong>
+          <strong>بازخورد و دستورات سرپرست:</strong>
           <p style="margin: 5px 0 0 0; line-height: 1.6;">${report.managerFeedback}</p>
         </div>
       ` : ''}
@@ -355,7 +355,7 @@ export function printOfficialReport(report: DailyReport) {
       <div class="signatures">
         <div>امضاء و تایید مشاور اجرایی</div>
         <div>امضاء مدیر فاوا و هماهنگی</div>
-        <div>ملاحظه و تایید مدیریت مجموعه کارینو</div>
+        <div>ملاحظه و تایید سرپرست مجموعه</div>
       </div>
     </body>
     </html>

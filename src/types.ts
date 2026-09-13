@@ -164,7 +164,7 @@ export interface PeriodicOverallReport {
   
   // فیلدهای ویژه دوره‌های هفتگی و ماهانه
   weeklyFocusGuilds?: string; // ارزیابی صنوف و صنایع کانون توجه (ویژه هفتگی)
-  monthlyStrategicNotes?: string; // پیشنهادات کلان و استراتژیک به مدیریت (ویژه ماهانه)
+  monthlyStrategicNotes?: string; // پیشنهادات کلان و استراتژیک به سرپرست (ویژه ماهانه)
 
   submittedAt: string; // زمان ارسال (ساعت یا فرمت فارسی)
   createdAt: string; // ISO

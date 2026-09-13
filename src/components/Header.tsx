@@ -59,17 +59,17 @@ export const Header: React.FC<HeaderProps> = ({
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="text-base sm:text-lg font-black tracking-tight text-white font-['Playfair_Display']">
-                  KARINO
+                  CRM
                 </span>
                 <span className="text-xs sm:text-sm font-black gold-gradient-text whitespace-nowrap">
-                  مجموعه کارینو
+                  پایش لحظه‌ای کارکنان و مشتریان
                 </span>
                 <span className="text-[9px] sm:text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded font-mono whitespace-nowrap">
-                  نسخه ۲.۵
+                  نسخه ۳.۰
                 </span>
               </div>
               <p className="text-[10px] sm:text-[11px] text-slate-400 line-clamp-1">
-                سامانه گزارش عملکرد اجرایی و مدیریت حقوق کار
+                سامانه هوشمند پایش لحظه‌ای کارکنان و مشتریان
               </p>
             </div>
           </div>
@@ -111,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
                 ? 'bg-blue-600 text-white' 
                 : 'bg-gradient-to-tr from-amber-600 to-amber-400 text-slate-950'
             }`}>
-              {currentUser.role === 'ceo' ? 'مدیر' : currentUser.role === 'it_admin' ? 'فاوا' : 'مشاور'}
+              {currentUser.role === 'ceo' ? 'سرپرست' : currentUser.role === 'it_admin' ? 'فاوا' : 'مشاور'}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
@@ -125,11 +125,11 @@ export const Header: React.FC<HeaderProps> = ({
                     ? 'bg-blue-950 text-blue-300 border border-blue-500/40'
                     : 'bg-amber-950 text-amber-300 border border-amber-500/40'
                 }`}>
-                  {currentUser.role === 'ceo' ? 'مدیریت' : currentUser.role === 'it_admin' ? 'مدیر فاوا' : `کد: ${currentUser.consultantCode}`}
+                  {currentUser.role === 'ceo' ? 'سرپرست' : currentUser.role === 'it_admin' ? 'مدیر فاوا' : `کد: ${currentUser.consultantCode}`}
                 </span>
               </div>
               <div className="text-[10px] text-slate-400 truncate">
-                {currentUser.branch || 'تیم اجرایی کارینو'}
+                {currentUser.branch || 'تیم اجرایی'}
               </div>
             </div>
           </div>

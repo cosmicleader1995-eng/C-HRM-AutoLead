@@ -197,11 +197,11 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
                 <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
                   <span>سامانه گزارشات کلی و دوره‌ای مشاوران</span>
                   <span className="text-xs bg-amber-500/20 border border-amber-500/40 text-amber-300 px-2.5 py-0.5 rounded-full font-normal">
-                    نظارت مستقیم مدیریت
+                    نظارت مستقیم سرپرست
                   </span>
                 </h2>
                 <p className="text-xs text-slate-300 mt-1">
-                  تحلیل‌های شخصی از سطرهای تکی جدا شده و به صورت گزارشات تفصیلی روزانه، هفتگی و ماهانه ثبت و توسط مدیر ارزیابی می‌شود.
+                  تحلیل‌های شخصی از سطرهای تکی جدا شده و به صورت گزارشات تفصیلی روزانه، هفتگی و ماهانه ثبت و توسط سرپرست ارزیابی می‌شود.
                 </p>
               </div>
             </div>
@@ -299,7 +299,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
           <Sparkles className="w-5 h-5 text-purple-400 shrink-0" />
           <div className="flex-1">
             <span className="font-bold">موعد تحویل گزارش ماهانه: </span>
-            در روزهای پایانی ماه قرار داریم. ارزیابی راهبردی ماهانه شما ملاک محاسبه کارایی و پاداش مدیریتی است.
+            در روزهای پایانی ماه قرار داریم. ارزیابی راهبردی ماهانه شما ملاک محاسبه کارایی و پاداش است.
           </div>
         </div>
       )}
@@ -374,10 +374,10 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
                   ⛔ قفل اداری سامانه: پایان مهلت قانونی ثبت گزارش (ساعت ۱۹:۰۰ به وقت تهران)
                 </span>
                 <p>
-                  همکار گرامی، طبق ضوابط انضباطی سازمان کارینو، حداکثر مهلت ثبت و ارسال هرگونه گزارش (روزانه، هفتگی، ماهانه) تا ساعت <strong>۱۹:۰۰ عصر</strong> بوده است. هم‌اکنون ساعت <strong>{windowStatus.tehranTimeString}</strong> به وقت تهران می‌باشد و دسترسی ثبت گزارش برای امروز مسدود گردید.
+                  همکار گرامی، طبق ضوابط انضباطی سازمان، حداکثر مهلت ثبت و ارسال هرگونه گزارش (روزانه، هفتگی، ماهانه) تا ساعت <strong>۱۹:۰۰ عصر</strong> بوده است. هم‌اکنون ساعت <strong>{windowStatus.tehranTimeString}</strong> به وقت تهران می‌باشد و دسترسی ثبت گزارش برای امروز مسدود گردید.
                 </p>
                 <p className="text-xs text-rose-300 font-bold bg-rose-900/60 p-3 rounded-xl border border-rose-700/60">
-                  وضعیت پرونده شما در پنل نظارتی مدیریت به عنوان «عدم ارسال گزارش / مشمول جریمه انضباطی و کسر امتیاز در سیستم KPI» ثبت گردید. در صورت داشتن عذر موجه اداری، بلافاصله موضوع را با مدیریت هماهنگ نمایید.
+                  وضعیت پرونده شما در پنل نظارتی سرپرست به عنوان «عدم ارسال گزارش / مشمول جریمه انضباطی و کسر امتیاز در سیستم KPI» ثبت گردید. در صورت داشتن عذر موجه اداری، بلافاصله موضوع را با سرپرست هماهنگ نمایید.
                 </p>
               </div>
             </div>
@@ -386,7 +386,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
               <CalendarCheck className="w-6 h-6 text-amber-400 shrink-0" />
               <div>
                 <span className="font-bold block text-sm text-white">امروز جمعه است (تعطیل رسمی اداری)</span>
-                <span>طبق ضوابط کارینو، روزهای جمعه نیازی به ارسال گزارش عملکرد روزانه نبوده و وضعیت غیبت منظور نمی‌گردد.</span>
+                <span>طبق ضوابط سازمانی، روزهای جمعه نیازی به ارسال گزارش عملکرد روزانه نبوده و وضعیت غیبت منظور نمی‌گردد.</span>
               </div>
             </div>
           ) : periodType === 'daily' && windowStatus.isInsideSubmissionWindow && !todayDailyReport ? (
@@ -497,7 +497,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
             <div className="space-y-1.5 bg-[#081525] p-4 rounded-2xl border border-purple-500/20">
               <label className="text-xs font-bold text-purple-300 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-purple-400" />
-                <span>پیشنهادات راهبردی توسعه بازار برای مدیریت:</span>
+                <span>پیشنهادات راهبردی توسعه بازار برای سرپرست:</span>
               </label>
               <textarea
                 rows={2}
@@ -583,7 +583,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
           {/* Submit Button */}
           <div className="flex items-center justify-between pt-2">
             <span className="text-xs text-slate-400">
-              * این گزارش بلافاصله در داشبورد نظارتی مدیریت و ماتریس انضباطی منعکس می‌گردد.
+              * این گزارش بلافاصله در داشبورد نظارتی سرپرست و ماتریس انضباطی منعکس می‌گردد.
             </span>
 
             <button
@@ -618,7 +618,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
           {saveSuccess && (
             <div className="p-3.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2">
               <Check className="w-4 h-4" />
-              <span>گزارش کلی شما با موفقیت ثبت و به پنل نظارت مدیریت ارسال گردید.</span>
+              <span>گزارش کلی شما با موفقیت ثبت و به پنل نظارت سرپرست ارسال گردید.</span>
             </div>
           )}
 
@@ -632,7 +632,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
             <Clock className="w-4 h-4 text-amber-400" />
             <span>سوابق گزارشات دوره‌ای ثبت‌شده شما ({toPersianDigits(myPeriodicReports.length)} گزارش)</span>
           </h3>
-          <span className="text-xs text-slate-400">نمایش آخرین ارزیابی‌ها و وضعیت تایید مدیریت</span>
+          <span className="text-xs text-slate-400">نمایش آخرین ارزیابی‌ها و وضعیت تایید سرپرست</span>
         </div>
 
         {myPeriodicReports.length === 0 ? (
@@ -644,9 +644,9 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
             {myPeriodicReports.map((rep) => {
               const statusBadge = 
                 rep.managerStatus === 'rewarded' ? { label: '🌟 تشویق و پاداش منظور شد', bg: 'bg-amber-500/20 text-amber-300 border-amber-500/40' } :
-                rep.managerStatus === 'approved' ? { label: '✅ تایید شده توسط مدیر', bg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' } :
+                rep.managerStatus === 'approved' ? { label: '✅ تایید شده توسط سرپرست', bg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' } :
                 rep.managerStatus === 'warned' ? { label: '⚠️ دارای تذکر / کسر امتیاز', bg: 'bg-rose-500/20 text-rose-300 border-rose-500/40' } :
-                { label: '⏳ در انتظار بررسی مدیریت', bg: 'bg-slate-700/40 text-slate-300 border-slate-600' };
+                { label: '⏳ در انتظار بررسی سرپرست', bg: 'bg-slate-700/40 text-slate-300 border-slate-600' };
 
               return (
                 <div 
@@ -704,7 +704,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
 
                     {rep.managerRating && (
                       <div className="flex items-center gap-1 text-xs text-amber-400">
-                        <span>امتیاز مدیر:</span>
+                        <span>امتیاز سرپرست:</span>
                         <span className="font-bold font-mono">{toPersianDigits(rep.managerRating)} از ۵</span>
                         <Star className="w-3.5 h-3.5 fill-amber-400" />
                       </div>
@@ -721,7 +721,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
 
                   {rep.managerFeedback && (
                     <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-200 space-y-1">
-                      <span className="font-bold block text-[11px] text-amber-400">بازخورد مدیریت:</span>
+                      <span className="font-bold block text-[11px] text-amber-400">بازخورد سرپرست:</span>
                       <p className="leading-relaxed">{rep.managerFeedback}</p>
                     </div>
                   )}

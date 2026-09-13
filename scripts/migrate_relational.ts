@@ -83,9 +83,9 @@ INSERT INTO public.daily_reports (id, consultant_id, consultant_name, consultant
 VALUES (
   ${escapeSql(r.id)},
   ${escapeSql(r.consultantId)},
-  ${escapeSql(r.consultantName || 'مشاور کارینو')},
+  ${escapeSql(r.consultantName || 'مشاور سازمانی')},
   ${escapeSql(r.consultantCode || 'C-100')},
-  ${escapeSql(r.branch || 'دفتر مرکزی کارینو')},
+  ${escapeSql(r.branch || 'دفتر مرکزی')},
   ${escapeSql(r.dateShamsi)},
   ${escapeSql(r.dayOfWeekShamsi || '')},
   ${escapeSql(r.submittedAt || '')},
@@ -155,7 +155,7 @@ INSERT INTO public.periodic_reports (id, consultant_id, consultant_name, consult
 VALUES (
   ${escapeSql(p.id)},
   ${escapeSql(p.consultantId)},
-  ${escapeSql(p.consultantName || 'مشاور کارینو')},
+  ${escapeSql(p.consultantName || 'مشاور سازمانی')},
   ${escapeSql(p.consultantCode || 'C-100')},
   ${escapeSql(p.periodType || 'daily')},
   ${escapeSql(p.dateShamsi)},

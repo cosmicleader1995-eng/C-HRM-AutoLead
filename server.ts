@@ -207,18 +207,18 @@ const DEFAULT_SERVER_USERS = [
   {
     id: 'user-ceo',
     username: 'ceo',
-    fullName: 'مدیریت کارینو (CEO)',
-    consultantCode: 'KARINO-CEO',
+    fullName: 'سرپرست ارشد (CEO)',
+    consultantCode: 'CRM-CEO',
     role: 'ceo',
     password: 'karino2026',
     phone: '09120000000',
-    branch: 'دفتر مرکزی کارینو'
+    branch: 'دفتر مرکزی'
   },
   {
     id: 'user-it',
     username: 'it_admin',
     fullName: 'مدیر فاوا و فناوری اطلاعات',
-    consultantCode: 'KARINO-IT',
+    consultantCode: 'CRM-IT',
     role: 'it_admin',
     password: 'it2026',
     phone: '09120000001',
@@ -354,7 +354,7 @@ function getInitialDB(): DatabaseSchema {
         timeShamsi: 'راه‌اندازی پایگاه داده ابری',
         category: 'SYSTEM',
         level: 'SUCCESS',
-        message: 'پایگاه داده متمرکز ابری کارینو با قابلیت همگام‌سازی سراسری مستقر گردید.'
+        message: 'پایگاه داده متمرکز با قابلیت همگام‌سازی سراسری مستقر گردید.'
       }
     ],
     stats: {
@@ -681,9 +681,9 @@ async function syncReportToSupabaseRelational(report: any): Promise<void> {
     const headerPayload = {
       id: report.id,
       consultant_id: report.consultantId,
-      consultant_name: report.consultantName || 'مشاور کارینو',
+      consultant_name: report.consultantName || 'مشاور سازمانی',
       consultant_code: report.consultantCode || 'C-100',
-      branch: report.branch || 'دفتر مرکزی کارینو',
+      branch: report.branch || 'دفتر مرکزی',
       date_shamsi: report.dateShamsi,
       day_of_week_shamsi: report.dayOfWeekShamsi || '',
       submitted_at: report.submittedAt || '',
@@ -1573,7 +1573,7 @@ function generateFallbackAnalysis(reports: any[], customInstruction?: string) {
     const hasAuditRisk = r.rows?.some((rw: any) => rw.employerConcern?.includes('بیمه') || rw.employerConcern?.includes('شکایت'));
 
     return {
-      consultantName: r.consultantName || 'مشاور کارینو',
+      consultantName: r.consultantName || 'مشاور سازمانی',
       consultantCode: r.consultantCode || 'C-100',
       performanceRating: rating,
       strengths: [
@@ -1589,7 +1589,7 @@ function generateFallbackAnalysis(reports: any[], customInstruction?: string) {
   });
 
   return {
-    summary: `تیم اجرایی کارینو امروز در مجموع موفق به برگزاری و پیگیری مستند ${totalRows} جلسه کاری در قالب ${totalReports} گزارش تخصصی شده است. شاخص نظم مستندسازی و تکمیل فیلدهای اجباری در سطح ۹۴٪ ارزیابی می‌شود که نشانگر انضباط فرآیندی مطلوب است.${customInstruction ? ` (با لحاظ زاویه دید مدیر: «${customInstruction}»)` : ''}`,
+    summary: `تیم اجرایی امروز در مجموع موفق به برگزاری و پیگیری مستند ${totalRows} جلسه کاری در قالب ${totalReports} گزارش تخصصی شده است. شاخص نظم مستندسازی و تکمیل فیلدهای اجباری در سطح ۹۴٪ ارزیابی می‌شود که نشانگر انضباط فرآیندی مطلوب است.${customInstruction ? ` (با لحاظ زاویه دید سرپرست: «${customInstruction}»)` : ''}`,
     overallScore: Math.min(98, 76 + totalRows * 4),
     topTrends: [
       sortedConcerns[0] ? `تمرکز اصلی دغدغه کارفرمایان: «${sortedConcerns[0]}»` : 'تمایل کارفرمایان به شفاف‌سازی قراردادهای پرسنلی و سیستم‌سازی حقوق و دستمزد',
@@ -1604,8 +1604,8 @@ function generateFallbackAnalysis(reports: any[], customInstruction?: string) {
     ],
     strategicActionItems: [
       'ابلاغ دستور پیگیری فوری رکوردهای مرحله ۳ که در آستانه عقد قرارداد هستند تا حداکثر ظهر فردا',
-      'ارائه بازخورد تشویقی و امتیاز عملکردی به مشاورین با انضباط بالای گزارش‌دهی در سیستم رتبه‌بندی کارینو',
-      'بررسی دقیق نظرات شخصی ثبت‌شده توسط مشاوران در جلسه تحلیل هفتگی فاوا و مدیریت'
+      'ارائه بازخورد تشویقی و امتیاز عملکردی به مشاورین با انضباط بالای گزارش‌دهی در سیستم رتبه‌بندی',
+      'بررسی دقیق نظرات شخصی ثبت‌شده توسط مشاوران در جلسه تحلیل هفتگی فاوا و سرپرست'
     ]
   };
 }
@@ -1625,18 +1625,18 @@ app.post('/api/gemini/analyze', async (req, res) => {
     if (ai) {
       try {
         const prompt = `
-نقش شما: مشاور ارشد و تحلیل‌گر استراتژیک ۲۵ ساله در حوزه «حقوق کار، مهندسی منابع انسانی، حل اختلاف کارگری/کارفرمایی، اداره کار و تأمین اجتماعی، و سیستم‌سازی مدیریتی» برای مجموعه کارینو هستید.
+نقش شما: تحلیل‌گر ارشد استراتژیک در حوزه «پایش لحظه‌ای کارکنان و مشتریان، مهندسی عملکرد سازمانی، حل تعارضات کاری و سیستم‌سازی» هستید.
 شما گزارش‌های عملکرد روزانه مشاوران اجرایی زیر را دریافت کرده‌اید:
 
 داده‌های گزارشات:
 ${JSON.stringify(reports, null, 2)}
 
-دستورالعمل ویژه مدیریت:
+دستورالعمل ویژه سرپرست:
 ${customInstruction || 'لطفاً یک تحلیل جامع، موشکافانه، دقیق و بدون تعارف به تفکیک تک‌تک مشاوران (با ذکر نام و کد مشاور) و همچنین تحلیل استراتژیک کل بازار و دغدغه‌های کارفرمایان ارائه دهید.'}
 
 خروجی شما باید حتماً یک شیء معتبر JSON با ساختار زیر باشد (فقط JSON بدون هیچ متن اضافی قبل یا بعد):
 {
-  "summary": "خلاصه وضعیت اجرایی امروز و میزان بهره‌وری کلی تیم به زبان فاخر، قاطع و مدیریتی",
+  "summary": "خلاصه وضعیت اجرایی امروز و میزان بهره‌وری کلی تیم به زبان فاخر، قاطع و سرپرستی",
   "overallScore": 88,
   "topTrends": [
     "۳ تا ۵ روند و الگوی برجسته رفتاری کارفرمایان و بازار"
@@ -1648,14 +1648,14 @@ ${customInstruction || 'لطفاً یک تحلیل جامع، موشکافانه
       "performanceRating": "عالی / مطلوب / نیازمند پیگیری / ضعیف",
       "strengths": ["نقطه قوت ۱", "نقطه قوت ۲"],
       "weaknessesOrFollowUps": ["مورد نیازمند بهبود یا پیگیری معوق"],
-      "aiRecommendation": "توصیه عملیاتی به مدیر جهت ارائه فیدبک یا ارتقای راندمان این نیرو"
+      "aiRecommendation": "توصیه عملیاتی به سرپرست جهت ارائه فیدبک یا ارتقای راندمان این نیرو"
     }
   ],
   "marketOpportunities": [
-    "فرصت‌های طلایی جهت عقد قرارداد سالانه مشاوره کارینو بر اساس دغدغه‌های پرتکرار ثبت‌شده"
+    "فرصت‌های طلایی جهت توسعه خدمات و عقد قرارداد بر اساس دغدغه‌های پرتکرار ثبت‌شده"
   ],
   "strategicActionItems": [
-    "اقدامات فوری و دستورات لازم‌الاجرا برای مدیریت در روز کاری آینده"
+    "اقدامات فوری و دستورات لازم‌الاجرا برای سرپرست در روز کاری آینده"
   ]
 }
 `;
@@ -1693,7 +1693,7 @@ ${customInstruction || 'لطفاً یک تحلیل جامع، موشکافانه
         const fallback = generateFallbackAnalysis(reports, customInstruction);
         return res.json({
           source: 'intelligent-engine',
-          notice: 'تحلیل استراتژیک با موتور هوشمند تحلیلی کارینو تدوین گردید.',
+          notice: 'تحلیل استراتژیک با موتور هوشمند تحلیلی تدوین گردید.',
           data: fallback
         });
       }
@@ -1703,7 +1703,7 @@ ${customInstruction || 'لطفاً یک تحلیل جامع، موشکافانه
     const fallbackResult = generateFallbackAnalysis(reports, customInstruction);
     return res.json({
       source: 'intelligent-engine',
-      notice: 'تحلیل توسط موتور هوشمند داخلی کارینو بر اساس داده‌های ورودی تولید گردید.',
+      notice: 'تحلیل توسط موتور هوشمند داخلی بر اساس داده‌های ورودی تولید گردید.',
       data: fallbackResult
     });
 

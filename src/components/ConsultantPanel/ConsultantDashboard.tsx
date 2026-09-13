@@ -655,7 +655,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
               </span>
             </div>
             <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-              هر پیگیری دقیق شما، گامی در ایجاد امنیت حقوقی برای کارفرمایان و پایداری کسب‌وکارهاست. گزارشات ارسالی مستقیماً در داشبورد نظارتی مدیریت منعکس می‌گردد.
+              هر پیگیری دقیق شما، گامی در ایجاد امنیت برای کارفرمایان و پایداری کسب‌وکارهاست. گزارشات ارسالی مستقیماً در داشبورد نظارتی سرپرست منعکس می‌گردد.
             </p>
           </div>
 
@@ -716,7 +716,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
             },
             {
               id: 'history',
-              label: 'سوابق و بازخورد مدیریت',
+              label: 'سوابق و بازخورد سرپرست',
               icon: History,
               badge: myReports.length > 0 ? toPersianDigits(myReports.length) : undefined
             }
@@ -777,7 +777,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
                 <CheckCircle className="w-7 h-7 text-emerald-400 shrink-0" />
                 <div>
                   <h4 className="font-bold text-sm">گزارش روزانه شما با موفقیت در سیستم ثبت و ذخیره شد!</h4>
-                  <p className="text-xs text-emerald-300/90">داده‌ها در پایگاه داده و داشبورد نظارتی مدیریت منعکس گردید.</p>
+                  <p className="text-xs text-emerald-300/90">داده‌ها در پایگاه داده و داشبورد نظارتی سرپرست منعکس گردید.</p>
                 </div>
               </div>
               <span className="text-xs font-mono bg-emerald-900/60 px-2.5 py-1 rounded-lg border border-emerald-500/40">
@@ -893,7 +893,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
               <Clock className="w-6 h-6 text-amber-400 shrink-0" />
               <div>
                 <span className="font-bold block text-sm text-white">امروز جمعه است (تعطیل رسمی اداری)</span>
-                <span>طبق قوانین سازمانی کارینو، روزهای جمعه تعطیل رسمی بوده و نیازی به ثبت و ارسال فرم گزارش روزانه وجود ندارد.</span>
+                <span>طبق قوانین سازمانی، روزهای جمعه تعطیل رسمی بوده و نیازی به ثبت و ارسال فرم گزارش روزانه وجود ندارد.</span>
               </div>
             </div>
           ) : windowStatus.isPastDeadline && !todayDailyCallReport && !editingReportId ? (
@@ -907,7 +907,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
                   همکار گرامی، طبق آیین‌نامه انضباطی سازمان، حداکثر مهلت ثبت گزارش روزانه تا ساعت ۱۹:۰۰ عصر بوده است. هم‌اکنون ساعت <strong>{windowStatus.tehranTimeString}</strong> به وقت تهران می‌باشد و دسترسی ثبت گزارش برای امروز قفل گردید.
                 </p>
                 <p className="text-xs text-rose-300 font-bold bg-rose-900/60 p-2.5 rounded-xl border border-rose-700/60">
-                  عدم ارسال گزارش در سیستم پایش KPI مدیریت به عنوان کسر امتیاز و جریمه انضباطی ثبت گردید. در صورت داشتن هماهنگی قبلی یا عذر موجه، با مدیریت تماس بگیرید.
+                  عدم ارسال گزارش در سیستم پایش KPI سرپرست به عنوان کسر امتیاز و جریمه انضباطی ثبت گردید. در صورت داشتن هماهنگی قبلی یا عذر موجه، با سرپرست تماس بگیرید.
                 </p>
               </div>
             </div>
@@ -925,7 +925,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
               <div className="space-y-1">
                 <span className="font-bold text-white block">ساعت کاری اداری در حال اجراست (ساعت فعلی تهران: {windowStatus.tehranTimeString})</span>
                 <p className="text-xs text-amber-300/90 leading-relaxed">
-                  طبق آیین‌نامه انضباطی سازمان کارینو، پنجره ثبت و ارسال گزارش عملکرد روزانه <strong>صرفاً بین ساعت ۱۷:۰۰ الی ۱۹:۰۰ عصر</strong> فعال خواهد بود. پیش از ساعت ۱۷:۰۰ امکان ثبت گزارش وجود ندارد.
+                  طبق آیین‌نامه انضباطی سازمان، پنجره ثبت و ارسال گزارش عملکرد روزانه <strong>صرفاً بین ساعت ۱۷:۰۰ الی ۱۹:۰۰ عصر</strong> فعال خواهد بود. پیش از ساعت ۱۷:۰۰ امکان ثبت گزارش وجود ندارد.
                 </p>
               </div>
             </div>
@@ -934,7 +934,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
           {/* Standard 5 Symbols Guide */}
           <div className="bg-[#081525]/90 border border-slate-800 rounded-2xl p-4 space-y-2">
             <div className="flex items-center justify-between text-xs font-bold text-amber-300">
-              <span>راهنمای ۵ نماد استاندارد و ۲۵ ساله کارینو در ثبت مراحل پیگیری:</span>
+              <span>راهنمای ۵ نماد استاندارد در ثبت مراحل پیگیری:</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
               <div className="flex items-center gap-2 bg-[#06101c] p-2 rounded-xl border border-slate-800">
@@ -1244,7 +1244,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
               <div>
                 <span className="font-bold block">تحلیل و گزارش عملکرد کلی دوره‌ای:</span>
                 <span className="text-slate-400">
-                  طبق ساختار جدید مدیریتی، تحلیل کلی روزانه، هفتگی و ماهانه به تب اختصاصی <strong>«گزارشات دوره‌ای»</strong> منتقل شده است.
+                  طبق ساختار جدید نظارتی، تحلیل کلی روزانه، هفتگی و ماهانه به تب اختصاصی <strong>«گزارشات دوره‌ای»</strong> منتقل شده است.
                 </span>
               </div>
             </div>
@@ -1260,7 +1260,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
           {/* Action Buttons Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
             <div className="text-xs text-slate-400">
-              * پس از ثبت، گزارش در پنل نظارتی مدیریت جهت بررسی، امتیازدهی و آرشیو قرار می‌گیرد.
+              * پس از ثبت، گزارش در پنل نظارتی سرپرست جهت بررسی، امتیازدهی و آرشیو قرار می‌گیرد.
             </div>
 
             <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -1287,7 +1287,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    <span>{editingReportId ? 'ذخیره تغییرات و تکمیل گزارش' : 'ثبت نهایی و ارسال به مدیریت'}</span>
+                    <span>{editingReportId ? 'ذخیره تغییرات و تکمیل گزارش' : 'ثبت نهایی و ارسال به سرپرست'}</span>
                   </>
                 )}
               </button>
@@ -1622,7 +1622,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
                       <button
                         onClick={() => printOfficialReport(report)}
                         className="p-2 rounded-xl bg-[#081525] hover:bg-slate-800 text-slate-300 hover:text-amber-300 border border-slate-700 transition-colors cursor-pointer"
-                        title="چاپ رسمی با سربرگ کارینو"
+                        title="چاپ رسمی سربرگ گزارش"
                       >
                         <Printer className="w-4 h-4 text-amber-300" />
                       </button>
@@ -1696,7 +1696,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
                   {/* Manager Feedback if any */}
                   {report.managerFeedback && (
                     <div className="bg-purple-950/40 border-r-4 border-purple-500 p-3 rounded-lg text-xs space-y-1">
-                      <span className="text-purple-300 font-bold block">دستور و بازخورد مدیریت:</span>
+                      <span className="text-purple-300 font-bold block">دستور و بازخورد سرپرست:</span>
                       <p className="text-slate-200 leading-relaxed">{report.managerFeedback}</p>
                     </div>
                   )}
@@ -1748,7 +1748,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
             {/* Select Symbol */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-amber-300 block">
-                انتخاب نماد تماس پیگیری {toPersianDigits(activeFollowUpTarget.nextStepNumber)} (از ۵ نماد استاندارد کارینو):
+                انتخاب نماد تماس پیگیری {toPersianDigits(activeFollowUpTarget.nextStepNumber)} (از ۵ نماد استاندارد پیگیری):
               </label>
               <FollowUpSelector
                 value={newFollowUpSymbol}

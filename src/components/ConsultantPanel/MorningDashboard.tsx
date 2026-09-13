@@ -305,10 +305,10 @@ export const MorningDashboard: React.FC<MorningDashboardProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-white text-base">
-                📝 یادداشت‌ها و اولویت‌های مدیر برای شما
+                📝 یادداشت‌ها و اولویت‌های سرپرست برای شما
               </h3>
               <p className="text-xs text-slate-400">
-                دستورات راهبردی و اولویت‌های ویژه ابلاغ شده توسط مدیریت مجموعه کارینو
+                دستورات راهبردی و اولویت‌های ویژه ابلاغ شده توسط سرپرست مجموعه
               </p>
             </div>
           </div>
@@ -319,7 +319,7 @@ export const MorningDashboard: React.FC<MorningDashboardProps> = ({
 
         {relevantDirectives.length === 0 ? (
           <div className="text-center py-6 text-slate-400 text-sm">
-            یادداشت جدیدی از سمت مدیریت ثبت نشده است. روی اهداف روزانه تمرکز فرمایید.
+            یادداشت جدیدی از سمت سرپرست ثبت نشده است. روی اهداف روزانه تمرکز فرمایید.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
