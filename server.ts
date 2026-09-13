@@ -457,17 +457,40 @@ async function syncFromSupabase(): Promise<DatabaseSchema | null> {
 
 // Merge two database states, keeping the most complete data from both
 function mergeServerDBs(local: DatabaseSchema, remote: DatabaseSchema): DatabaseSchema {
-  // Merge users by id, ALWAYS preserving server password hashes
+  // Merge users by id & username, preserving newest updates and valid password hashes
   const userMap = new Map<string, any>();
   (local.users || []).forEach((u: any) => userMap.set(u.id || u.username, { ...u }));
   (remote.users || []).forEach((u: any) => {
     const key = u.id || u.username;
     const existing = userMap.get(key);
     if (existing) {
+      const existingTime = new Date(existing.updatedAt || 0).getTime();
+      const remoteTime = new Date(u.updatedAt || 0).getTime();
+
+      // Password resolution logic:
+      // If remote user has no password (e.g. client sync payload), preserve existing password.
+      // If remote user has a valid password:
+      //   - If remote updatedAt is newer, remote password wins.
+      //   - If existing updatedAt is newer, existing password wins.
+      //   - If timestamps are equal or absent: prioritize remote (cloud state) over local default/seed.
+      let effectivePassword = existing.password;
+      if (u.password && typeof u.password === 'string' && u.password.trim() !== '') {
+        if (!existing.password) {
+          effectivePassword = u.password;
+        } else if (remoteTime > existingTime) {
+          effectivePassword = u.password;
+        } else if (existingTime > remoteTime) {
+          effectivePassword = existing.password;
+        } else {
+          effectivePassword = u.password;
+        }
+      }
+
       userMap.set(key, {
         ...existing,
         ...u,
-        password: existing.password || u.password
+        password: effectivePassword,
+        updatedAt: remoteTime >= existingTime ? (u.updatedAt || existing.updatedAt) : existing.updatedAt
       });
     } else {
       userMap.set(key, { ...u });
@@ -1001,7 +1024,7 @@ app.post('/api/db/users', async (req, res) => {
     u.id === user.id || u.username.toLowerCase() === user.username.toLowerCase()
   );
 
-  const processedUser = { ...user };
+  const processedUser = { ...user, updatedAt: new Date().toISOString() };
   if (processedUser.password) {
     processedUser.password = hashPassword(processedUser.password);
   }
@@ -1035,7 +1058,7 @@ app.put('/api/db/users/:id', async (req, res) => {
   const idx = db.users.findIndex((u: any) => u.id === id || u.username.toLowerCase() === id.toLowerCase());
   
   if (idx >= 0) {
-    const processedUpdates = { ...updates };
+    const processedUpdates = { ...updates, updatedAt: new Date().toISOString() };
     if (processedUpdates.password) {
       processedUpdates.password = hashPassword(processedUpdates.password);
     }
