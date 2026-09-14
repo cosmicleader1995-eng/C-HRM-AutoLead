@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { DailyReport, ReportRow, ArchiveRecord, PeriodicOverallReport, ArchiveType } from '../types';
+import { DailyReport, ReportRow, ArchiveRecord, PeriodicOverallReport, ArchiveType, LeadSheet } from '../types';
 import { toPersianDigits, formatStandardReportTitle, compareReportsLatestFirst } from './shamsi';
 
 export function exportSingleReportToExcel(report: DailyReport) {
@@ -407,3 +407,216 @@ export function printOfficialReport(report: DailyReport) {
     }, 300);
   }
 }
+
+/**
+ * Export 25-row Lead Sheet to Excel matching official 11-column table
+ */
+export function exportLeadSheetToExcel(sheet: LeadSheet) {
+  const headers = [
+    'ردیف',
+    'نام و نام خانوادگی کارفرما',
+    'صنف / زمینه فعالیت',
+    'تعداد پرسنل',
+    'شماره تماس',
+    'آدرس',
+    'دغدغه کارفرما',
+    'پیگیری ۱',
+    'پیگیری ۲',
+    'پیگیری ۳',
+    'پیگیری ۴',
+    'نتیجه پیگیری',
+    'موضوع جلسه و توضیحات'
+  ];
+
+  const dataRows = sheet.rows.map(r => [
+    r.rowNumber,
+    r.clientName,
+    r.activityField,
+    r.personnelCount || '',
+    r.phone,
+    r.address,
+    r.employerConcern || '',
+    r.followUp1 || '',
+    r.followUp2 || '',
+    r.followUp3 || '',
+    r.followUp4 || '',
+    r.followUpResult || (r.status === 'won' ? '✓ موفق' : r.status === 'lost' ? '- عدم نیاز' : '. در جریان'),
+    r.meetingTopic || r.notes || ''
+  ]);
+
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, `شیت_${sheet.sheetNumber}`);
+
+  XLSX.writeFile(workbook, `شیت_۲۵_لید_شماره_${sheet.sheetNumber}_${sheet.assignedToConsultantName.replace(/\s+/g, '_')}_${sheet.dateShamsi.replace(/\//g, '-')}.xlsx`);
+}
+
+/**
+ * Print 25-row Lead Sheet landscape matching the authentic PDF document
+ */
+export function printOfficialLeadSheet(sheet: LeadSheet) {
+  const rowsHtml = sheet.rows.map(r => `
+    <tr>
+      <td style="text-align: center; font-weight: bold; width: 30px;">${toPersianDigits(r.rowNumber)}</td>
+      <td style="text-align: right; font-weight: bold; min-width: 110px;">${r.clientName || '-'}</td>
+      <td style="text-align: right; min-width: 80px;">${r.activityField || '-'}</td>
+      <td style="text-align: center; width: 45px;">${r.personnelCount ? toPersianDigits(r.personnelCount) : '-'}</td>
+      <td style="text-align: center; direction: ltr; font-family: monospace; font-weight: bold; min-width: 90px;">${r.phone || '-'}</td>
+      <td style="text-align: right; font-size: 8.5px; max-width: 140px;">${r.address || '-'}</td>
+      <td style="text-align: right; font-size: 8.5px; max-width: 110px;">${r.employerConcern || '-'}</td>
+      <td style="text-align: center; font-weight: bold; width: 40px;">${r.followUp1 || '.'}</td>
+      <td style="text-align: center; font-weight: bold; width: 40px;">${r.followUp2 || '.'}</td>
+      <td style="text-align: center; font-weight: bold; width: 40px;">${r.followUp3 || '.'}</td>
+      <td style="text-align: center; font-weight: bold; width: 40px;">${r.followUp4 || '.'}</td>
+      <td style="text-align: center; font-size: 8.5px; width: 70px;">${r.followUpResult || (r.status === 'won' ? '✓ جلسه ست شد' : r.status === 'lost' ? '- عدم نیاز' : '. در جریان')}</td>
+      <td style="text-align: right; font-size: 8.5px; min-width: 130px;">${r.meetingTopic || r.notes || '-'}</td>
+    </tr>
+  `).join('');
+
+  const printHtml = `
+    <!DOCTYPE html>
+    <html lang="fa" dir="rtl">
+    <head>
+      <meta charset="utf-8">
+      <title>فرم پیگیری لید و تماس‌های روزانه مشاورین - شیت شماره ${sheet.sheetNumber}</title>
+      <style>
+        @page {
+          size: A4 landscape;
+          margin: 6mm 8mm;
+        }
+        body {
+          font-family: 'Vazirmatn', Tahoma, sans-serif;
+          direction: rtl;
+          margin: 0;
+          padding: 0;
+          color: #111;
+          font-size: 9.5px;
+        }
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 2px solid #333;
+          padding-bottom: 5px;
+          margin-bottom: 6px;
+        }
+        .title {
+          font-size: 13px;
+          font-weight: 900;
+          text-align: center;
+        }
+        .meta-info {
+          display: flex;
+          gap: 15px;
+          font-size: 9.5px;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 9px;
+        }
+        th, td {
+          border: 1px solid #444;
+          padding: 3px 2px;
+          line-height: 1.2;
+        }
+        th {
+          background-color: #f2f2f2;
+          font-weight: bold;
+          text-align: center;
+        }
+        .signatures {
+          margin-top: 10px;
+          display: flex;
+          justify-content: space-around;
+          font-size: 9.5px;
+          font-weight: bold;
+          padding-top: 5px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div><strong>مجموعه کارینو</strong></div>
+        <div class="title">فرم پیگیری لید و تماس‌های روزانه مشاورین (شیت ${toPersianDigits(sheet.sheetNumber)})</div>
+        <div class="meta-info">
+          <div>مشاور: <strong>${sheet.assignedToConsultantName} (${sheet.assignedToConsultantCode})</strong></div>
+          <div>صنف: <strong>${sheet.guild}</strong></div>
+          <div>تاریخ: <strong>${toPersianDigits(sheet.dateShamsi)}</strong></div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ردیف</th>
+            <th>نام و نام خانوادگی کارفرما</th>
+            <th>صنف / زمینه</th>
+            <th>پرسنل</th>
+            <th>شماره تماس</th>
+            <th>آدرس</th>
+            <th>دغدغه کارفرما</th>
+            <th>پیگیری ۱</th>
+            <th>پیگیری ۲</th>
+            <th>پیگیری ۳</th>
+            <th>پیگیری ۴</th>
+            <th>نتیجه پیگیری</th>
+            <th>توضیحات / موضوع جلسه</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      </table>
+
+      <div class="signatures">
+        <div>امضای مشاور: ........................</div>
+        <div>امضای سرپرست واحد: ........................</div>
+        <div>ملاحظه مدیریت: ........................</div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const printWindow = window.open('', '_blank');
+  if (printWindow) {
+    printWindow.document.open();
+    printWindow.document.write(printHtml);
+    printWindow.document.close();
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+    };
+    setTimeout(() => {
+      try {
+        printWindow.focus();
+        printWindow.print();
+      } catch (e) {}
+    }, 500);
+    return;
+  }
+
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document;
+  if (doc) {
+    doc.open();
+    doc.write(printHtml);
+    doc.close();
+    setTimeout(() => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }, 300);
+  }
+}
+

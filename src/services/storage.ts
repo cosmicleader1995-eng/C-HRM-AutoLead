@@ -1,4 +1,4 @@
-import { User, DailyReport, ArchiveRecord, ReportRow, ManagerDirective, PeriodicOverallReport, ArchiveType } from '../types';
+import { User, DailyReport, ArchiveRecord, ReportRow, ManagerDirective, PeriodicOverallReport, ArchiveType, LeadRow, LeadSheet, SheetMessage, MemoMessage, UserStatus } from '../types';
 import { DEFAULT_USERS, EMPLOYER_CONCERNS_LIST, getInitialReports, DEFAULT_DIRECTIVES, getInitialPeriodicReports } from '../data/defaultData';
 import { 
   getCurrentShamsiDate, 
@@ -29,6 +29,9 @@ const STORAGE_KEYS = {
   ARCHIVES: 'karino_archives_v2',
   CONCERNS: 'karino_concerns_v2',
   DIRECTIVES: 'karino_directives_v2',
+  LEAD_SHEETS: 'karino_lead_sheets_v1',
+  SHEET_MESSAGES: 'karino_sheet_messages_v1',
+  MEMOS: 'karino_memos_v1',
   DRAFTS: 'karino_draft_v2',
   LAST_ARCHIVE_DATE: 'karino_last_archive_date_v2',
   DOWNLOADED_ARCHIVES: 'karino_downloaded_archives_v3',
@@ -50,6 +53,9 @@ interface CloudDatabaseState {
   archives: ArchiveRecord[];
   concerns: string[];
   directives?: ManagerDirective[];
+  leadSheets?: LeadSheet[];
+  sheetMessages?: SheetMessage[];
+  memos?: MemoMessage[];
   logs?: any[];
   stats?: any;
 }
@@ -61,6 +67,9 @@ let cachedOverallReports: PeriodicOverallReport[] = [];
 let cachedArchives: ArchiveRecord[] = [];
 let cachedConcerns: string[] = [];
 let cachedDirectives: ManagerDirective[] = [];
+let cachedLeadSheets: LeadSheet[] = [];
+let cachedSheetMessages: SheetMessage[] = [];
+let cachedMemos: MemoMessage[] = [];
 let isSyncInProgress = false;
 
 // Custom Event to notify React components to re-render
@@ -80,7 +89,10 @@ function getCurrentFullState(): CloudDatabaseState {
     overallReports: getStoredPeriodicReports(),
     archives: getStoredArchives(),
     concerns: getStoredConcerns(),
-    directives: getStoredDirectives()
+    directives: getStoredDirectives(),
+    leadSheets: getStoredLeadSheets(),
+    sheetMessages: getStoredSheetMessages(),
+    memos: getStoredMemos()
   };
 }
 
@@ -225,6 +237,33 @@ function mergeStates(local: CloudDatabaseState, remote: CloudDatabaseState): Clo
     }))
     .sort(compareReportsLatestFirst);
 
+  // Merge lead sheets
+  const sheetMap = new Map<string, LeadSheet>();
+  (local.leadSheets || []).forEach(s => sheetMap.set(s.id, s));
+  (remote.leadSheets || []).forEach(s => {
+    const existing = sheetMap.get(s.id);
+    if (!existing) {
+      sheetMap.set(s.id, s);
+    } else {
+      const localTime = new Date(existing.updatedAt || 0).getTime();
+      const remoteTime = new Date(s.updatedAt || 0).getTime();
+      sheetMap.set(s.id, remoteTime >= localTime ? s : existing);
+    }
+  });
+  const mergedLeadSheets = Array.from(sheetMap.values());
+
+  // Merge sheet messages
+  const msgMap = new Map<string, SheetMessage>();
+  (local.sheetMessages || []).forEach(m => msgMap.set(m.id, m));
+  (remote.sheetMessages || []).forEach(m => msgMap.set(m.id, m));
+  const mergedSheetMessages = Array.from(msgMap.values());
+
+  // Merge memos
+  const memoMap = new Map<string, MemoMessage>();
+  (local.memos || []).forEach(m => memoMap.set(m.id, m));
+  (remote.memos || []).forEach(m => memoMap.set(m.id, m));
+  const mergedMemos = Array.from(memoMap.values());
+
   return {
     version: '2.5',
     lastUpdated: new Date().toISOString(),
@@ -233,7 +272,10 @@ function mergeStates(local: CloudDatabaseState, remote: CloudDatabaseState): Clo
     overallReports: mergedOverallReports,
     archives: mergedArchives,
     concerns: mergedConcerns,
-    directives: mergedDirectives
+    directives: mergedDirectives,
+    leadSheets: mergedLeadSheets,
+    sheetMessages: mergedSheetMessages,
+    memos: mergedMemos
   };
 }
 
@@ -291,12 +333,19 @@ async function persistCloudDatabase(localData: CloudDatabaseState): Promise<bool
     cachedArchives = finalData.archives;
     cachedConcerns = finalData.concerns;
     if (finalData.directives) cachedDirectives = finalData.directives;
+    if (finalData.leadSheets) cachedLeadSheets = finalData.leadSheets;
+    if (finalData.sheetMessages) cachedSheetMessages = finalData.sheetMessages;
+    if (finalData.memos) cachedMemos = finalData.memos;
+
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(finalData.users));
     localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(finalData.reports));
     if (finalData.overallReports) localStorage.setItem(STORAGE_KEYS.OVERALL_REPORTS, JSON.stringify(finalData.overallReports));
     localStorage.setItem(STORAGE_KEYS.ARCHIVES, JSON.stringify(finalData.archives));
     localStorage.setItem(STORAGE_KEYS.CONCERNS, JSON.stringify(finalData.concerns));
     if (finalData.directives) localStorage.setItem(STORAGE_KEYS.DIRECTIVES, JSON.stringify(finalData.directives));
+    if (finalData.leadSheets) localStorage.setItem(STORAGE_KEYS.LEAD_SHEETS, JSON.stringify(finalData.leadSheets));
+    if (finalData.sheetMessages) localStorage.setItem(STORAGE_KEYS.SHEET_MESSAGES, JSON.stringify(finalData.sheetMessages));
+    if (finalData.memos) localStorage.setItem(STORAGE_KEYS.MEMOS, JSON.stringify(finalData.memos));
     notifyDbListeners();
 
     // 3. Primary & Secure: Persist via Server API (/api/db/sync)
@@ -324,11 +373,18 @@ async function persistCloudDatabase(localData: CloudDatabaseState): Promise<bool
           'Content-Type': 'application/json',
           'Prefer': 'resolution=merge-duplicates,return=representation'
         },
-        body: JSON.stringify({
-          id: 'main_state',
-          data: finalData,
-          updated_at: new Date().toISOString()
-        })
+        body: JSON.stringify([
+          {
+            id: 'main_state',
+            data: finalData,
+            updated_at: new Date().toISOString()
+          },
+          {
+            id: 'app_db',
+            data: finalData,
+            updated_at: new Date().toISOString()
+          }
+        ])
       });
       return res.ok;
     } catch (_) {
@@ -388,6 +444,24 @@ export async function syncWithServer(): Promise<boolean> {
       if (merged.directives && JSON.stringify(merged.directives) !== JSON.stringify(cachedDirectives)) {
         cachedDirectives = merged.directives;
         localStorage.setItem(STORAGE_KEYS.DIRECTIVES, JSON.stringify(merged.directives));
+        changed = true;
+      }
+
+      if (merged.leadSheets && JSON.stringify(merged.leadSheets) !== JSON.stringify(cachedLeadSheets)) {
+        cachedLeadSheets = merged.leadSheets;
+        localStorage.setItem(STORAGE_KEYS.LEAD_SHEETS, JSON.stringify(merged.leadSheets));
+        changed = true;
+      }
+
+      if (merged.sheetMessages && JSON.stringify(merged.sheetMessages) !== JSON.stringify(cachedSheetMessages)) {
+        cachedSheetMessages = merged.sheetMessages;
+        localStorage.setItem(STORAGE_KEYS.SHEET_MESSAGES, JSON.stringify(merged.sheetMessages));
+        changed = true;
+      }
+
+      if (merged.memos && JSON.stringify(merged.memos) !== JSON.stringify(cachedMemos)) {
+        cachedMemos = merged.memos;
+        localStorage.setItem(STORAGE_KEYS.MEMOS, JSON.stringify(merged.memos));
         changed = true;
       }
 
@@ -490,18 +564,98 @@ export function updateUserPassword(userId: string, newPassword: string): void {
 }
 
 export function deleteUser(userId: string): void {
+  deleteUserWithOption(userId, false);
+}
+
+export async function deleteUserWithOption(userId: string, purge: boolean, reassignLeadsToId?: string): Promise<void> {
+  let url = `/api/db/users/${userId}?purge=${purge ? 'true' : 'false'}`;
+  if (reassignLeadsToId) {
+    url += `&reassignLeadsToId=${encodeURIComponent(reassignLeadsToId)}`;
+  }
+
+  try {
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (res.ok) {
+      await syncWithServer();
+    }
+  } catch (_) {}
+
   const users = getStoredUsers().filter(u => u.id !== userId);
   cachedUsers = users;
   localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-  notifyDbListeners();
 
-  // Atomic User deletion
-  fetch(`/api/db/users/${userId}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders()
-  }).catch(err => {
-    console.warn('[Storage] API user delete network error:', err);
-  });
+  if (purge) {
+    const reports = getStoredReports().filter(r => r.consultantId !== userId);
+    cachedReports = reports;
+    localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(reports));
+
+    const sheets = getStoredLeadSheets().filter(s => s.assignedToConsultantId !== userId);
+    cachedLeadSheets = sheets;
+    localStorage.setItem(STORAGE_KEYS.LEAD_SHEETS, JSON.stringify(sheets));
+  } else if (reassignLeadsToId) {
+    const targetUser = getStoredUsers().find(u => u.id === reassignLeadsToId);
+    if (targetUser) {
+      const sheets = getStoredLeadSheets().map(s => {
+        if (s.assignedToConsultantId === userId && s.status !== 'completed' && s.status !== 'archived') {
+          return {
+            ...s,
+            assignedToConsultantId: targetUser.id,
+            assignedToConsultantName: targetUser.fullName,
+            updatedAt: new Date().toISOString()
+          };
+        }
+        return s;
+      });
+      cachedLeadSheets = sheets;
+      localStorage.setItem(STORAGE_KEYS.LEAD_SHEETS, JSON.stringify(sheets));
+    }
+  }
+
+  notifyDbListeners();
+}
+
+export async function updateUserStatus(userId: string, status: UserStatus, reassignLeadsToId?: string): Promise<void> {
+  const users = getStoredUsers();
+  const user = users.find(u => u.id === userId);
+  if (user) {
+    user.status = status;
+    user.updatedAt = new Date().toISOString();
+    cachedUsers = [...users];
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+
+    if (reassignLeadsToId && (status === 'archived' || status === 'terminated')) {
+      const targetUser = users.find(u => u.id === reassignLeadsToId);
+      if (targetUser) {
+        const sheets = getStoredLeadSheets().map(s => {
+          if (s.assignedToConsultantId === userId && s.status !== 'completed' && s.status !== 'archived') {
+            return {
+              ...s,
+              assignedToConsultantId: targetUser.id,
+              assignedToConsultantName: targetUser.fullName,
+              updatedAt: new Date().toISOString()
+            };
+          }
+          return s;
+        });
+        cachedLeadSheets = sheets;
+        localStorage.setItem(STORAGE_KEYS.LEAD_SHEETS, JSON.stringify(sheets));
+      }
+    }
+
+    notifyDbListeners();
+
+    try {
+      await fetch(`/api/db/users/${userId}/status`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status, reassignLeadsToId })
+      });
+      await syncWithServer();
+    } catch (_) {}
+  }
 }
 
 export function saveJwtToken(token: string): void {
@@ -1570,6 +1724,273 @@ export function deletePeriodicReport(id: string): void {
     headers: getAuthHeaders()
   }).catch(err => {
     console.warn('[Storage] API periodic report delete network error:', err);
+  });
+}
+
+// -----------------------------------------------------------
+// LEAD SHEETS Management (Living 25-Lead Engine)
+// -----------------------------------------------------------
+export function getStoredLeadSheets(consultantId?: string): LeadSheet[] {
+  let list = cachedLeadSheets;
+  if (list.length === 0) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.LEAD_SHEETS);
+      if (data) {
+        list = JSON.parse(data);
+        if (Array.isArray(list)) {
+          cachedLeadSheets = list;
+        }
+      }
+    } catch (_) {}
+  }
+
+  if (consultantId) {
+    return (list || []).filter(s => s.assignedToConsultantId === consultantId);
+  }
+  return list || [];
+}
+
+export function saveLeadSheet(sheet: LeadSheet): void {
+  const current = getStoredLeadSheets();
+  const idx = current.findIndex(s => s.id === sheet.id);
+  const updatedSheet = { ...sheet, updatedAt: new Date().toISOString() };
+
+  if (idx >= 0) {
+    current[idx] = updatedSheet;
+  } else {
+    current.unshift(updatedSheet);
+  }
+
+  cachedLeadSheets = [...current];
+  try {
+    localStorage.setItem(STORAGE_KEYS.LEAD_SHEETS, JSON.stringify(current));
+  } catch (_) {}
+  notifyDbListeners();
+
+  fetch(`/api/db/lead-sheets/${sheet.id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(updatedSheet)
+  }).catch(err => {
+    console.warn('[Storage] API lead sheet update network error:', err);
+  });
+}
+
+export function saveLeadSheets(sheets: LeadSheet[]): void {
+  if (!Array.isArray(sheets) || sheets.length === 0) return;
+  const current = getStoredLeadSheets();
+  sheets.forEach(sheet => {
+    const idx = current.findIndex(s => s.id === sheet.id);
+    const updated = { ...sheet, updatedAt: new Date().toISOString() };
+    if (idx >= 0) {
+      current[idx] = updated;
+    } else {
+      current.unshift(updated);
+    }
+  });
+
+  cachedLeadSheets = [...current];
+  try {
+    localStorage.setItem(STORAGE_KEYS.LEAD_SHEETS, JSON.stringify(current));
+  } catch (_) {}
+  notifyDbListeners();
+
+  fetch('/api/db/lead-sheets', {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(sheets)
+  }).catch(err => {
+    console.warn('[Storage] API lead sheets batch save network error:', err);
+  });
+}
+
+export function updateLeadRow(sheetId: string, rowId: string, rowUpdates: Partial<LeadRow>): void {
+  const current = getStoredLeadSheets();
+  const sheet = current.find(s => s.id === sheetId);
+  if (!sheet) return;
+
+  const rowIdx = sheet.rows.findIndex(r => r.id === rowId);
+  if (rowIdx === -1) return;
+
+  sheet.rows[rowIdx] = {
+    ...sheet.rows[rowIdx],
+    ...rowUpdates,
+    updatedAt: new Date().toISOString()
+  };
+
+  // Re-calculate counts
+  const total = sheet.rows.length;
+  const completedCount = sheet.rows.filter(r => r.status === 'won' || r.status === 'lost' || r.status === 'archived' || r.followUpResult === '✓').length;
+  if (completedCount === total && total > 0) {
+    sheet.status = 'completed';
+  } else if (sheet.rows.some(r => r.followUp1 || r.followUp2 || r.followUp3 || r.followUp4)) {
+    sheet.status = 'in_progress';
+  }
+  sheet.updatedAt = new Date().toISOString();
+
+  cachedLeadSheets = [...current];
+  try {
+    localStorage.setItem(STORAGE_KEYS.LEAD_SHEETS, JSON.stringify(current));
+  } catch (_) {}
+  notifyDbListeners();
+
+  fetch(`/api/db/lead-sheets/${sheetId}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(sheet)
+  }).catch(err => {
+    console.warn('[Storage] API lead row update network error:', err);
+  });
+}
+
+export function deleteLeadSheet(sheetId: string): void {
+  const current = getStoredLeadSheets().filter(s => s.id !== sheetId);
+  cachedLeadSheets = current;
+  try {
+    localStorage.setItem(STORAGE_KEYS.LEAD_SHEETS, JSON.stringify(current));
+  } catch (_) {}
+  notifyDbListeners();
+
+  fetch(`/api/db/lead-sheets/${sheetId}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  }).catch(err => {
+    console.warn('[Storage] API lead sheet delete network error:', err);
+  });
+}
+
+// -----------------------------------------------------------
+// SHEET MESSAGES Management (In-Row Contextual Q&A)
+// -----------------------------------------------------------
+export function getStoredSheetMessages(sheetId?: string, rowId?: string): SheetMessage[] {
+  let list = cachedSheetMessages;
+  if (list.length === 0) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.SHEET_MESSAGES);
+      if (data) {
+        list = JSON.parse(data);
+        if (Array.isArray(list)) cachedSheetMessages = list;
+      }
+    } catch (_) {}
+  }
+  list = list || [];
+  if (sheetId && rowId) {
+    return list.filter(m => m.sheetId === sheetId && m.rowId === rowId);
+  }
+  if (sheetId) {
+    return list.filter(m => m.sheetId === sheetId);
+  }
+  return list;
+}
+
+export function saveSheetMessage(message: Omit<SheetMessage, 'id' | 'createdAt'>): SheetMessage {
+  const newMsg: SheetMessage = {
+    ...message,
+    id: `smsg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    createdAt: new Date().toISOString()
+  };
+
+  const current = getStoredSheetMessages();
+  current.push(newMsg);
+  cachedSheetMessages = [...current];
+  try {
+    localStorage.setItem(STORAGE_KEYS.SHEET_MESSAGES, JSON.stringify(current));
+  } catch (_) {}
+  notifyDbListeners();
+
+  fetch('/api/db/sheet-messages', {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(newMsg)
+  }).catch(err => {
+    console.warn('[Storage] API sheet message save network error:', err);
+  });
+
+  return newMsg;
+}
+
+export function markSheetMessageRead(msgId: string): void {
+  const current = getStoredSheetMessages();
+  const msg = current.find(m => m.id === msgId);
+  if (!msg) return;
+  msg.isRead = true;
+  cachedSheetMessages = [...current];
+  try {
+    localStorage.setItem(STORAGE_KEYS.SHEET_MESSAGES, JSON.stringify(current));
+  } catch (_) {}
+  notifyDbListeners();
+
+  fetch(`/api/db/sheet-messages/${msgId}/read`, {
+    method: 'PATCH',
+    headers: getAuthHeaders()
+  }).catch(err => {
+    console.warn('[Storage] API sheet message read network error:', err);
+  });
+}
+
+// -----------------------------------------------------------
+// OFFICIAL MEMOS Management (Circulars & Direct Communication)
+// -----------------------------------------------------------
+export function getStoredMemos(targetUserId?: string): MemoMessage[] {
+  let list = cachedMemos;
+  if (list.length === 0) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.MEMOS);
+      if (data) {
+        list = JSON.parse(data);
+        if (Array.isArray(list)) cachedMemos = list;
+      }
+    } catch (_) {}
+  }
+  list = list || [];
+  if (targetUserId) {
+    return list.filter(m => m.targetUserId === targetUserId || m.targetUserId === 'all' || m.senderId === targetUserId);
+  }
+  return list;
+}
+
+export function saveMemo(memo: Omit<MemoMessage, 'id' | 'createdAt'>): MemoMessage {
+  const newMemo: MemoMessage = {
+    ...memo,
+    id: `memo-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    createdAt: new Date().toISOString()
+  };
+
+  const current = getStoredMemos();
+  current.unshift(newMemo);
+  cachedMemos = [...current];
+  try {
+    localStorage.setItem(STORAGE_KEYS.MEMOS, JSON.stringify(current));
+  } catch (_) {}
+  notifyDbListeners();
+
+  fetch('/api/db/memos', {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(newMemo)
+  }).catch(err => {
+    console.warn('[Storage] API memo save network error:', err);
+  });
+
+  return newMemo;
+}
+
+export function markMemoRead(memoId: string): void {
+  const current = getStoredMemos();
+  const memo = current.find(m => m.id === memoId);
+  if (!memo) return;
+  memo.isRead = true;
+  cachedMemos = [...current];
+  try {
+    localStorage.setItem(STORAGE_KEYS.MEMOS, JSON.stringify(current));
+  } catch (_) {}
+  notifyDbListeners();
+
+  fetch(`/api/db/memos/${memoId}/read`, {
+    method: 'PATCH',
+    headers: getAuthHeaders()
+  }).catch(err => {
+    console.warn('[Storage] API memo read network error:', err);
   });
 }
 

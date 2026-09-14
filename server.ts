@@ -232,6 +232,7 @@ const DEFAULT_SERVER_USERS = [
     fullName: 'سرپرست ارشد (CEO)',
     consultantCode: 'CRM-CEO',
     role: 'ceo',
+    status: 'active',
     password: 'karino2026',
     phone: '09120000000',
     branch: 'دفتر مرکزی'
@@ -242,49 +243,10 @@ const DEFAULT_SERVER_USERS = [
     fullName: 'مدیر فاوا و فناوری اطلاعات',
     consultantCode: 'CRM-IT',
     role: 'it_admin',
+    status: 'active',
     password: 'it2026',
     phone: '09120000001',
     branch: 'واحد فناوری اطلاعات'
-  },
-  {
-    id: 'user-c101',
-    username: 'rezaei',
-    fullName: 'علیرضا رضایی',
-    consultantCode: 'C-101',
-    role: 'consultant',
-    password: '1234',
-    phone: '09151112233',
-    branch: 'تیم اجرایی مشهد'
-  },
-  {
-    id: 'user-c102',
-    username: 'mohammadi',
-    fullName: 'مریم محمدی',
-    consultantCode: 'C-102',
-    role: 'consultant',
-    password: '1234',
-    phone: '09152223344',
-    branch: 'تیم اجرایی مشهد'
-  },
-  {
-    id: 'user-c103',
-    username: 'hosseini',
-    fullName: 'سعید حسینی',
-    consultantCode: 'C-103',
-    role: 'consultant',
-    password: '1234',
-    phone: '09123334455',
-    branch: 'تیم اجرایی تهران'
-  },
-  {
-    id: 'user-c104',
-    username: 'karimi',
-    fullName: 'ندا کریمی',
-    consultantCode: 'C-104',
-    role: 'consultant',
-    password: '1234',
-    phone: '09154445566',
-    branch: 'تیم اجرایی مشهد'
   }
 ];
 
@@ -325,6 +287,9 @@ interface DatabaseSchema {
   archives: any[];
   concerns: string[];
   directives?: any[];
+  leadSheets?: any[];
+  sheetMessages?: any[];
+  memos?: any[];
   logs: any[];
   stats?: {
     totalWrites: number;
@@ -368,6 +333,10 @@ function getInitialDB(): DatabaseSchema {
     reports: [],
     overallReports: [],
     archives: [],
+    directives: [],
+    leadSheets: [],
+    sheetMessages: [],
+    memos: [],
     concerns: DEFAULT_SERVER_CONCERNS,
     logs: [
       {
@@ -430,7 +399,7 @@ async function syncFromSupabase(): Promise<DatabaseSchema | null> {
   const timeoutId = setTimeout(() => controller.abort(), 8000);
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/karino_store?id=eq.main_state&select=*`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/karino_store?id=in.(main_state,app_db)&select=*`, {
       signal: controller.signal,
       headers: {
         'apikey': SUPABASE_KEY,
@@ -441,33 +410,46 @@ async function syncFromSupabase(): Promise<DatabaseSchema | null> {
 
     if (res.ok) {
       const rows = await res.json();
-      if (Array.isArray(rows) && rows.length > 0 && rows[0].data) {
-        const cloudDB: DatabaseSchema = ensureDBShape(rows[0].data);
-        // Ensure default users are present
-        DEFAULT_SERVER_USERS.forEach(defUser => {
-          if (!cloudDB.users.some((u: any) => u.username?.toLowerCase() === defUser.username.toLowerCase() || u.id === defUser.id)) {
-            cloudDB.users.unshift(defUser);
-          }
-        });
-        if (!Array.isArray(cloudDB.concerns) || cloudDB.concerns.length === 0) {
-          cloudDB.concerns = DEFAULT_SERVER_CONCERNS;
-        }
+      if (Array.isArray(rows) && rows.length > 0) {
+        // Sort descending by updated_at to pick the freshest snapshot
+        rows.sort((a: any, b: any) => new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime());
+        const bestRow = rows[0];
+        if (bestRow && bestRow.data) {
+          const cloudDB: DatabaseSchema = ensureDBShape(bestRow.data);
+          
 
-        // Merge cloud with local instead of overwriting (prevents data loss)
-        const mergedDB = mergeServerDBs(inMemoryDB, cloudDB);
-        inMemoryDB = mergedDB;
-        isCloudConnected = true;
-        writeLocalDB(mergedDB);
-        console.log(`[Supabase] Cloud database synced & merged: ${mergedDB.reports?.length || 0} reports, ${mergedDB.users?.length || 0} users.`);
-        return mergedDB;
+
+          // Ensure default users are present
+          DEFAULT_SERVER_USERS.forEach(defUser => {
+            if (!cloudDB.users.some((u: any) => u.username?.toLowerCase() === defUser.username.toLowerCase() || u.id === defUser.id)) {
+              cloudDB.users.unshift(defUser);
+            }
+          });
+          if (!Array.isArray(cloudDB.concerns) || cloudDB.concerns.length === 0) {
+            cloudDB.concerns = DEFAULT_SERVER_CONCERNS;
+          }
+
+          // Merge cloud with local instead of overwriting (prevents data loss)
+          const mergedDB = mergeServerDBs(inMemoryDB, cloudDB);
+          inMemoryDB = mergedDB;
+          isCloudConnected = true;
+          writeLocalDB(mergedDB);
+          console.log(`[Supabase] Cloud database synced & merged: ${mergedDB.reports?.length || 0} reports, ${mergedDB.users?.length || 0} users, ${mergedDB.leadSheets?.length || 0} lead sheets.`);
+          return mergedDB;
+        }
       } else if (Array.isArray(rows) && rows.length === 0) {
         // Table exists but is empty -> seed it
-        console.log('[Supabase] Table empty, seeding initial data...');
+        console.log('[Supabase] Table empty, seeding initial clean data...');
         const initial = ensureDBShape(getInitialDB());
         await syncToSupabase(initial);
         inMemoryDB = initial;
         isCloudConnected = true;
         return initial;
+      }
+    } else {
+      if (res.status === 401 || res.status === 403) {
+        console.log(`[Supabase] Notice: Supabase returned HTTP ${res.status}. Secret/service_role API key required for direct cloud REST writes. Operating smoothly on local database (data/db.json).`);
+        lastSupabaseSync = now + 300000;
       }
     }
   } catch (err) {
@@ -573,6 +555,30 @@ function mergeServerDBs(local: DatabaseSchema, remote: DatabaseSchema): Database
   (local.overallReports || []).forEach((o: any) => overallMap.set(o.id, o));
   (remote.overallReports || []).forEach((o: any) => overallMap.set(o.id, o));
 
+  // Merge lead sheets by id
+  const sheetMap = new Map<string, any>();
+  (local.leadSheets || []).forEach((s: any) => sheetMap.set(s.id, s));
+  (remote.leadSheets || []).forEach((s: any) => {
+    const existing = sheetMap.get(s.id);
+    if (!existing) {
+      sheetMap.set(s.id, s);
+    } else {
+      const localTime = new Date(existing.updatedAt || 0).getTime();
+      const remoteTime = new Date(s.updatedAt || 0).getTime();
+      sheetMap.set(s.id, remoteTime >= localTime ? s : existing);
+    }
+  });
+
+  // Merge sheet messages by id
+  const msgMap = new Map<string, any>();
+  (local.sheetMessages || []).forEach((m: any) => msgMap.set(m.id, m));
+  (remote.sheetMessages || []).forEach((m: any) => msgMap.set(m.id, m));
+
+  // Merge official memos by id
+  const memoMap = new Map<string, any>();
+  (local.memos || []).forEach((m: any) => memoMap.set(m.id, m));
+  (remote.memos || []).forEach((m: any) => memoMap.set(m.id, m));
+
   return {
     version: remote.version || local.version || '2.5',
     lastUpdated: new Date().toISOString(),
@@ -582,6 +588,9 @@ function mergeServerDBs(local: DatabaseSchema, remote: DatabaseSchema): Database
     archives: Array.from(archiveMap.values()),
     concerns: Array.from(concernSet),
     directives: Array.from(dirMap.values()),
+    leadSheets: Array.from(sheetMap.values()),
+    sheetMessages: Array.from(msgMap.values()),
+    memos: Array.from(memoMap.values()),
     logs: [...(local.logs || []), ...(remote.logs || [])].slice(-100),
     stats: remote.stats || local.stats
   };
@@ -596,6 +605,9 @@ function ensureDBShape(db: any): DatabaseSchema {
   if (!Array.isArray(db.overallReports)) db.overallReports = [];
   if (!Array.isArray(db.archives)) db.archives = [];
   if (!Array.isArray(db.directives)) db.directives = [];
+  if (!Array.isArray(db.leadSheets)) db.leadSheets = [];
+  if (!Array.isArray(db.sheetMessages)) db.sheetMessages = [];
+  if (!Array.isArray(db.memos)) db.memos = [];
   if (!Array.isArray(db.logs)) db.logs = [];
   if (!Array.isArray(db.concerns)) db.concerns = DEFAULT_SERVER_CONCERNS;
   return db as DatabaseSchema;
@@ -627,11 +639,18 @@ async function syncToSupabase(data: DatabaseSchema): Promise<boolean> {
         'Content-Type': 'application/json',
         'Prefer': 'resolution=merge-duplicates,return=representation'
       },
-      body: JSON.stringify({
-        id: 'main_state',
-        data: data,
-        updated_at: new Date().toISOString()
-      })
+      body: JSON.stringify([
+        {
+          id: 'main_state',
+          data: data,
+          updated_at: new Date().toISOString()
+        },
+        {
+          id: 'app_db',
+          data: data,
+          updated_at: new Date().toISOString()
+        }
+      ])
     });
 
     if (res.ok) {
@@ -857,6 +876,19 @@ app.post('/api/auth/login', loginRateLimiter, async (req, res) => {
     return res.status(401).json({ success: false, message: 'کد کاربری یا کلمه عبور وارد شده نادرست است.' });
   }
 
+  // Check employment / account status
+  if (user.status && user.status !== 'active') {
+    if (user.status === 'suspended') {
+      return res.status(403).json({ success: false, message: 'حساب کاربری شما موقتاً به حالت تعلیق درآمده است. لطفاً با واحد فاوا تماس بگیرید.' });
+    }
+    if (user.status === 'archived') {
+      return res.status(403).json({ success: false, message: 'این حساب کاربری بایگانی شده و دسترسی ورود به سامانه ندارد.' });
+    }
+    if (user.status === 'terminated') {
+      return res.status(403).json({ success: false, message: 'این حساب کاربری قطع همکاری گردیده و دسترسی به سامانه مسدود است.' });
+    }
+  }
+
   if (role && user.role !== role) {
     if ((role === 'ceo' || role === 'it_admin') && user.role === 'consultant') {
       return res.status(403).json({ success: false, message: 'این حساب دسترسی به بخش مدیریت ندارد.' });
@@ -897,14 +929,17 @@ app.post('/api/auth/login', loginRateLimiter, async (req, res) => {
       }),
       reports: db.reports,
       archives: db.archives,
-      concerns: db.concerns
+      concerns: db.concerns,
+      leadSheets: db.leadSheets || [],
+      sheetMessages: db.sheetMessages || [],
+      memos: db.memos || []
     }
   });
 });
 
 // Direct Real-time Consultant Registration Endpoint
 app.post('/api/auth/register', async (req, res) => {
-  const { fullName, username, consultantCode, password, phone, branch, role } = req.body;
+  const { fullName, username, consultantCode, password, phone, branch, role, status } = req.body;
   if (!fullName || !username || !consultantCode || !password) {
     return res.status(400).json({ success: false, message: 'لطفاً تمام فیلدهای الزامی را تکمیل فرمایید.' });
   }
@@ -930,6 +965,7 @@ app.post('/api/auth/register', async (req, res) => {
     fullName: String(fullName).trim(),
     consultantCode: cleanCode,
     role: role || 'consultant',
+    status: status || 'active',
     password: hashedPassword,
     phone: phone ? String(phone).trim() : '',
     branch: branch ? String(branch).trim() : 'تیم اجرایی'
@@ -976,6 +1012,9 @@ app.get(['/api/auth/me', '/api/auth/verify'], async (req, res) => {
     const user = db.users.find((u: any) => u.id === decoded.id || u.username === decoded.username);
     if (!user) {
       return res.status(404).json({ success: false, message: 'کاربر یافت نشد.' });
+    }
+    if (user.status && user.status !== 'active') {
+      return res.status(403).json({ success: false, message: 'حساب کاربری شما غیرفعال یا معلق گردیده است.' });
     }
     const { password: _pwd, ...sanitizedUser } = user;
     return res.json({ success: true, user: sanitizedUser });
@@ -1106,20 +1145,92 @@ app.put('/api/db/users/:id', async (req, res) => {
   res.status(404).json({ error: 'کاربر مورد نظر یافت نشد.' });
 });
 
+app.patch('/api/db/users/:id/status', async (req, res) => {
+  const { id } = req.params;
+  const { status, reassignLeadsToId } = req.body;
+  if (!status || !['active', 'suspended', 'archived', 'terminated'].includes(status)) {
+    return res.status(400).json({ error: 'وضعیت پرسنلی ارسالی نامعتبر است.' });
+  }
+  const db = await getDB();
+  const idx = db.users.findIndex((u: any) => u.id === id);
+  if (idx === -1) {
+    return res.status(404).json({ error: 'کاربر مورد نظر یافت نشد.' });
+  }
+  db.users[idx].status = status;
+  db.users[idx].updatedAt = new Date().toISOString();
+
+  // If reassignLeadsToId is provided and valid, reassign open lead sheets
+  if (reassignLeadsToId && (status === 'archived' || status === 'terminated')) {
+    const targetUser = db.users.find((u: any) => u.id === reassignLeadsToId && u.status === 'active');
+    if (targetUser && Array.isArray(db.leadSheets)) {
+      db.leadSheets.forEach((s: any) => {
+        if (s.assignedToConsultantId === id && s.status !== 'completed' && s.status !== 'archived') {
+          s.assignedToConsultantId = targetUser.id;
+          s.assignedToConsultantName = targetUser.fullName;
+          s.updatedAt = new Date().toISOString();
+        }
+      });
+    }
+  }
+
+  addAuditLog(db, {
+    timeShamsi: 'تغییر وضعیت پرسنل',
+    category: 'AUTH',
+    level: 'INFO',
+    message: `وضعیت کاربر «${db.users[idx].fullName}» به «${status}» تغییر یافت.`
+  });
+
+  await persistDB(db);
+  const sanitized = sanitizeUsers(db.users);
+  res.json({ success: true, user: sanitized[idx], users: sanitized });
+});
+
 app.delete('/api/db/users/:id', async (req, res) => {
   const { id } = req.params;
+  const { purge, reassignLeadsToId } = req.query;
+  const isPurge = purge === 'true' || purge === true;
   const db = await getDB();
   const idx = db.users.findIndex((u: any) => u.id === id);
   if (idx >= 0) {
-    const deleted = db.users.splice(idx, 1)[0];
-    addAuditLog(db, {
-      timeShamsi: 'حذف کاربر',
-      category: 'AUTH',
-      level: 'WARN',
-      message: `حساب کاربری «${deleted.fullName}» از پایگاه داده حذف گردید.`
-    });
+    const deleted = db.users[idx];
+    if (isPurge) {
+      // Hard purge: delete user and all associated reports, sheets, messages, memos
+      db.users.splice(idx, 1);
+      db.reports = (db.reports || []).filter((r: any) => r.consultantId !== id);
+      db.overallReports = (db.overallReports || []).filter((r: any) => r.consultantId !== id);
+      db.leadSheets = (db.leadSheets || []).filter((s: any) => s.assignedToConsultantId !== id);
+      db.sheetMessages = (db.sheetMessages || []).filter((m: any) => m.senderId !== id);
+      db.memos = (db.memos || []).filter((m: any) => m.senderId !== id && m.targetUserId !== id);
+      addAuditLog(db, {
+        timeShamsi: 'حذف کامل کاربر و سوابق',
+        category: 'AUTH',
+        level: 'ERROR',
+        message: `حساب کاربری «${deleted.fullName}» و کلیه سوابق، شیت‌ها و گزارش‌های مربوطه به صورت قطعی و کامل پاکسازی گردید.`
+      });
+    } else {
+      // Option A: Archive & Retain History
+      if (reassignLeadsToId && typeof reassignLeadsToId === 'string') {
+        const targetUser = db.users.find((u: any) => u.id === reassignLeadsToId);
+        if (targetUser && Array.isArray(db.leadSheets)) {
+          db.leadSheets.forEach((s: any) => {
+            if (s.assignedToConsultantId === id && s.status !== 'completed' && s.status !== 'archived') {
+              s.assignedToConsultantId = targetUser.id;
+              s.assignedToConsultantName = targetUser.fullName;
+              s.updatedAt = new Date().toISOString();
+            }
+          });
+        }
+      }
+      db.users.splice(idx, 1);
+      addAuditLog(db, {
+        timeShamsi: 'حذف کاربر و بایگانی سوابق',
+        category: 'AUTH',
+        level: 'WARN',
+        message: `حساب کاربری «${deleted.fullName}» حذف شد، اما کلیه سوابق، شیت‌ها و گزارش‌ها در سیستم محفوظ ماند.`
+      });
+    }
     await persistDB(db);
-    return res.json({ success: true, users: db.users });
+    return res.json({ success: true, users: sanitizeUsers(db.users) });
   }
   res.status(404).json({ error: 'کاربر یافت نشد.' });
 });
@@ -1415,6 +1526,173 @@ app.delete('/api/db/periodic-reports/:id', async (req, res) => {
     if (!Array.isArray(inMemoryDB.overallReports)) inMemoryDB.overallReports = [];
     inMemoryDB.overallReports = inMemoryDB.overallReports.filter((r: any) => r.id !== id);
     await persistDB(inMemoryDB);
+  });
+  res.json({ success: true });
+});
+
+// 4-3. LEAD SHEETS Endpoints (Living 25-Lead Engine)
+app.get('/api/db/lead-sheets', async (req, res) => {
+  const db = await getDB();
+  const { consultantId, status } = req.query;
+  let sheets = db.leadSheets || [];
+  if (consultantId && typeof consultantId === 'string') {
+    sheets = sheets.filter((s: any) => s.assignedToConsultantId === consultantId);
+  }
+  if (status && typeof status === 'string') {
+    sheets = sheets.filter((s: any) => s.status === status);
+  }
+  res.json({ success: true, leadSheets: sheets });
+});
+
+app.post('/api/db/lead-sheets', async (req, res) => {
+  const payload = req.body;
+  if (!payload) {
+    return res.status(400).json({ error: 'داده‌های شیت ارسالی نامعتبر است.' });
+  }
+
+  // Support single sheet or batch of sheets (from supervisor upload)
+  const incomingSheets = Array.isArray(payload) ? payload : (payload.sheets && Array.isArray(payload.sheets) ? payload.sheets : [payload]);
+  
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.leadSheets)) inMemoryDB.leadSheets = [];
+    incomingSheets.forEach((sheet: any) => {
+      if (!sheet || !sheet.id) return;
+      const idx = inMemoryDB.leadSheets.findIndex((s: any) => s.id === sheet.id);
+      const enriched = { ...sheet, updatedAt: new Date().toISOString() };
+      if (idx >= 0) {
+        inMemoryDB.leadSheets[idx] = { ...inMemoryDB.leadSheets[idx], ...enriched };
+      } else {
+        inMemoryDB.leadSheets.unshift(enriched);
+      }
+    });
+    await persistDB(inMemoryDB);
+  });
+
+  res.json({ success: true, leadSheets: inMemoryDB.leadSheets });
+});
+
+app.put('/api/db/lead-sheets/:id', async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+  let updatedSheet: any = null;
+
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.leadSheets)) inMemoryDB.leadSheets = [];
+    const idx = inMemoryDB.leadSheets.findIndex((s: any) => s.id === id);
+    if (idx >= 0) {
+      inMemoryDB.leadSheets[idx] = {
+        ...inMemoryDB.leadSheets[idx],
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+      updatedSheet = inMemoryDB.leadSheets[idx];
+      await persistDB(inMemoryDB);
+    }
+  });
+
+  if (updatedSheet) {
+    return res.json({ success: true, leadSheet: updatedSheet });
+  }
+  res.status(404).json({ error: 'شیت مورد نظر یافت نشد.' });
+});
+
+app.delete('/api/db/lead-sheets/:id', async (req, res) => {
+  const { id } = req.params;
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.leadSheets)) inMemoryDB.leadSheets = [];
+    inMemoryDB.leadSheets = inMemoryDB.leadSheets.filter((s: any) => s.id !== id);
+    await persistDB(inMemoryDB);
+  });
+  res.json({ success: true });
+});
+
+// 4-4. SHEET MESSAGES Endpoints (In-Row Contextual Q&A)
+app.get('/api/db/sheet-messages', async (req, res) => {
+  const db = await getDB();
+  const { sheetId, rowId } = req.query;
+  let msgs = db.sheetMessages || [];
+  if (sheetId && typeof sheetId === 'string') {
+    msgs = msgs.filter((m: any) => m.sheetId === sheetId);
+  }
+  if (rowId && typeof rowId === 'string') {
+    msgs = msgs.filter((m: any) => m.rowId === rowId);
+  }
+  res.json({ success: true, sheetMessages: msgs });
+});
+
+app.post('/api/db/sheet-messages', async (req, res) => {
+  const msg = req.body;
+  if (!msg || !msg.sheetId || !msg.message) {
+    return res.status(400).json({ error: 'اطلاعات پیام ناقص است.' });
+  }
+  const newMsg = {
+    ...msg,
+    id: msg.id || `smsg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    createdAt: new Date().toISOString()
+  };
+
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.sheetMessages)) inMemoryDB.sheetMessages = [];
+    inMemoryDB.sheetMessages.push(newMsg);
+    await persistDB(inMemoryDB);
+  });
+
+  res.json({ success: true, sheetMessage: newMsg });
+});
+
+app.patch('/api/db/sheet-messages/:id/read', async (req, res) => {
+  const { id } = req.params;
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.sheetMessages)) inMemoryDB.sheetMessages = [];
+    const msg = inMemoryDB.sheetMessages.find((m: any) => m.id === id);
+    if (msg) {
+      msg.isRead = true;
+      await persistDB(inMemoryDB);
+    }
+  });
+  res.json({ success: true });
+});
+
+// 4-5. OFFICIAL MEMOS Endpoints (Circulars & Direct Communication)
+app.get('/api/db/memos', async (req, res) => {
+  const db = await getDB();
+  const { targetUserId } = req.query;
+  let memos = db.memos || [];
+  if (targetUserId && typeof targetUserId === 'string') {
+    memos = memos.filter((m: any) => m.targetUserId === targetUserId || m.targetUserId === 'all' || m.senderId === targetUserId);
+  }
+  res.json({ success: true, memos });
+});
+
+app.post('/api/db/memos', async (req, res) => {
+  const memo = req.body;
+  if (!memo || !memo.content || !memo.title) {
+    return res.status(400).json({ error: 'اطلاعات نامه اداری ناقص است.' });
+  }
+  const newMemo = {
+    ...memo,
+    id: memo.id || `memo-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    createdAt: new Date().toISOString()
+  };
+
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.memos)) inMemoryDB.memos = [];
+    inMemoryDB.memos.unshift(newMemo);
+    await persistDB(inMemoryDB);
+  });
+
+  res.json({ success: true, memo: newMemo });
+});
+
+app.patch('/api/db/memos/:id/read', async (req, res) => {
+  const { id } = req.params;
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.memos)) inMemoryDB.memos = [];
+    const memo = inMemoryDB.memos.find((m: any) => m.id === id);
+    if (memo) {
+      memo.isRead = true;
+      await persistDB(inMemoryDB);
+    }
   });
   res.json({ success: true });
 });

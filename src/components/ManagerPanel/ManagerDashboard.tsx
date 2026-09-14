@@ -30,6 +30,8 @@ import { exportAggregatedReportsToExcel, exportSingleReportToExcel, exportArchiv
 import { FollowUpBadge } from '../common/FollowUpBadge';
 import { ScrollableTabs, TabItem } from '../common/ScrollableTabs';
 import { PeriodicReportsManager } from './PeriodicReportsManager';
+import { LeadSheetManager } from './LeadSheetManager';
+import { EnterpriseMemoBox } from '../common/EnterpriseMemoBox';
 import { FOLLOW_UP_STATUS_CODES } from '../../data/defaultData';
 import { 
   BarChart3, 
@@ -69,7 +71,8 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
-  ExternalLink
+  ExternalLink,
+  Mail
 } from 'lucide-react';
 
 interface ManagerDashboardProps {
@@ -121,7 +124,7 @@ interface AggregatedConsultantData {
 }
 
 export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser }) => {
-  const [activeTab, setActiveTab] = useState<'analytics' | 'consultants' | 'periodic' | 'aggregated' | 'gemini' | 'archive' | 'settings'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'leads' | 'memos' | 'consultants' | 'periodic' | 'aggregated' | 'gemini' | 'archive' | 'settings'>('analytics');
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('today');
   
   // Storage states
@@ -1101,6 +1104,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
           onChange={(id) => setActiveTab(id as any)}
           tabs={[
             { id: 'analytics', label: 'خلاصه استراتژیک و شاخص‌ها', icon: BarChart3 },
+            { id: 'leads', label: 'مدیریت و تخصیص لیدشیت‌های ۲۵ تایی', icon: FileSpreadsheet, badge: 'موتور لید' },
+            { id: 'memos', label: 'مکاتبات و بخشنامه‌های رسمی', icon: Mail, badge: 'سازمانی' },
             { id: 'consultants', label: `عملکرد تفکیکی مشاورین (${toPersianDigits(consultantsAggregatedList.length)})`, icon: Users },
             { id: 'periodic', label: 'گزارشات دوره‌ای و پیگیری‌ها (نظارت)', icon: FileSpreadsheet, badge: 'جدید' },
             { id: 'aggregated', label: `جدول کل گزارشات (${toPersianDigits(totalRowsCount)})`, icon: Layers },
@@ -1110,6 +1115,16 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
           ]}
         />
       </div>
+
+      {/* TAB: 25-ROW LEAD SHEET ENGINE */}
+      {activeTab === 'leads' && (
+        <LeadSheetManager currentUser={currentUser} />
+      )}
+
+      {/* TAB: ENTERPRISE DISPATCH MEMOS */}
+      {activeTab === 'memos' && (
+        <EnterpriseMemoBox currentUser={currentUser} />
+      )}
 
       {/* TAB 1: EXECUTIVE KPIS OVERVIEW & VISUALS */}
       {activeTab === 'analytics' && (

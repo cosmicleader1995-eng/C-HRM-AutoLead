@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, DailyReport, ArchiveRecord } from '../../types';
+import { User, DailyReport, ArchiveRecord, UserStatus } from '../../types';
 import { 
   getStoredReports, 
   getStoredUsers, 
@@ -10,7 +10,9 @@ import {
   saveConcerns,
   saveReport,
   pushLocalToServer,
-  registerConsultantOnServer
+  registerConsultantOnServer,
+  updateUserStatus,
+  deleteUserWithOption
 } from '../../services/storage';
 import { getCurrentShamsiDate, toPersianDigits, getCurrentTimeFormatted } from '../../utils/shamsi';
 import { ScrollableTabs, TabItem } from '../common/ScrollableTabs';
@@ -40,6 +42,11 @@ import {
   Bug,
   Sparkles,
   UserPlus,
+  UserCheck,
+  UserX,
+  ShieldAlert,
+  ArrowLeftRight,
+  UserMinus,
   X
 } from 'lucide-react';
 
@@ -87,8 +94,19 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
   const [newPhone, setNewPhone] = useState('');
   const [newBranch, setNewBranch] = useState('تیم اجرایی مشهد');
   const [newRole, setNewRole] = useState<'consultant' | 'ceo' | 'it_admin'>('consultant');
+  const [newStatus, setNewStatus] = useState<UserStatus>('active');
   const [addUserError, setAddUserError] = useState('');
   const [isCreatingUser, setIsCreatingUser] = useState(false);
+
+  // Smart Action Modal State (Option A: Archive & Retain vs Option B: Hard Delete / Purge)
+  const [userForAction, setUserForAction] = useState<User | null>(null);
+  const [actionModalMode, setActionModalMode] = useState<'status_change' | 'delete' | null>(null);
+  const [targetStatus, setTargetStatus] = useState<UserStatus>('archived');
+  const [deleteOption, setDeleteOption] = useState<'archive' | 'purge'>('archive');
+  const [reassignLeadsToId, setReassignLeadsToId] = useState<string>('');
+  const [purgeConfirmationText, setPurgeConfirmationText] = useState<string>('');
+  const [actionError, setActionError] = useState<string>('');
+  const [isProcessingAction, setIsProcessingAction] = useState<boolean>(false);
 
   // Concerns Management
   const [newConcernInput, setNewConcernInput] = useState('');
@@ -247,6 +265,32 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
     reader.readAsText(file);
   };
 
+  const getStatusBadge = (status?: UserStatus) => {
+    switch (status) {
+      case 'suspended':
+        return {
+          label: 'تعلیق موقت',
+          className: 'bg-amber-950 text-amber-300 border-amber-500/40'
+        };
+      case 'archived':
+        return {
+          label: 'بایگانی‌شده',
+          className: 'bg-slate-800 text-slate-300 border-slate-600/40'
+        };
+      case 'terminated':
+        return {
+          label: 'لغو همکاری',
+          className: 'bg-rose-950 text-rose-300 border-rose-500/40'
+        };
+      case 'active':
+      default:
+        return {
+          label: 'فعال',
+          className: 'bg-emerald-950 text-emerald-300 border-emerald-500/40'
+        };
+    }
+  };
+
   // Create New User (Consultant / Admin)
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -266,6 +310,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
         consultantCode: newCode.trim().toUpperCase(),
         password: newPassword.trim(),
         role: newRole,
+        status: newStatus,
         phone: newPhone.trim() || '',
         branch: newBranch.trim() || 'تیم اجرایی'
       };
@@ -274,7 +319,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
       reloadData();
       
       setUserSuccessMsg(`کاربر «${newUserObj.fullName}» با موفقیت تعریف و در سرور ثبت شد.`);
-      addLog('AUTH', 'SUCCESS', `تعریف کاربر جدید ${newUserObj.username} (${newUserObj.fullName}) با نقش ${newUserObj.role} توسط مدیر فاوا.`);
+      addLog('AUTH', 'SUCCESS', `تعریف کاربر جدید ${newUserObj.username} (${newUserObj.fullName}) با نقش ${newUserObj.role} و وضعیت ${newStatus} توسط مدیر فاوا.`);
       
       setShowAddUserModal(false);
       setNewFullName('');
@@ -284,11 +329,83 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
       setNewPhone('');
       setNewBranch('تیم اجرایی مشهد');
       setNewRole('consultant');
+      setNewStatus('active');
       setTimeout(() => setUserSuccessMsg(''), 3500);
     } catch (err: any) {
       setAddUserError('خطا در ثبت کاربر جدید در سیستم.');
     } finally {
       setIsCreatingUser(false);
+    }
+  };
+
+  // Initiate user status change
+  const handleInitiateStatusChange = (user: User, newStat: UserStatus) => {
+    if (newStat === 'active' || newStat === 'suspended') {
+      updateUserStatus(user.id, newStat);
+      addLog('AUTH', 'INFO', `تغییر سریع وضعیت کاربر «${user.fullName}» به «${newStat}».`);
+      setUserSuccessMsg(`وضعیت «${user.fullName}» به «${getStatusBadge(newStat).label}» تغییر یافت.`);
+      reloadData();
+      setTimeout(() => setUserSuccessMsg(''), 3500);
+    } else {
+      // Archived or Terminated: Requires Smart Action Dialog for reassigning leads
+      setUserForAction(user);
+      setTargetStatus(newStat);
+      setActionModalMode('status_change');
+      setReassignLeadsToId('');
+      setActionError('');
+    }
+  };
+
+  // Initiate user deletion
+  const handleInitiateDelete = (user: User) => {
+    setUserForAction(user);
+    setActionModalMode('delete');
+    setDeleteOption('archive');
+    setPurgeConfirmationText('');
+    setReassignLeadsToId('');
+    setActionError('');
+  };
+
+  // Execute Smart Action (Option A or Option B)
+  const handleExecuteUserAction = async () => {
+    if (!userForAction) return;
+    setActionError('');
+    setIsProcessingAction(true);
+
+    try {
+      if (actionModalMode === 'delete') {
+        if (deleteOption === 'purge') {
+          // Verify confirmation text
+          if (purgeConfirmationText.trim() !== 'حذف قطعی' && purgeConfirmationText.trim() !== userForAction.username) {
+            setActionError(`جهت تأیید پاکسازی، باید دقیقاً عبارت «حذف قطعی» یا نام کاربری «${userForAction.username}» را وارد نمایید.`);
+            setIsProcessingAction(false);
+            return;
+          }
+          await deleteUserWithOption(userForAction.id, true);
+          addLog('AUTH', 'ERROR', `پاکسازی کامل و غیرقابل بازگشت کاربر «${userForAction.fullName}» و کلیه داده‌های منتسب.`);
+          setUserSuccessMsg(`حساب کاربری «${userForAction.fullName}» و کلیه اطلاعات مربوطه با موفقیت پاکسازی شد.`);
+        } else {
+          // Option A: Archive & Retain History
+          await deleteUserWithOption(userForAction.id, false, reassignLeadsToId || undefined);
+          addLog('AUTH', 'WARN', `بایگانی و حذف حساب کاربری «${userForAction.fullName}» با حفظ سوابق.`);
+          setUserSuccessMsg(`کاربر «${userForAction.fullName}» حذف شد، اما کلیه سوابق و لیدها در سیستم بایگانی و حفظ گردید.`);
+        }
+      } else if (actionModalMode === 'status_change') {
+        await updateUserStatus(userForAction.id, targetStatus, reassignLeadsToId || undefined);
+        addLog('AUTH', 'INFO', `تغییر وضعیت کاربر «${userForAction.fullName}» به «${targetStatus}».`);
+        setUserSuccessMsg(`وضعیت پرسنلی «${userForAction.fullName}» به «${getStatusBadge(targetStatus).label}» تغییر یافت.`);
+      }
+
+      reloadData();
+      setUserForAction(null);
+      setActionModalMode(null);
+      setPurgeConfirmationText('');
+      setReassignLeadsToId('');
+      setTimeout(() => setUserSuccessMsg(''), 4000);
+    } catch (err: any) {
+      setActionError('خطا در اعمال تغییرات بر روی کاربر.');
+    } finally {
+      setIsProcessingAction(false);
     }
   };
 
@@ -738,60 +855,101 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
 
           {/* Users List: Mobile Cards (<md) and Desktop Table (md+) */}
           
+          {/* Users List: Mobile Cards (<md) and Desktop Table (md+) */}
+          
           {/* Mobile View: Cards */}
           <div className="grid grid-cols-1 gap-3 md:hidden">
-            {filteredUsers.map((user, idx) => (
-              <div 
-                key={user.id} 
-                className="navy-card-glass rounded-xl border border-blue-500/25 p-3.5 space-y-2.5 shadow-md"
-              >
-                <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-300 font-bold font-mono text-[11px] flex items-center justify-center border border-blue-500/30">
-                      {toPersianDigits(idx + 1)}
+            {filteredUsers.map((user, idx) => {
+              const statusInfo = getStatusBadge(user.status);
+              const isProtectedRole = user.role === 'ceo' || user.id === currentUser.id;
+
+              return (
+                <div 
+                  key={user.id} 
+                  className="navy-card-glass rounded-xl border border-blue-500/25 p-3.5 space-y-2.5 shadow-md"
+                >
+                  <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-300 font-bold font-mono text-[11px] flex items-center justify-center border border-blue-500/30">
+                        {toPersianDigits(idx + 1)}
+                      </span>
+                      <span className="font-bold text-white text-xs">{user.fullName}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`text-[10px] px-2 py-0.5 rounded font-bold whitespace-nowrap ${
+                        user.role === 'ceo' 
+                          ? 'bg-purple-950 text-purple-300 border border-purple-500/30' 
+                          : user.role === 'it_admin' 
+                          ? 'bg-blue-950 text-blue-300 border border-blue-500/30' 
+                          : 'bg-amber-950 text-amber-300 border border-amber-500/30'
+                      }`}>
+                        {user.role === 'ceo' ? 'سرپرست' : user.role === 'it_admin' ? 'مدیر فاوا' : 'مشاور اجرایی'}
+                      </span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded font-bold border whitespace-nowrap ${statusInfo.className}`}>
+                        {statusInfo.label}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div className="bg-[#081525] p-2 rounded-lg border border-slate-800/80">
+                      <span className="text-slate-400 block text-[10px]">کد پرسنلی:</span>
+                      <span className="font-mono text-amber-300 font-bold">{user.consultantCode}</span>
+                    </div>
+                    <div className="bg-[#081525] p-2 rounded-lg border border-slate-800/80">
+                      <span className="text-slate-400 block text-[10px]">نام کاربری:</span>
+                      <span className="font-mono text-slate-200">{user.username}</span>
+                    </div>
+                  </div>
+
+                  {/* Status Change Selector for Mobile */}
+                  {user.role === 'consultant' && (
+                    <div className="flex items-center justify-between gap-2 p-1.5 bg-[#06111e] rounded-lg border border-slate-800">
+                      <span className="text-[10px] text-slate-400">تغییر وضعیت:</span>
+                      <select
+                        value={user.status || 'active'}
+                        onChange={(e) => handleInitiateStatusChange(user, e.target.value as UserStatus)}
+                        className="bg-transparent text-[11px] font-bold text-white outline-none cursor-pointer"
+                      >
+                        <option value="active" className="bg-[#081525]">فعال (Active)</option>
+                        <option value="suspended" className="bg-[#081525]">تعلیق موقت (Suspended)</option>
+                        <option value="archived" className="bg-[#081525]">بایگانی‌شده (Archived)</option>
+                        <option value="terminated" className="bg-[#081525]">لغو همکاری (Terminated)</option>
+                      </select>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[10px] text-slate-400 truncate">
+                      {user.branch || 'تیم اجرایی'}
                     </span>
-                    <span className="font-bold text-white text-xs">{user.fullName}</span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingUser(user);
+                          setNewPasswordInput('');
+                        }}
+                        className="px-2.5 py-1.5 bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-blue-200 rounded-lg text-xs flex items-center gap-1 cursor-pointer font-bold whitespace-nowrap"
+                      >
+                        <Key className="w-3.5 h-3.5" />
+                        <span>رمز</span>
+                      </button>
+                      {!isProtectedRole && (
+                        <button
+                          type="button"
+                          onClick={() => handleInitiateDelete(user)}
+                          className="p-1.5 bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/30 text-rose-300 rounded-lg text-xs flex items-center justify-center cursor-pointer transition-colors"
+                          title="حذف یا بایگانی مشاور"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded font-bold whitespace-nowrap ${
-                    user.role === 'ceo' 
-                      ? 'bg-purple-950 text-purple-300 border border-purple-500/30' 
-                      : user.role === 'it_admin' 
-                      ? 'bg-blue-950 text-blue-300 border border-blue-500/30' 
-                      : 'bg-amber-950 text-amber-300 border border-amber-500/30'
-                  }`}>
-                    {user.role === 'ceo' ? 'سرپرست' : user.role === 'it_admin' ? 'مدیر فاوا' : 'مشاور اجرایی'}
-                  </span>
                 </div>
-
-                <div className="grid grid-cols-2 gap-2 text-[11px]">
-                  <div className="bg-[#081525] p-2 rounded-lg border border-slate-800/80">
-                    <span className="text-slate-400 block text-[10px]">کد پرسنلی:</span>
-                    <span className="font-mono text-amber-300 font-bold">{user.consultantCode}</span>
-                  </div>
-                  <div className="bg-[#081525] p-2 rounded-lg border border-slate-800/80">
-                    <span className="text-slate-400 block text-[10px]">نام کاربری:</span>
-                    <span className="font-mono text-slate-200">{user.username}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] text-slate-400 truncate">
-                    {user.branch || 'تیم اجرایی'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingUser(user);
-                      setNewPasswordInput('');
-                    }}
-                    className="px-3 py-1.5 bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-blue-200 rounded-lg text-xs flex items-center gap-1.5 cursor-pointer font-bold whitespace-nowrap"
-                  >
-                    <Key className="w-3.5 h-3.5" />
-                    <span>تغییر کلمه عبور</span>
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Desktop View: Table (md+) */}
@@ -805,46 +963,83 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                     <th className="py-3 px-3">کد پرسنلی</th>
                     <th className="py-3 px-3">نام کاربری</th>
                     <th className="py-3 px-3">نقش کاربری</th>
+                    <th className="py-3 px-3">وضعیت پرسنلی</th>
                     <th className="py-3 px-3">شعبه / واحد</th>
                     <th className="py-3 px-3 text-center">عملیات فاوا</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/80 text-slate-300">
-                  {filteredUsers.map((user, idx) => (
-                    <tr key={user.id} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="py-2.5 px-3 font-mono font-bold text-blue-300">
-                        {toPersianDigits(idx + 1)}
-                      </td>
-                      <td className="py-2.5 px-3 font-bold text-white">{user.fullName}</td>
-                      <td className="py-2.5 px-3 font-mono text-amber-300">{user.consultantCode}</td>
-                      <td className="py-2.5 px-3 font-mono text-slate-300">{user.username}</td>
-                      <td className="py-2.5 px-3">
-                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold whitespace-nowrap ${
-                          user.role === 'ceo' 
-                            ? 'bg-purple-950 text-purple-300 border border-purple-500/30' 
-                            : user.role === 'it_admin' 
-                            ? 'bg-blue-950 text-blue-300 border border-blue-500/30' 
-                            : 'bg-amber-950 text-amber-300 border border-amber-500/30'
-                        }`}>
-                          {user.role === 'ceo' ? 'سرپرست' : user.role === 'it_admin' ? 'مدیر فاوا' : 'مشاور اجرایی'}
-                        </span>
-                      </td>
-                      <td className="py-2.5 px-3 text-slate-400">{user.branch || 'تیم اجرایی'}</td>
-                      <td className="py-2.5 px-3 text-center">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingUser(user);
-                            setNewPasswordInput('');
-                          }}
-                          className="px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-300 rounded-lg text-xs flex items-center gap-1 mx-auto cursor-pointer whitespace-nowrap"
-                        >
-                          <Key className="w-3 h-3" />
-                          <span>تغییر کلمه عبور</span>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredUsers.map((user, idx) => {
+                    const statusInfo = getStatusBadge(user.status);
+                    const isProtectedRole = user.role === 'ceo' || user.id === currentUser.id;
+
+                    return (
+                      <tr key={user.id} className="hover:bg-slate-800/40 transition-colors">
+                        <td className="py-2.5 px-3 font-mono font-bold text-blue-300">
+                          {toPersianDigits(idx + 1)}
+                        </td>
+                        <td className="py-2.5 px-3 font-bold text-white">{user.fullName}</td>
+                        <td className="py-2.5 px-3 font-mono text-amber-300">{user.consultantCode}</td>
+                        <td className="py-2.5 px-3 font-mono text-slate-300">{user.username}</td>
+                        <td className="py-2.5 px-3">
+                          <span className={`text-[10px] px-2 py-0.5 rounded font-bold whitespace-nowrap ${
+                            user.role === 'ceo' 
+                              ? 'bg-purple-950 text-purple-300 border border-purple-500/30' 
+                              : user.role === 'it_admin' 
+                              ? 'bg-blue-950 text-blue-300 border border-blue-500/30' 
+                              : 'bg-amber-950 text-amber-300 border border-amber-500/30'
+                          }`}>
+                            {user.role === 'ceo' ? 'سرپرست' : user.role === 'it_admin' ? 'مدیر فاوا' : 'مشاور اجرایی'}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3">
+                          {user.role === 'consultant' ? (
+                            <select
+                              value={user.status || 'active'}
+                              onChange={(e) => handleInitiateStatusChange(user, e.target.value as UserStatus)}
+                              className={`text-[10px] px-2 py-1 rounded-lg font-bold border outline-none cursor-pointer bg-[#081525] ${statusInfo.className}`}
+                            >
+                              <option value="active">فعال (Active)</option>
+                              <option value="suspended">تعلیق موقت (Suspended)</option>
+                              <option value="archived">بایگانی‌شده (Archived)</option>
+                              <option value="terminated">لغو همکاری (Terminated)</option>
+                            </select>
+                          ) : (
+                            <span className={`text-[10px] px-2 py-0.5 rounded font-bold border whitespace-nowrap ${statusInfo.className}`}>
+                              {statusInfo.label}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3 text-slate-400">{user.branch || 'تیم اجرایی'}</td>
+                        <td className="py-2.5 px-3 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingUser(user);
+                                setNewPasswordInput('');
+                              }}
+                              className="px-2 py-1 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-300 rounded-lg text-xs flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                              title="تغییر کلمه عبور"
+                            >
+                              <Key className="w-3 h-3" />
+                              <span>تغییر رمز</span>
+                            </button>
+                            {!isProtectedRole && (
+                              <button
+                                type="button"
+                                onClick={() => handleInitiateDelete(user)}
+                                className="p-1 bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/30 text-rose-300 rounded-lg text-xs flex items-center justify-center cursor-pointer transition-colors"
+                                title="حذف یا بایگانی مشاور"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -932,8 +1127,8 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="space-y-1 sm:col-span-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="space-y-1">
                       <label className="text-xs font-semibold text-slate-300 block">
                         نقش کاربری:
                       </label>
@@ -948,7 +1143,23 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                       </select>
                     </div>
 
-                    <div className="space-y-1 sm:col-span-1">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-slate-300 block">
+                        وضعیت پرسنلی:
+                      </label>
+                      <select
+                        value={newStatus}
+                        onChange={(e) => setNewStatus(e.target.value as UserStatus)}
+                        className="w-full bg-[#06111e] border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                      >
+                        <option value="active">فعال (Active)</option>
+                        <option value="suspended">تعلیق موقت (Suspended)</option>
+                        <option value="archived">بایگانی‌شده (Archived)</option>
+                        <option value="terminated">لغو همکاری (Terminated)</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
                       <label className="text-xs font-semibold text-slate-300 block">
                         شماره تماس:
                       </label>
@@ -962,7 +1173,7 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                       />
                     </div>
 
-                    <div className="space-y-1 sm:col-span-1">
+                    <div className="space-y-1">
                       <label className="text-xs font-semibold text-slate-300 block">
                         شعبه / واحد:
                       </label>
@@ -1044,6 +1255,244 @@ export const ITDashboard: React.FC<ITDashboardProps> = ({ currentUser }) => {
                     ذخیره رمز جدید
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Smart Action Prompt Dialog (Option A: Archive & Retain vs Option B: Hard Delete / Purge) */}
+          {actionModalMode && userForAction && (
+            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+              <div className="bg-[#0a192c] border border-amber-500/40 rounded-2xl max-w-xl w-full p-5 sm:p-6 space-y-4 shadow-2xl animate-scaleIn">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                      actionModalMode === 'delete' && deleteOption === 'purge' 
+                        ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' 
+                        : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    }`}>
+                      <AlertTriangle className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-white">
+                        {actionModalMode === 'delete' 
+                          ? `تعیین تکلیف داده‌ها و حذف حساب کاربری: ${userForAction.fullName}`
+                          : `تغییر وضعیت پرسنلی: ${userForAction.fullName}`
+                        }
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        کد پرسنلی: <span className="font-mono text-amber-300 font-bold">{userForAction.consultantCode}</span> | نام کاربری: <span className="font-mono text-blue-300">{userForAction.username}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserForAction(null);
+                      setActionModalMode(null);
+                    }}
+                    className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* MODE 1: DELETE MODAL */}
+                {actionModalMode === 'delete' && (
+                  <div className="space-y-4">
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      لطفاً نحوه برخورد با اطلاعات، پرونده‌ها و سوابق پیگیری این مشاور را مشخص فرمایید:
+                    </p>
+
+                    {/* Option A: Archive & Retain History (Recommended) */}
+                    <div 
+                      onClick={() => setDeleteOption('archive')}
+                      className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                        deleteOption === 'archive'
+                          ? 'bg-emerald-950/40 border-emerald-500/60 ring-1 ring-emerald-500/40'
+                          : 'bg-[#06111e] border-slate-800 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          name="deleteOption"
+                          checked={deleteOption === 'archive'}
+                          onChange={() => setDeleteOption('archive')}
+                          className="mt-1 cursor-pointer accent-emerald-500"
+                        />
+                        <div className="space-y-1.5 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-black text-emerald-300">
+                              گزینه الف: بایگانی مشاور و حفظ یکپارچگی سوابق (توصیه‌شده - امن)
+                            </span>
+                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold">
+                              استاندارد سازمانی
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            حساب کاربری حذف و غیرفعال می‌شود اما کلیه گزارش‌ها، سوابق پیگیری ۲۵ ردیفه و لیدشیت‌ها در سامانه حفظ و در آرشیو سرپرست نگهداری می‌شوند.
+                          </p>
+
+                          {deleteOption === 'archive' && (
+                            <div className="mt-3 pt-3 border-t border-emerald-500/20 space-y-1.5">
+                              <label className="text-[11px] font-bold text-slate-300 block">
+                                انتقال لیدها و پرونده‌های باز به مشاور فعال دیگر (اختیاری):
+                              </label>
+                              <select
+                                value={reassignLeadsToId}
+                                onChange={(e) => setReassignLeadsToId(e.target.value)}
+                                className="w-full bg-[#081525] border border-emerald-500/40 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                              >
+                                <option value="">عدم تخصیص (تنها نگهداری در آرشیو سرپرست)</option>
+                                {users
+                                  .filter(u => u.role === 'consultant' && u.id !== userForAction.id && (u.status === 'active' || !u.status))
+                                  .map(u => (
+                                    <option key={u.id} value={u.id}>
+                                      واگذاری به: {u.fullName} ({u.consultantCode})
+                                    </option>
+                                  ))}
+                              </select>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Option B: Hard Delete / Purge */}
+                    <div 
+                      onClick={() => setDeleteOption('purge')}
+                      className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                        deleteOption === 'purge'
+                          ? 'bg-rose-950/40 border-rose-500/60 ring-1 ring-rose-500/40'
+                          : 'bg-[#06111e] border-slate-800 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          name="deleteOption"
+                          checked={deleteOption === 'purge'}
+                          onChange={() => setDeleteOption('purge')}
+                          className="mt-1 cursor-pointer accent-rose-500"
+                        />
+                        <div className="space-y-1.5 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-black text-rose-300">
+                              گزینه ب: پاکسازی کامل و قطعی داده‌ها (Hard Purge - عملیات حساس)
+                            </span>
+                            <span className="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-bold">
+                              غیرقابل بازگشت
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            کلیه اطلاعات این کاربر شامل شیت‌های ۲۵ ردیفه لید، یادداشت‌ها، پیام‌ها و گزارش‌های روزانه به صورت کامل از سرور و پایگاه ابری پاک خواهد شد.
+                          </p>
+
+                          {deleteOption === 'purge' && (
+                            <div className="mt-3 pt-3 border-t border-rose-500/20 space-y-2">
+                              <p className="text-[11px] text-rose-400 font-bold">
+                                جهت تایید این عملیات خطیر، لطفاً عبارت «حذف قطعی» را در کادر زیر تایپ نمایید:
+                              </p>
+                              <input
+                                type="text"
+                                value={purgeConfirmationText}
+                                onChange={(e) => setPurgeConfirmationText(e.target.value)}
+                                placeholder="حذف قطعی"
+                                className="w-full bg-[#081525] border border-rose-500/50 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 outline-none font-bold"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* MODE 2: STATUS CHANGE MODAL */}
+                {actionModalMode === 'status_change' && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-[#06111e] border border-blue-500/30 rounded-xl space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-slate-300">وضعیت جدید انتخابی:</span>
+                        <span className={`text-xs px-2.5 py-0.5 rounded font-bold border ${getStatusBadge(targetStatus).className}`}>
+                          {getStatusBadge(targetStatus).label}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-relaxed">
+                        {targetStatus === 'suspended' && 'دسترسی کاربر موقتاً مسدود می‌شود و امکان ورود به سیستم را نخواهد داشت.'}
+                        {targetStatus === 'archived' && 'حساب کاربری به عنوان پرسنل سابق بایگانی شده و دسترسی ورود غیرفعال می‌گردد.'}
+                        {targetStatus === 'terminated' && 'همکاری با این مشاور قطع شده و کلیه دسترسی‌های سیستمی سلب می‌گردد.'}
+                      </p>
+                    </div>
+
+                    {(targetStatus === 'archived' || targetStatus === 'terminated') && (
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-slate-300 block">
+                          واگذاری پرونده‌ها و لیدشیت‌های باز این مشاور به یک مشاور فعال (اختیاری):
+                        </label>
+                        <select
+                          value={reassignLeadsToId}
+                          onChange={(e) => setReassignLeadsToId(e.target.value)}
+                          className="w-full bg-[#06111e] border border-slate-700 focus:border-blue-400 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                        >
+                          <option value="">بدون واگذاری (تنها نگهداری در بایگانی)</option>
+                          {users
+                            .filter(u => u.role === 'consultant' && u.id !== userForAction.id && (u.status === 'active' || !u.status))
+                            .map(u => (
+                              <option key={u.id} value={u.id}>
+                                انتقال به: {u.fullName} ({u.consultantCode})
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {actionError && (
+                  <div className="p-2.5 bg-rose-950/80 border border-rose-500/40 rounded-xl text-rose-300 text-xs flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                    <span>{actionError}</span>
+                  </div>
+                )}
+
+                {/* Footer Actions */}
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                  <button
+                    type="button"
+                    disabled={isProcessingAction}
+                    onClick={() => {
+                      setUserForAction(null);
+                      setActionModalMode(null);
+                    }}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl cursor-pointer transition-colors"
+                  >
+                    انصراف
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isProcessingAction}
+                    onClick={handleExecuteUserAction}
+                    className={`px-5 py-2 text-xs font-bold rounded-xl cursor-pointer shadow-lg transition-all flex items-center gap-1.5 ${
+                      actionModalMode === 'delete' && deleteOption === 'purge'
+                        ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/30'
+                        : actionModalMode === 'delete' && deleteOption === 'archive'
+                        ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-amber-600/30'
+                        : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/30'
+                    } disabled:opacity-60`}
+                  >
+                    {isProcessingAction ? (
+                      <span>در حال اعمال تغییرات...</span>
+                    ) : actionModalMode === 'delete' ? (
+                      deleteOption === 'purge' ? 'تأیید پاکسازی قطعی' : 'بایگانی و حذف کاربر'
+                    ) : (
+                      'تأیید و اعمال وضعیت'
+                    )}
+                  </button>
+                </div>
+
               </div>
             </div>
           )}

@@ -18,6 +18,8 @@ import { FollowUpBadge } from '../common/FollowUpBadge';
 import { ScrollableTabs, TabItem } from '../common/ScrollableTabs';
 import { MorningDashboard } from './MorningDashboard';
 import { PeriodicReportsConsultant } from './PeriodicReportsConsultant';
+import { LeadSheetCockpit } from './LeadSheetCockpit';
+import { EnterpriseMemoBox } from '../common/EnterpriseMemoBox';
 import confetti from 'canvas-confetti';
 
 import { 
@@ -46,7 +48,8 @@ import {
   Check,
   Flame,
   Lock,
-  AlertOctagon
+  AlertOctagon,
+  Mail
 } from 'lucide-react';
 
 interface ConsultantDashboardProps {
@@ -54,7 +57,7 @@ interface ConsultantDashboardProps {
 }
 
 export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ currentUser }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'morning' | 'form' | 'periodic' | 'upcoming' | 'history'>('morning');
+  const [activeSubTab, setActiveSubTab] = useState<'morning' | 'leads' | 'memos' | 'form' | 'periodic' | 'upcoming' | 'history'>('morning');
   const [concernsList, setConcernsList] = useState<string[]>(getStoredConcerns());
   const [allReports, setAllReports] = useState<DailyReport[]>(getStoredReports());
   const [directives, setDirectives] = useState<ManagerDirective[]>(getStoredDirectives());
@@ -676,6 +679,19 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
               badgeColor: overdueFollowUps.length > 0 ? 'bg-rose-500 text-white animate-pulse' : 'bg-emerald-500 text-white'
             },
             {
+              id: 'leads',
+              label: 'کارتابل شیت‌های ۲۵ تایی',
+              icon: FileSpreadsheet,
+              badge: 'موتور لید',
+              badgeColor: 'bg-[#9C6644] text-white'
+            },
+            {
+              id: 'memos',
+              label: 'مکاتبات و بخشنامه‌ها',
+              icon: Mail,
+              badge: 'سازمانی'
+            },
+            {
               id: 'form',
               label: editingReportId ? 'ویرایش گزارش تماس' : 'ثبت تماس‌های روزانه',
               icon: FilePlus
@@ -709,6 +725,19 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
           </div>
         )}
       </div>
+
+      {/* TAB: 25-ROW LEAD SHEET COCKPIT */}
+      {activeSubTab === 'leads' && (
+        <LeadSheetCockpit
+          currentUser={currentUser}
+          onGoToDailyReport={() => setActiveSubTab('form')}
+        />
+      )}
+
+      {/* TAB: ENTERPRISE DISPATCH MEMOS */}
+      {activeSubTab === 'memos' && (
+        <EnterpriseMemoBox currentUser={currentUser} />
+      )}
 
       {/* TAB 0: MORNING DASHBOARD (TODAY'S PLAN & OVERDUE ACTIONS) */}
       {activeSubTab === 'morning' && (

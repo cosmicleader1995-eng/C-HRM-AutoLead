@@ -14,16 +14,20 @@ export interface FollowUpStatusCode {
   borderColor: string;
 }
 
+export type UserStatus = 'active' | 'suspended' | 'archived' | 'terminated';
+
 export interface User {
   id: string;
   username: string;
   fullName: string;
   consultantCode: string;
   role: UserRole;
+  status?: UserStatus;
   password?: string;
   avatar?: string;
   phone?: string;
   branch?: string;
+  updatedAt?: string;
 }
 
 export interface ReportRow {
@@ -176,6 +180,98 @@ export interface PeriodicOverallReport {
   managerStatus?: 'approved' | 'rewarded' | 'warned' | 'pending';
   managerReviewedAt?: string;
 }
+
+// -----------------------------------------------------------
+// 25-ROW LEAD SHEET ENGINE & ENTERPRISE DISPATCH TYPES
+// -----------------------------------------------------------
+
+export type LeadRowStatus = 'in_progress' | 'won' | 'lost' | 'invalid';
+
+export interface LeadRow {
+  id: string;
+  rowNumber: number; // 1 to 25
+  clientName: string; // نام و نام خانوادگی کارفرما
+  activityField: string; // زمینه فعالیت / صنف
+  personnelCount?: number | string; // تعداد پرسنل
+  phone: string; // شماره تماس
+  address: string; // آدرس
+  followUp1?: string; // پیگیری ۱ (نماد)
+  followUp1Date?: string; // تاریخ میلادی
+  followUp1DateShamsi?: string; // تاریخ شمسی
+  followUp2?: string; // پیگیری ۲
+  followUp2Date?: string;
+  followUp2DateShamsi?: string;
+  followUp3?: string; // پیگیری ۳
+  followUp3Date?: string;
+  followUp3DateShamsi?: string;
+  followUp4?: string; // پیگیری ۴
+  followUp4Date?: string;
+  employerConcern?: string; // دغدغه کارفرما
+  followUpResult?: string; // نتیجه پیگیری
+  meetingTopic?: string; // موضوع جلسه و بسته پیشنهادی
+  status?: LeadRowStatus; // وضعیت ردیف
+  notes?: string;
+  updatedAt?: string;
+}
+
+export type LeadSheetStatus = 'active' | 'completed' | 'archived';
+
+export interface LeadSheet {
+  id: string;
+  sheetNumber: number;
+  title: string;
+  guild: string;
+  assignedToConsultantId: string;
+  assignedToConsultantName: string;
+  assignedToConsultantCode: string;
+  assignedByManagerId?: string;
+  assignedAt: string; // ISO
+  dateShamsi: string; // تاریخ تخصیص شمسی
+  targetCallsCount: number; // معمولاً ۲۵
+  rows: LeadRow[];
+  status: LeadSheetStatus;
+  completedAt?: string;
+  archivedAt?: string;
+  managerNotes?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface SheetMessage {
+  id: string;
+  sheetId: string;
+  rowId: string;
+  clientName?: string;
+  senderId: string;
+  senderName: string;
+  senderRole: UserRole;
+  content: string;
+  createdAt: string;
+  timeShamsi: string;
+  isRead: boolean;
+}
+
+export type MemoCategory = 'directive' | 'warning' | 'report_request' | 'consultant_query' | 'other';
+export type MemoPriority = 'normal' | 'urgent';
+
+export interface MemoMessage {
+  id: string;
+  memoNumber: string;
+  senderId: string;
+  senderName: string;
+  senderRole: UserRole;
+  recipientId: string; // 'all' or specific consultantId/userId
+  recipientName: string;
+  title: string;
+  content: string;
+  priority: MemoPriority;
+  category: MemoCategory;
+  relatedSheetId?: string;
+  createdAt: string;
+  dateShamsi: string;
+  isRead: boolean;
+}
+
 
 
 
