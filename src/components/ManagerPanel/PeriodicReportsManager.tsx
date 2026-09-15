@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { User, DailyReport, PeriodicOverallReport, PeriodicReportType, ManagerDirective } from '../../types';
+import { User, DailyReport, PeriodicOverallReport, PeriodicReportType, ManagerDirective, LeadSheet } from '../../types';
 import { 
   getStoredPeriodicReports, 
   updatePeriodicReportManagerStatus,
   saveDirective,
   getStoredUsers,
-  getStoredReports
+  getStoredReports,
+  getStoredLeadSheets
 } from '../../services/storage';
 import { 
   getCurrentShamsiDate, 
@@ -82,6 +83,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
   const [users, setUsers] = useState<User[]>(propUsers || getStoredUsers());
   const [periodicReports, setPeriodicReports] = useState<PeriodicOverallReport[]>(getStoredPeriodicReports());
   const [allDailyReports, setAllDailyReports] = useState<DailyReport[]>(propReports || getStoredReports());
+  const [allLeadSheets, setAllLeadSheets] = useState<LeadSheet[]>(getStoredLeadSheets());
 
   // Sub-views inside this Manager section:
   // 1. 'matrix': ماتریس انضباط و پایش غیبت گزارش‌ها
@@ -122,6 +124,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
     setUsers(getStoredUsers());
     setPeriodicReports(getStoredPeriodicReports());
     setAllDailyReports(getStoredReports());
+    setAllLeadSheets(getStoredLeadSheets());
     if (onReload) onReload();
   };
 
@@ -318,6 +321,88 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
       });
     });
 
+    // 2. Also process auto-allocated 25-row lead sheets
+    allLeadSheets.forEach(sheet => {
+      (sheet.rows || []).forEach(row => {
+        // Skip completely un-contacted rows
+        if (!row.clientName?.trim() && !row.phone?.trim() && !row.followUp1?.trim()) {
+          return;
+        }
+
+        const f1DateShamsi = row.followUp1DateShamsi || sheet.dateShamsi;
+        const f2DateShamsi = row.followUp2DateShamsi;
+        const f3DateShamsi = row.followUp3DateShamsi;
+        const f4DateShamsi = row.followUp4DateShamsi;
+
+        // Determine the latest follow-up step executed
+        let latestStepNumber: 1 | 2 | 3 | 4 = 1;
+        let latestStepCode = row.followUp1 || '';
+        let latestDateShamsi = f1DateShamsi;
+        let latestIsoDate = row.followUp1Date || sheet.createdAt;
+
+        if (row.followUp4 && row.followUp4.trim()) {
+          latestStepNumber = 4;
+          latestStepCode = row.followUp4;
+          latestDateShamsi = f4DateShamsi || sheet.dateShamsi;
+          latestIsoDate = row.followUp4Date || sheet.updatedAt || sheet.createdAt;
+        } else if (row.followUp3 && row.followUp3.trim()) {
+          latestStepNumber = 3;
+          latestStepCode = row.followUp3;
+          latestDateShamsi = f3DateShamsi || sheet.dateShamsi;
+          latestIsoDate = row.followUp3Date || sheet.updatedAt || sheet.createdAt;
+        } else if (row.followUp2 && row.followUp2.trim()) {
+          latestStepNumber = 2;
+          latestStepCode = row.followUp2;
+          latestDateShamsi = f2DateShamsi || sheet.dateShamsi;
+          latestIsoDate = row.followUp2Date || sheet.updatedAt || sheet.createdAt;
+        }
+
+        let latestTimestamp = 0;
+        if (latestIsoDate) {
+          const t = new Date(latestIsoDate).getTime();
+          if (!isNaN(t)) latestTimestamp = t;
+        }
+        if (!latestTimestamp && latestDateShamsi) {
+          const d = shamsiToDate(latestDateShamsi);
+          if (d) latestTimestamp = d.getTime();
+        }
+
+        const isToday = latestDateShamsi === curShamsi.formatted;
+        const isThisWeek = isDateInCurrentShamsiWeek(latestDateShamsi);
+        const isThisMonth = isDateInCurrentShamsiMonth(latestDateShamsi);
+
+        list.push({
+          reportId: `sheet-${sheet.id}-${row.id}`,
+          consultantName: sheet.assignedToConsultantName,
+          consultantCode: sheet.assignedToConsultantCode,
+          reportDateShamsi: sheet.dateShamsi,
+          guild: sheet.guild || row.activityField,
+          clientName: row.clientName,
+          activityField: row.activityField,
+          phone: row.phone,
+          address: row.address || '',
+          employerConcern: row.employerConcern || '',
+          followUp1: row.followUp1 || '',
+          followUp1DateShamsi: f1DateShamsi,
+          followUp2: row.followUp2 || '',
+          followUp2DateShamsi: f2DateShamsi,
+          followUp3: row.followUp3 || '',
+          followUp3DateShamsi: f3DateShamsi,
+          followUp4: row.followUp4 || '',
+          followUp4DateShamsi: f4DateShamsi,
+          followUpResult: row.followUpResult || (row.status === 'won' ? '✓ موفق' : row.status === 'lost' ? '- عدم نیاز' : 'در حال پیگیری'),
+          meetingTopic: row.meetingTopic || row.notes,
+          latestStepNumber,
+          latestStepCode,
+          latestDateShamsi,
+          latestTimestamp,
+          isToday,
+          isThisWeek,
+          isThisMonth
+        });
+      });
+    });
+
     // CRITICAL REQUIREMENT: Always sort latest follow-up activity to the absolute top row!
     list.sort((a, b) => {
       // 1. Compare Shamsi date of latest follow-up (descending, e.g. "1405/06/21" > "1405/06/20")
@@ -346,7 +431,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
     };
 
     return { sortedFollowUpRows: list, timeCounts: counts };
-  }, [allDailyReports, curShamsi.formatted]);
+  }, [allDailyReports, allLeadSheets, curShamsi.formatted]);
 
   // Filtered follow-up rows based on consultant, time filter, and search
   const filteredFollowUpRows = useMemo(() => {

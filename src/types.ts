@@ -206,6 +206,7 @@ export interface LeadRow {
   followUp3DateShamsi?: string;
   followUp4?: string; // پیگیری ۴
   followUp4Date?: string;
+  followUp4DateShamsi?: string; // تاریخ شمسی پیگیری ۴
   employerConcern?: string; // دغدغه کارفرما
   followUpResult?: string; // نتیجه پیگیری
   meetingTopic?: string; // موضوع جلسه و بسته پیشنهادی

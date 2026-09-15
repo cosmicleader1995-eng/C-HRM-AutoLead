@@ -79,6 +79,17 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
     row: LeadRow;
     stepIndex: 1 | 2 | 3 | 4;
   } | null>(null);
+  const [followUpDateInput, setFollowUpDateInput] = useState<string>(getCurrentShamsiDate().formatted);
+
+  const openFollowUpModal = (row: LeadRow, stepIndex: 1 | 2 | 3 | 4) => {
+    let existingDate = '';
+    if (stepIndex === 1) existingDate = row.followUp1DateShamsi || '';
+    else if (stepIndex === 2) existingDate = row.followUp2DateShamsi || '';
+    else if (stepIndex === 3) existingDate = row.followUp3DateShamsi || '';
+    else if (stepIndex === 4) existingDate = row.followUp4DateShamsi || '';
+    setFollowUpDateInput(existingDate || getCurrentShamsiDate().formatted);
+    setEditingFollowUpCell({ row, stepIndex });
+  };
 
   // Won meeting prompt modal
   const [wonPromptRow, setWonPromptRow] = useState<LeadRow | null>(null);
@@ -116,10 +127,10 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
   }, [mySheets, selectedSheetId]);
 
   // Handle follow-up symbol selection
-  const handleSelectSymbol = async (row: LeadRow, stepIndex: 1 | 2 | 3 | 4, symbol: string) => {
+  const handleSelectSymbol = async (row: LeadRow, stepIndex: 1 | 2 | 3 | 4, symbol: string, customDateShamsi?: string) => {
     if (!activeSheet) return;
 
-    const todayShamsi = getCurrentShamsiDate().formatted;
+    const targetShamsi = (customDateShamsi || followUpDateInput || getCurrentShamsiDate().formatted).trim();
     const nowIso = new Date().toISOString();
 
     const updates: Partial<LeadRow> = {
@@ -129,19 +140,19 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
     if (stepIndex === 1) {
       updates.followUp1 = symbol;
       updates.followUp1Date = nowIso;
-      updates.followUp1DateShamsi = todayShamsi;
+      updates.followUp1DateShamsi = targetShamsi;
     } else if (stepIndex === 2) {
       updates.followUp2 = symbol;
       updates.followUp2Date = nowIso;
-      updates.followUp2DateShamsi = todayShamsi;
+      updates.followUp2DateShamsi = targetShamsi;
     } else if (stepIndex === 3) {
       updates.followUp3 = symbol;
       updates.followUp3Date = nowIso;
-      updates.followUp3DateShamsi = todayShamsi;
+      updates.followUp3DateShamsi = targetShamsi;
     } else if (stepIndex === 4) {
       updates.followUp4 = symbol;
       updates.followUp4Date = nowIso;
-      updates.followUp4DateShamsi = todayShamsi;
+      updates.followUp4DateShamsi = targetShamsi;
     }
 
     // Determine status & result label
@@ -642,7 +653,7 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
                         <td className="py-2 px-1.5 text-center border-l border-slate-800/80">
                           <button
                             type="button"
-                            onClick={() => setEditingFollowUpCell({ row, stepIndex: 1 })}
+                            onClick={() => openFollowUpModal(row, 1)}
                             className={`w-9 h-8 rounded-lg font-black text-sm transition-all flex items-center justify-center mx-auto cursor-pointer ${
                               row.followUp1 === '✓'
                                 ? 'bg-emerald-600 text-white shadow-emerald-600/40 shadow-sm'
@@ -655,8 +666,8 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
                             {row.followUp1 || '+'}
                           </button>
                           {row.followUp1DateShamsi && (
-                            <span className="text-[9px] text-slate-400 font-mono block mt-0.5">
-                              {toPersianDigits(row.followUp1DateShamsi.slice(5))}
+                            <span className="text-[9px] text-blue-300 font-mono block mt-1 font-bold whitespace-nowrap" title={`تاریخ پیگیری ۱: ${toPersianDigits(row.followUp1DateShamsi)}`}>
+                              {toPersianDigits(row.followUp1DateShamsi)}
                             </span>
                           )}
                         </td>
@@ -666,7 +677,7 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
                           <button
                             type="button"
                             disabled={!row.followUp1}
-                            onClick={() => setEditingFollowUpCell({ row, stepIndex: 2 })}
+                            onClick={() => openFollowUpModal(row, 2)}
                             className={`w-9 h-8 rounded-lg font-black text-sm transition-all flex items-center justify-center mx-auto ${
                               !row.followUp1
                                 ? 'opacity-30 cursor-not-allowed bg-[#081525] text-slate-600'
@@ -681,8 +692,8 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
                             {row.followUp2 || (row.followUp1 ? '+' : '.')}
                           </button>
                           {row.followUp2DateShamsi && (
-                            <span className="text-[9px] text-slate-400 font-mono block mt-0.5">
-                              {toPersianDigits(row.followUp2DateShamsi.slice(5))}
+                            <span className="text-[9px] text-amber-300 font-mono block mt-1 font-bold whitespace-nowrap" title={`تاریخ پیگیری ۲: ${toPersianDigits(row.followUp2DateShamsi)}`}>
+                              {toPersianDigits(row.followUp2DateShamsi)}
                             </span>
                           )}
                         </td>
@@ -692,7 +703,7 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
                           <button
                             type="button"
                             disabled={!row.followUp2}
-                            onClick={() => setEditingFollowUpCell({ row, stepIndex: 3 })}
+                            onClick={() => openFollowUpModal(row, 3)}
                             className={`w-9 h-8 rounded-lg font-black text-sm transition-all flex items-center justify-center mx-auto ${
                               !row.followUp2
                                 ? 'opacity-30 cursor-not-allowed bg-[#081525] text-slate-600'
@@ -707,8 +718,8 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
                             {row.followUp3 || (row.followUp2 ? '+' : '.')}
                           </button>
                           {row.followUp3DateShamsi && (
-                            <span className="text-[9px] text-slate-400 font-mono block mt-0.5">
-                              {toPersianDigits(row.followUp3DateShamsi.slice(5))}
+                            <span className="text-[9px] text-purple-300 font-mono block mt-1 font-bold whitespace-nowrap" title={`تاریخ پیگیری ۳: ${toPersianDigits(row.followUp3DateShamsi)}`}>
+                              {toPersianDigits(row.followUp3DateShamsi)}
                             </span>
                           )}
                         </td>
@@ -718,7 +729,7 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
                           <button
                             type="button"
                             disabled={!row.followUp3}
-                            onClick={() => setEditingFollowUpCell({ row, stepIndex: 4 })}
+                            onClick={() => openFollowUpModal(row, 4)}
                             className={`w-9 h-8 rounded-lg font-black text-sm transition-all flex items-center justify-center mx-auto ${
                               !row.followUp3
                                 ? 'opacity-30 cursor-not-allowed bg-[#081525] text-slate-600'
@@ -733,8 +744,8 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
                             {row.followUp4 || (row.followUp3 ? '+' : '.')}
                           </button>
                           {row.followUp4DateShamsi && (
-                            <span className="text-[9px] text-slate-400 font-mono block mt-0.5">
-                              {toPersianDigits(row.followUp4DateShamsi.slice(5))}
+                            <span className="text-[9px] text-emerald-300 font-mono block mt-1 font-bold whitespace-nowrap" title={`تاریخ پیگیری ۴: ${toPersianDigits(row.followUp4DateShamsi)}`}>
+                              {toPersianDigits(row.followUp4DateShamsi)}
                             </span>
                           )}
                         </td>
@@ -810,14 +821,38 @@ export const LeadSheetCockpit: React.FC<LeadSheetCockpitProps> = ({ currentUser,
                   </button>
                 </div>
 
+                {/* Exact Shamsi Follow-up Date */}
+                <div className="bg-[#081525] p-2.5 rounded-xl border border-slate-800 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-slate-300 font-bold flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-amber-400" />
+                      <span>تاریخ دقیق ثبت این پیگیری (شمسی):</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setFollowUpDateInput(getCurrentShamsiDate().formatted)}
+                      className="text-[10px] text-blue-400 hover:text-blue-300 font-bold cursor-pointer"
+                    >
+                      امروز ({toPersianDigits(getCurrentShamsiDate().formatted)})
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={followUpDateInput}
+                    onChange={(e) => setFollowUpDateInput(e.target.value)}
+                    placeholder="مثال: ۱۴۰۵/۰۶/۱۷"
+                    className="w-full bg-[#050d18] border border-slate-700 focus:border-amber-400 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-mono text-center outline-none"
+                  />
+                </div>
+
                 <div className="space-y-2">
-                  <span className="text-xs text-slate-300 block">نماد نتیجه این تماس را انتخاب فرمایید:</span>
+                  <span className="text-xs text-slate-300 block font-medium">نماد نتیجه این تماس را انتخاب فرمایید:</span>
                   <div className="grid grid-cols-1 gap-2">
                     {FOLLOW_UP_STATUS_CODES.map((item) => (
                       <button
                         key={item.code}
                         type="button"
-                        onClick={() => handleSelectSymbol(editingFollowUpCell.row, editingFollowUpCell.stepIndex, item.symbol)}
+                        onClick={() => handleSelectSymbol(editingFollowUpCell.row, editingFollowUpCell.stepIndex, item.symbol, followUpDateInput)}
                         className={`p-2.5 rounded-xl border flex items-center justify-between transition-all cursor-pointer ${
                           item.symbol === '✓'
                             ? 'bg-emerald-950/60 hover:bg-emerald-900 border-emerald-500/40 text-emerald-200'

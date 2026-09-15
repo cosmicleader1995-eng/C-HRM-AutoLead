@@ -590,38 +590,54 @@ export const LeadSheetManager: React.FC<LeadSheetManagerProps> = ({ currentUser 
     setTimeout(() => setSuccessMsg(''), 3500);
   };
 
-  // Export Sheet to Excel matching official 11-column PDF table
+  // Export Sheet to Excel matching official 25-row office forms with exact follow-up dates
   const handleExportSheetToExcel = (sheet: LeadSheet) => {
     const headers = [
-      'ردیف',
+      'ردیف در فرم (۱ تا ۲۵)',
+      'مشاور مسئول',
+      'کد مشاور',
+      'تاریخ تخصیص شیت',
+      'صنف / اتحادیه',
       'نام و نام خانوادگی کارفرما',
-      'صنف / زمینه فعالیت',
+      'زمینه فعالیت',
       'تعداد پرسنل',
       'شماره تماس',
       'آدرس',
-      'دغدغه کارفرما',
-      'پیگیری ۱',
-      'پیگیری ۲',
-      'پیگیری ۳',
-      'پیگیری ۴',
+      'دغدغه اصلی کارفرما',
+      'نماد پیگیری ۱',
+      'تاریخ دقیق پیگیری ۱',
+      'نماد پیگیری ۲',
+      'تاریخ دقیق پیگیری ۲',
+      'نماد پیگیری ۳',
+      'تاریخ دقیق پیگیری ۳',
+      'نماد پیگیری ۴',
+      'تاریخ دقیق پیگیری ۴',
       'نتیجه پیگیری',
-      'موضوع جلسه و بسته پیشنهادی / توضیحات'
+      'دستور سرپرست / موضوع جلسه و توضیحات'
     ];
 
     const dataRows = sheet.rows.map(r => [
-      r.rowNumber,
+      toPersianDigits(r.rowNumber),
+      sheet.assignedToConsultantName,
+      sheet.assignedToConsultantCode,
+      sheet.dateShamsi,
+      sheet.guild || r.activityField,
       r.clientName,
       r.activityField,
-      r.personnelCount || '',
+      r.personnelCount ? toPersianDigits(r.personnelCount) : '—',
       r.phone,
-      r.address,
-      r.employerConcern || '',
-      r.followUp1 || '',
-      r.followUp2 || '',
-      r.followUp3 || '',
-      r.followUp4 || '',
-      r.followUpResult || (r.status === 'won' ? '✓ موفق' : r.status === 'lost' ? '- عدم نیاز' : '. در جریان'),
-      r.meetingTopic || r.notes || ''
+      r.address || '—',
+      r.employerConcern || '—',
+      r.followUp1 || '—',
+      r.followUp1DateShamsi ? toPersianDigits(r.followUp1DateShamsi) : '—',
+      r.followUp2 || '—',
+      r.followUp2DateShamsi ? toPersianDigits(r.followUp2DateShamsi) : '—',
+      r.followUp3 || '—',
+      r.followUp3DateShamsi ? toPersianDigits(r.followUp3DateShamsi) : '—',
+      r.followUp4 || '—',
+      r.followUp4DateShamsi ? toPersianDigits(r.followUp4DateShamsi) : '—',
+      r.followUpResult || (r.status === 'won' ? '✓ موفق' : r.status === 'lost' ? '- عدم نیاز' : 'در جریان'),
+      r.meetingTopic || r.notes || '—'
     ]);
 
     const worksheet = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
@@ -629,6 +645,76 @@ export const LeadSheetManager: React.FC<LeadSheetManagerProps> = ({ currentUser 
     XLSX.utils.book_append_sheet(workbook, worksheet, `شیت_${sheet.sheetNumber}`);
 
     XLSX.writeFile(workbook, `شیت_۲۵_لید_شماره_${sheet.sheetNumber}_${sheet.assignedToConsultantName.replace(/\s+/g, '_')}_${sheet.dateShamsi.replace(/\//g, '-')}.xlsx`);
+    setSuccessMsg(`خروجی اکسل شیت شماره ${toPersianDigits(sheet.sheetNumber)} با موفقیت دانلود شد.`);
+    setTimeout(() => setSuccessMsg(''), 3000);
+  };
+
+  // Bulk Export All Filtered Sheets into a Single Multi-Tab Excel Workbook
+  const handleExportAllSheetsExcel = () => {
+    if (filteredSheets.length === 0) {
+      alert('هیچ شیتی برای خروجی اکسل در فیلتر فعلی یافت نشد.');
+      return;
+    }
+
+    const headers = [
+      'ردیف در فرم (۱ تا ۲۵)',
+      'مشاور مسئول',
+      'کد مشاور',
+      'تاریخ تخصیص شیت',
+      'صنف / اتحادیه',
+      'نام و نام خانوادگی کارفرما',
+      'زمینه فعالیت',
+      'تعداد پرسنل',
+      'شماره تماس',
+      'آدرس',
+      'دغدغه اصلی کارفرما',
+      'نماد پیگیری ۱',
+      'تاریخ دقیق پیگیری ۱',
+      'نماد پیگیری ۲',
+      'تاریخ دقیق پیگیری ۲',
+      'نماد پیگیری ۳',
+      'تاریخ دقیق پیگیری ۳',
+      'نماد پیگیری ۴',
+      'تاریخ دقیق پیگیری ۴',
+      'نتیجه پیگیری',
+      'دستور سرپرست / موضوع جلسه و توضیحات'
+    ];
+
+    const workbook = XLSX.utils.book_new();
+
+    filteredSheets.forEach(sheet => {
+      const dataRows = sheet.rows.map(r => [
+        toPersianDigits(r.rowNumber),
+        sheet.assignedToConsultantName,
+        sheet.assignedToConsultantCode,
+        sheet.dateShamsi,
+        sheet.guild || r.activityField,
+        r.clientName,
+        r.activityField,
+        r.personnelCount ? toPersianDigits(r.personnelCount) : '—',
+        r.phone,
+        r.address || '—',
+        r.employerConcern || '—',
+        r.followUp1 || '—',
+        r.followUp1DateShamsi ? toPersianDigits(r.followUp1DateShamsi) : '—',
+        r.followUp2 || '—',
+        r.followUp2DateShamsi ? toPersianDigits(r.followUp2DateShamsi) : '—',
+        r.followUp3 || '—',
+        r.followUp3DateShamsi ? toPersianDigits(r.followUp3DateShamsi) : '—',
+        r.followUp4 || '—',
+        r.followUp4DateShamsi ? toPersianDigits(r.followUp4DateShamsi) : '—',
+        r.followUpResult || (r.status === 'won' ? '✓ موفق' : r.status === 'lost' ? '- عدم نیاز' : 'در جریان'),
+        r.meetingTopic || r.notes || '—'
+      ]);
+
+      const worksheet = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
+      const tabTitle = `شیت_${sheet.sheetNumber}_${sheet.assignedToConsultantCode}`.slice(0, 31);
+      XLSX.utils.book_append_sheet(workbook, worksheet, tabTitle);
+    });
+
+    XLSX.writeFile(workbook, `گزارش_جامع_شیت‌های_تخصیص_لید_${getCurrentShamsiDate().formatted.replace(/\//g, '-')}.xlsx`);
+    setSuccessMsg(`خروجی اکسل جامع ${toPersianDigits(filteredSheets.length)} شیت با موفقیت ذخیره گردید.`);
+    setTimeout(() => setSuccessMsg(''), 3500);
   };
 
   // Filtered sheets
@@ -795,6 +881,18 @@ export const LeadSheetManager: React.FC<LeadSheetManagerProps> = ({ currentUser 
             <option value="completed">تکمیل‌شده (Completed)</option>
             <option value="archived">بایگانی‌شده (Archived)</option>
           </select>
+
+          {/* Bulk Excel Export Button */}
+          <button
+            type="button"
+            onClick={handleExportAllSheetsExcel}
+            className="px-3 py-2 rounded-xl bg-[#2D6A4F] hover:bg-[#1B4332] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer whitespace-nowrap"
+            title="دانلود فایل اکسل چندتبی شامل تمام شیت‌های ۲۵ ردیفه به همراه تاریخ دقیق پیگیری‌ها"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>اکسل کلیه شیت‌ها ({toPersianDigits(filteredSheets.length)})</span>
+            <Download className="w-3 h-3 opacity-80" />
+          </button>
         </div>
 
       </div>
@@ -1328,25 +1426,100 @@ export const LeadSheetManager: React.FC<LeadSheetManagerProps> = ({ currentUser 
                         <td className="p-2 border-l border-[#F5EDE2] text-[11px] text-amber-900 truncate max-w-xs" title={row.employerConcern}>
                           {row.employerConcern || '-'}
                         </td>
-                        <td className="p-2 text-center border-l border-[#F5EDE2] font-black text-sm">
-                          <span className={row.followUp1 === '✓' ? 'text-emerald-700' : 'text-[#9C6644]'}>
-                            {row.followUp1 || '.'}
-                          </span>
+                        {/* Follow-up 1 with Exact Date */}
+                        <td className="p-2 text-center border-l border-[#F5EDE2]">
+                          <div className="flex flex-col items-center justify-center gap-0.5">
+                            <span className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                              row.followUp1 === '✓'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                : row.followUp1 === '-'
+                                ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                                : row.followUp1
+                                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                : 'text-slate-400 bg-slate-100'
+                            }`}>
+                              {row.followUp1 || '—'}
+                            </span>
+                            {row.followUp1DateShamsi ? (
+                              <span className="text-[9px] font-mono font-bold text-[#1565C0] whitespace-nowrap" title="تاریخ پیگیری ۱">
+                                {toPersianDigits(row.followUp1DateShamsi)}
+                              </span>
+                            ) : (
+                              <span className="text-[9px] text-slate-400">—</span>
+                            )}
+                          </div>
                         </td>
-                        <td className="p-2 text-center border-l border-[#F5EDE2] font-black text-sm">
-                          <span className={row.followUp2 === '✓' ? 'text-emerald-700' : 'text-[#9C6644]'}>
-                            {row.followUp2 || '.'}
-                          </span>
+
+                        {/* Follow-up 2 with Exact Date */}
+                        <td className="p-2 text-center border-l border-[#F5EDE2]">
+                          <div className="flex flex-col items-center justify-center gap-0.5">
+                            <span className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                              row.followUp2 === '✓'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                : row.followUp2 === '-'
+                                ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                                : row.followUp2
+                                ? 'bg-amber-100 text-[#B78103] border border-amber-200'
+                                : 'text-slate-400 bg-slate-100'
+                            }`}>
+                              {row.followUp2 || '—'}
+                            </span>
+                            {row.followUp2DateShamsi ? (
+                              <span className="text-[9px] font-mono font-bold text-[#B78103] whitespace-nowrap" title="تاریخ پیگیری ۲">
+                                {toPersianDigits(row.followUp2DateShamsi)}
+                              </span>
+                            ) : (
+                              <span className="text-[9px] text-slate-400">—</span>
+                            )}
+                          </div>
                         </td>
-                        <td className="p-2 text-center border-l border-[#F5EDE2] font-black text-sm">
-                          <span className={row.followUp3 === '✓' ? 'text-emerald-700' : 'text-[#9C6644]'}>
-                            {row.followUp3 || '.'}
-                          </span>
+
+                        {/* Follow-up 3 with Exact Date */}
+                        <td className="p-2 text-center border-l border-[#F5EDE2]">
+                          <div className="flex flex-col items-center justify-center gap-0.5">
+                            <span className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                              row.followUp3 === '✓'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                : row.followUp3 === '-'
+                                ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                                : row.followUp3
+                                ? 'bg-purple-100 text-[#7B1FA2] border border-purple-200'
+                                : 'text-slate-400 bg-slate-100'
+                            }`}>
+                              {row.followUp3 || '—'}
+                            </span>
+                            {row.followUp3DateShamsi ? (
+                              <span className="text-[9px] font-mono font-bold text-[#7B1FA2] whitespace-nowrap" title="تاریخ پیگیری ۳">
+                                {toPersianDigits(row.followUp3DateShamsi)}
+                              </span>
+                            ) : (
+                              <span className="text-[9px] text-slate-400">—</span>
+                            )}
+                          </div>
                         </td>
-                        <td className="p-2 text-center border-l border-[#F5EDE2] font-black text-sm">
-                          <span className={row.followUp4 === '✓' ? 'text-emerald-700' : 'text-[#9C6644]'}>
-                            {row.followUp4 || '.'}
-                          </span>
+
+                        {/* Follow-up 4 with Exact Date */}
+                        <td className="p-2 text-center border-l border-[#F5EDE2]">
+                          <div className="flex flex-col items-center justify-center gap-0.5">
+                            <span className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs ${
+                              row.followUp4 === '✓'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                : row.followUp4 === '-'
+                                ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                                : row.followUp4
+                                ? 'bg-teal-100 text-[#2E7D32] border border-teal-200'
+                                : 'text-slate-400 bg-slate-100'
+                            }`}>
+                              {row.followUp4 || '—'}
+                            </span>
+                            {row.followUp4DateShamsi ? (
+                              <span className="text-[9px] font-mono font-bold text-[#2E7D32] whitespace-nowrap" title="تاریخ پیگیری ۴">
+                                {toPersianDigits(row.followUp4DateShamsi)}
+                              </span>
+                            ) : (
+                              <span className="text-[9px] text-slate-400">—</span>
+                            )}
+                          </div>
                         </td>
                         <td className="p-2 border-l border-[#F5EDE2]">
                           <span className={`text-[10px] px-2 py-0.5 rounded font-bold whitespace-nowrap ${
