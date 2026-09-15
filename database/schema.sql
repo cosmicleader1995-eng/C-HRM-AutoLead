@@ -183,6 +183,98 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON public.audit_logs(timestamp DESC);
 
 -- ====================================================================
+-- جدول ۹: شیت‌های ۲۵ کارفرمایی لیدها (lead_sheets)
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS public.lead_sheets (
+    id TEXT PRIMARY KEY,
+    sheet_number INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    guild TEXT NOT NULL,
+    assigned_to_consultant_id TEXT REFERENCES public.users(id) ON DELETE SET NULL,
+    assigned_to_consultant_name TEXT NOT NULL,
+    assigned_to_consultant_code TEXT NOT NULL,
+    assigned_by_manager_id TEXT,
+    assigned_at TIMESTAMPTZ DEFAULT NOW(),
+    date_shamsi TEXT NOT NULL,
+    target_calls_count INTEGER NOT NULL DEFAULT 25,
+    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'completed', 'archived')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_lead_sheets_consultant_id ON public.lead_sheets(assigned_to_consultant_id);
+CREATE INDEX IF NOT EXISTS idx_lead_sheets_status ON public.lead_sheets(status);
+CREATE INDEX IF NOT EXISTS idx_lead_sheets_date_shamsi ON public.lead_sheets(date_shamsi);
+
+-- ====================================================================
+-- جدول ۱۰: ردیف‌های کارفرمایان شیت لید (lead_rows)
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS public.lead_rows (
+    id TEXT PRIMARY KEY,
+    sheet_id TEXT NOT NULL REFERENCES public.lead_sheets(id) ON DELETE CASCADE,
+    row_number INTEGER NOT NULL,
+    client_name TEXT NOT NULL,
+    activity_field TEXT NOT NULL,
+    personnel_count TEXT,
+    phone TEXT NOT NULL,
+    address TEXT,
+    employer_concern TEXT,
+    follow_up_1 TEXT DEFAULT '',
+    follow_up_1_date TIMESTAMPTZ,
+    follow_up_2 TEXT DEFAULT '',
+    follow_up_2_date TIMESTAMPTZ,
+    follow_up_3 TEXT DEFAULT '',
+    follow_up_3_date TIMESTAMPTZ,
+    follow_up_4 TEXT DEFAULT '',
+    follow_up_4_date TIMESTAMPTZ,
+    follow_up_result TEXT DEFAULT 'در حال پیگیری',
+    meeting_topic TEXT,
+    status TEXT NOT NULL DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'completed', 'no_answer', 'cancelled', 'won', 'lost', 'archived')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_lead_rows_sheet_id ON public.lead_rows(sheet_id);
+CREATE INDEX IF NOT EXISTS idx_lead_rows_phone ON public.lead_rows(phone);
+CREATE INDEX IF NOT EXISTS idx_lead_rows_status ON public.lead_rows(status);
+
+-- ====================================================================
+-- جدول ۱۱: گفت‌وگوها و یادداشت‌های پرونده‌ای روی سطرها (sheet_messages)
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS public.sheet_messages (
+    id TEXT PRIMARY KEY,
+    sheet_id TEXT NOT NULL REFERENCES public.lead_sheets(id) ON DELETE CASCADE,
+    row_id TEXT,
+    sender_id TEXT NOT NULL,
+    sender_name TEXT NOT NULL,
+    sender_role TEXT NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_sheet_messages_sheet_id ON public.sheet_messages(sheet_id);
+CREATE INDEX IF NOT EXISTS idx_sheet_messages_row_id ON public.sheet_messages(row_id);
+
+-- ====================================================================
+-- جدول ۱۲: مکاتبات رسمی و ابلاغیه‌های درون‌سازمانی (memos)
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS public.memos (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    sender_id TEXT NOT NULL,
+    sender_name TEXT NOT NULL,
+    sender_role TEXT NOT NULL,
+    target_user_id TEXT NOT NULL DEFAULT 'all',
+    is_urgent BOOLEAN DEFAULT FALSE,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_memos_target ON public.memos(target_user_id);
+
+-- ====================================================================
 -- تنظیمات امنیت سطح ردیف (Row Level Security - RLS)
 -- ====================================================================
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
@@ -193,36 +285,46 @@ ALTER TABLE public.archives ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.employer_concerns ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.directives ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.lead_sheets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.lead_rows ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sheet_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.memos ENABLE ROW LEVEL SECURITY;
 
 -- سیاست‌های دسترسی کامل برای کلاینت و سرویس (سازگار با کلید anon و authenticated)
-DROP POLICY IF EXISTS "Service role has full access to users" ON public.users;
 DROP POLICY IF EXISTS "Allow all access to users" ON public.users;
 CREATE POLICY "Allow all access to users" ON public.users FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Service role has full access to daily_reports" ON public.daily_reports;
 DROP POLICY IF EXISTS "Allow all access to daily_reports" ON public.daily_reports;
 CREATE POLICY "Allow all access to daily_reports" ON public.daily_reports FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Service role has full access to report_rows" ON public.report_rows;
 DROP POLICY IF EXISTS "Allow all access to report_rows" ON public.report_rows;
 CREATE POLICY "Allow all access to report_rows" ON public.report_rows FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Service role has full access to periodic_reports" ON public.periodic_reports;
 DROP POLICY IF EXISTS "Allow all access to periodic_reports" ON public.periodic_reports;
 CREATE POLICY "Allow all access to periodic_reports" ON public.periodic_reports FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Service role has full access to archives" ON public.archives;
 DROP POLICY IF EXISTS "Allow all access to archives" ON public.archives;
 CREATE POLICY "Allow all access to archives" ON public.archives FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Service role has full access to employer_concerns" ON public.employer_concerns;
 DROP POLICY IF EXISTS "Allow all access to employer_concerns" ON public.employer_concerns;
 CREATE POLICY "Allow all access to employer_concerns" ON public.employer_concerns FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Service role has full access to directives" ON public.directives;
 DROP POLICY IF EXISTS "Allow all access to directives" ON public.directives;
 CREATE POLICY "Allow all access to directives" ON public.directives FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Allow all access to audit_logs" ON public.audit_logs;
 CREATE POLICY "Allow all access to audit_logs" ON public.audit_logs FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow all access to lead_sheets" ON public.lead_sheets;
+CREATE POLICY "Allow all access to lead_sheets" ON public.lead_sheets FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow all access to lead_rows" ON public.lead_rows;
+CREATE POLICY "Allow all access to lead_rows" ON public.lead_rows FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow all access to sheet_messages" ON public.sheet_messages;
+CREATE POLICY "Allow all access to sheet_messages" ON public.sheet_messages FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow all access to memos" ON public.memos;
+CREATE POLICY "Allow all access to memos" ON public.memos FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
 

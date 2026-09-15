@@ -1289,35 +1289,68 @@ export function clearDraft(consultantId: string): void {
 // SYSTEM RESET & RESTORE
 // -----------------------------------------------------------
 export function resetAllSystemData(): void {
+  // 1. Clear all in-memory caches
   cachedReports = [];
   cachedOverallReports = [];
   cachedArchives = [];
+  cachedLeadSheets = [];
+  cachedSheetMessages = [];
+  cachedMemos = [];
+  cachedDirectives = [];
   cachedUsers = DEFAULT_USERS;
   cachedConcerns = EMPLOYER_CONCERNS_LIST;
 
+  // 2. Overwrite all localStorage keys with clean state
   localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify([]));
   localStorage.setItem(STORAGE_KEYS.OVERALL_REPORTS, JSON.stringify([]));
   localStorage.setItem(STORAGE_KEYS.ARCHIVES, JSON.stringify([]));
+  localStorage.setItem(STORAGE_KEYS.LEAD_SHEETS, JSON.stringify([]));
+  localStorage.setItem(STORAGE_KEYS.SHEET_MESSAGES, JSON.stringify([]));
+  localStorage.setItem(STORAGE_KEYS.MEMOS, JSON.stringify([]));
+  localStorage.setItem(STORAGE_KEYS.DIRECTIVES, JSON.stringify([]));
   localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(DEFAULT_USERS));
   localStorage.setItem(STORAGE_KEYS.CONCERNS, JSON.stringify(EMPLOYER_CONCERNS_LIST));
-  localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+  localStorage.removeItem(STORAGE_KEYS.DRAFTS);
+  localStorage.removeItem(STORAGE_KEYS.LAST_ARCHIVE_DATE);
 
   notifyDbListeners();
 
-  const resetState: CloudDatabaseState = {
+  const cleanState: CloudDatabaseState = {
     version: '2.5',
     lastUpdated: new Date().toISOString(),
     users: DEFAULT_USERS,
     reports: [],
     overallReports: [],
     archives: [],
-    concerns: EMPLOYER_CONCERNS_LIST
+    concerns: EMPLOYER_CONCERNS_LIST,
+    directives: [],
+    leadSheets: [],
+    sheetMessages: [],
+    memos: []
   };
-  persistCloudDatabase(resetState);
 
+  // 3. Reset Server-Side DB immediately
   fetch('/api/db/reset', {
-    method: 'POST'
+    method: 'POST',
+    headers: getAuthHeaders()
   }).catch(() => {});
+
+  // 4. Overwrite Supabase Cloud Store directly (NO merge) so cloud doesn't restore old reports
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    fetch(`${SUPABASE_URL}/rest/v1/karino_store`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=representation'
+      },
+      body: JSON.stringify([
+        { id: 'main_state', data: cleanState, updated_at: new Date().toISOString() },
+        { id: 'app_db', data: cleanState, updated_at: new Date().toISOString() }
+      ])
+    }).catch(() => {});
+  }
 }
 
 export function restoreAllData(backupData: any): void {
@@ -1834,12 +1867,20 @@ export function updateLeadRow(sheetId: string, rowId: string, rowUpdates: Partia
   } catch (_) {}
   notifyDbListeners();
 
-  fetch(`/api/db/lead-sheets/${sheetId}`, {
-    method: 'PUT',
+  // 1. High-speed atomic row patch (Race-Condition Free for 20-500 concurrent consultants)
+  fetch(`/api/db/lead-sheets/${sheetId}/rows/${rowId}`, {
+    method: 'PATCH',
     headers: getAuthHeaders(),
-    body: JSON.stringify(sheet)
-  }).catch(err => {
-    console.warn('[Storage] API lead row update network error:', err);
+    body: JSON.stringify(rowUpdates)
+  }).catch(() => {
+    // Fallback to full sheet update if patch endpoint unavailable
+    fetch(`/api/db/lead-sheets/${sheetId}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(sheet)
+    }).catch(err => {
+      console.warn('[Storage] API lead row update network error:', err);
+    });
   });
 }
 

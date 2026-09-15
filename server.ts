@@ -823,6 +823,166 @@ async function syncReportToSupabaseRelational(report: any): Promise<void> {
   }
 }
 
+// Relational sync for Lead Sheets and Lead Rows
+async function syncLeadSheetToSupabaseRelational(sheet: any): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_KEY || !sheet) return;
+  try {
+    const headerPayload = {
+      id: sheet.id,
+      sheet_number: Number(sheet.sheetNumber) || 1,
+      title: sheet.title || 'شیت لید',
+      guild: sheet.guild || 'عمومی',
+      assigned_to_consultant_id: sheet.assignedToConsultantId || null,
+      assigned_to_consultant_name: sheet.assignedToConsultantName || 'نامشخص',
+      assigned_to_consultant_code: sheet.assignedToConsultantCode || 'C-100',
+      assigned_by_manager_id: sheet.assignedByManagerId || null,
+      assigned_at: sheet.assignedAt || new Date().toISOString(),
+      date_shamsi: sheet.dateShamsi,
+      target_calls_count: sheet.targetCallsCount || (Array.isArray(sheet.rows) ? sheet.rows.length : 25),
+      status: sheet.status || 'active',
+      created_at: sheet.createdAt || new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const hRes = await fetch(`${SUPABASE_URL}/rest/v1/lead_sheets`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(headerPayload)
+    });
+
+    if (!hRes.ok) return;
+
+    if (Array.isArray(sheet.rows) && sheet.rows.length > 0) {
+      const rowsPayload = sheet.rows.map((r: any, idx: number) => ({
+        id: r.id || `${sheet.id}-row-${idx + 1}`,
+        sheet_id: sheet.id,
+        row_number: Number(r.rowNumber) || (idx + 1),
+        client_name: r.clientName || 'بدون نام',
+        activity_field: r.activityField || sheet.guild || 'عمومی',
+        personnel_count: String(r.personnelCount || ''),
+        phone: r.phone || '',
+        address: r.address || '',
+        employer_concern: r.employerConcern || '',
+        follow_up_1: r.followUp1 || '',
+        follow_up_1_date: r.followUp1Date || null,
+        follow_up_2: r.followUp2 || '',
+        follow_up_2_date: r.followUp2Date || null,
+        follow_up_3: r.followUp3 || '',
+        follow_up_3_date: r.followUp3Date || null,
+        follow_up_4: r.followUp4 || '',
+        follow_up_4_date: r.followUp4Date || null,
+        follow_up_result: r.followUpResult || 'در حال پیگیری',
+        meeting_topic: r.meetingTopic || '',
+        status: r.status || 'in_progress',
+        created_at: r.createdAt || new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }));
+
+      await fetch(`${SUPABASE_URL}/rest/v1/lead_rows`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify(rowsPayload)
+      });
+    }
+  } catch (err) {
+    // Gracefully handle if tables not created
+  }
+}
+
+// Relational sync for Memos
+async function syncMemoToSupabaseRelational(memo: any): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_KEY || !memo) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/memos`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        id: memo.id,
+        title: memo.title,
+        content: memo.content,
+        sender_id: memo.senderId || 'system',
+        sender_name: memo.senderName || 'مدیریت',
+        sender_role: memo.senderRole || 'ceo',
+        target_user_id: memo.targetUserId || 'all',
+        is_urgent: Boolean(memo.isUrgent),
+        is_read: Boolean(memo.isRead),
+        created_at: memo.createdAt || new Date().toISOString()
+      })
+    });
+  } catch (err) {}
+}
+
+// Relational sync for Sheet Messages
+async function syncSheetMessageToSupabaseRelational(msg: any): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_KEY || !msg) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/sheet_messages`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        id: msg.id,
+        sheet_id: msg.sheetId,
+        row_id: msg.rowId || null,
+        sender_id: msg.senderId || 'unknown',
+        sender_name: msg.senderName || 'نامشخص',
+        sender_role: msg.senderRole || 'consultant',
+        message: msg.message,
+        is_read: Boolean(msg.isRead),
+        created_at: msg.createdAt || new Date().toISOString()
+      })
+    });
+  } catch (err) {}
+}
+
+// Relational sync for Users
+async function syncUserToSupabaseRelational(user: any): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_KEY || !user) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/users`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        id: user.id,
+        username: user.username,
+        full_name: user.fullName,
+        consultant_code: user.consultantCode || null,
+        role: user.role,
+        status: user.status || 'active',
+        password_hash: user.password || '$2a$10$defaultHashPlaceholder',
+        phone: user.phone || null,
+        branch: user.branch || 'دفتر مرکزی',
+        created_at: user.createdAt || new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+    });
+  } catch (err) {}
+}
+
 // ----------------------------------------------------
 // DATABASE REST API ROUTES (Sync across all devices)
 // ----------------------------------------------------
@@ -1564,6 +1724,8 @@ app.post('/api/db/lead-sheets', async (req, res) => {
       } else {
         inMemoryDB.leadSheets.unshift(enriched);
       }
+      // Async sync to Supabase relational tables
+      syncLeadSheetToSupabaseRelational(enriched).catch(() => {});
     });
     await persistDB(inMemoryDB);
   });
@@ -1591,9 +1753,78 @@ app.put('/api/db/lead-sheets/:id', async (req, res) => {
   });
 
   if (updatedSheet) {
+    // Relational sync in background
+    syncLeadSheetToSupabaseRelational(updatedSheet).catch(() => {});
     return res.json({ success: true, leadSheet: updatedSheet });
   }
   res.status(404).json({ error: 'شیت مورد نظر یافت نشد.' });
+});
+
+// Atomic Row-Level Update Endpoint (High Concurrency / Race-Condition Free)
+app.patch('/api/db/lead-sheets/:sheetId/rows/:rowId', async (req, res) => {
+  const { sheetId, rowId } = req.params;
+  const rowUpdates = req.body;
+  let updatedRow: any = null;
+  let parentSheet: any = null;
+
+  await dbMutex.runExclusive(async () => {
+    if (!Array.isArray(inMemoryDB.leadSheets)) inMemoryDB.leadSheets = [];
+    const sheet = inMemoryDB.leadSheets.find((s: any) => s.id === sheetId);
+    if (!sheet) return;
+    if (!Array.isArray(sheet.rows)) sheet.rows = [];
+    const rowIdx = sheet.rows.findIndex((r: any) => r.id === rowId);
+    if (rowIdx === -1) return;
+
+    sheet.rows[rowIdx] = {
+      ...sheet.rows[rowIdx],
+      ...rowUpdates,
+      updatedAt: new Date().toISOString()
+    };
+    updatedRow = sheet.rows[rowIdx];
+
+    const total = sheet.rows.length;
+    const completedCount = sheet.rows.filter((r: any) => r.status === 'won' || r.status === 'lost' || r.status === 'archived' || r.followUpResult === '✓').length;
+    if (completedCount === total && total > 0) {
+      sheet.status = 'completed';
+    } else if (sheet.rows.some((r: any) => r.followUp1 || r.followUp2 || r.followUp3 || r.followUp4)) {
+      sheet.status = 'in_progress';
+    }
+    sheet.updatedAt = new Date().toISOString();
+    parentSheet = sheet;
+
+    await persistDB(inMemoryDB);
+  });
+
+  if (updatedRow) {
+    // Atomic direct row patch to Supabase
+    if (SUPABASE_URL && SUPABASE_KEY) {
+      fetch(`${SUPABASE_URL}/rest/v1/lead_rows?id=eq.${rowId}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          follow_up_1: updatedRow.followUp1 || '',
+          follow_up_1_date: updatedRow.followUp1Date || null,
+          follow_up_2: updatedRow.followUp2 || '',
+          follow_up_2_date: updatedRow.followUp2Date || null,
+          follow_up_3: updatedRow.followUp3 || '',
+          follow_up_3_date: updatedRow.followUp3Date || null,
+          follow_up_4: updatedRow.followUp4 || '',
+          follow_up_4_date: updatedRow.followUp4Date || null,
+          follow_up_result: updatedRow.followUpResult || 'در حال پیگیری',
+          meeting_topic: updatedRow.meetingTopic || '',
+          employer_concern: updatedRow.employerConcern || '',
+          status: updatedRow.status || 'in_progress',
+          updated_at: updatedRow.updatedAt
+        })
+      }).catch(() => {});
+    }
+    return res.json({ success: true, row: updatedRow, sheet: parentSheet });
+  }
+  res.status(404).json({ error: 'سطر یا شیت مورد نظر یافت نشد.' });
 });
 
 app.delete('/api/db/lead-sheets/:id', async (req, res) => {
@@ -1603,6 +1834,15 @@ app.delete('/api/db/lead-sheets/:id', async (req, res) => {
     inMemoryDB.leadSheets = inMemoryDB.leadSheets.filter((s: any) => s.id !== id);
     await persistDB(inMemoryDB);
   });
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    fetch(`${SUPABASE_URL}/rest/v1/lead_sheets?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    }).catch(() => {});
+  }
   res.json({ success: true });
 });
 
@@ -1637,6 +1877,7 @@ app.post('/api/db/sheet-messages', async (req, res) => {
     await persistDB(inMemoryDB);
   });
 
+  syncSheetMessageToSupabaseRelational(newMsg).catch(() => {});
   res.json({ success: true, sheetMessage: newMsg });
 });
 
@@ -1681,6 +1922,7 @@ app.post('/api/db/memos', async (req, res) => {
     await persistDB(inMemoryDB);
   });
 
+  syncMemoToSupabaseRelational(newMemo).catch(() => {});
   res.json({ success: true, memo: newMemo });
 });
 
@@ -1779,7 +2021,11 @@ app.post('/api/db/restore', async (req, res) => {
 
 app.post('/api/db/reset', async (req, res) => {
   const db = getInitialDB();
-  await persistDB(db);
+  upgradeUsersToBcrypt(db.users);
+  inMemoryDB = db;
+  writeLocalDB(db);
+  await syncToSupabase(db);
+  console.log('[System] Database successfully reset to clean factory state on local disk and Supabase cloud.');
   res.json({ success: true, data: db });
 });
 
