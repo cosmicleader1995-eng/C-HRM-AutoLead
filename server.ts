@@ -85,6 +85,48 @@ function sanitizeUsers(users: any[]): any[] {
   return users.map(sanitizeUser);
 }
 
+// Extract authenticated user info from request Authorization Bearer JWT
+function getRequestUser(req: express.Request): any | null {
+  try {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return null;
+    const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
+    if (!token) return null;
+    return jwt.verify(token, JWT_SECRET) as any;
+  } catch {
+    return null;
+  }
+}
+
+// Filter memos strictly by confidentiality matrix:
+// - CEO/IT Admin: See all memos
+// - Consultant: Strictly see ONLY direct memos to/from self, or company-wide circulars from management
+// - Unauthenticated: Strictly see ONLY company-wide circulars from management
+function filterMemosForUser(memos: any[], user: any | null): any[] {
+  if (!Array.isArray(memos)) return [];
+  if (!user) {
+    return memos.filter((m: any) => 
+      (m.recipientId === 'all' || m.targetUserId === 'all') &&
+      (m.senderRole === 'ceo' || m.senderRole === 'it_admin')
+    );
+  }
+  if (user.role === 'ceo' || user.role === 'it_admin') {
+    return memos;
+  }
+  return memos.filter((m: any) => {
+    // Consultant's own sent memos
+    if (m.senderId === user.id) return true;
+    // Directly addressed to this consultant
+    if (m.recipientId === user.id || m.targetUserId === user.id) return true;
+    // Public circular from management ONLY
+    if ((m.recipientId === 'all' || m.targetUserId === 'all') && (m.senderRole === 'ceo' || m.senderRole === 'it_admin')) {
+      return true;
+    }
+    // Block all other consultant memos
+    return false;
+  });
+}
+
 // Local digit conversion function to avoid import issues
 function toEnglishDigits(str: string): string {
   if (!str) return '';
@@ -1188,10 +1230,12 @@ app.get(['/api/auth/me', '/api/auth/verify'], async (req, res) => {
 // 1. GET Full Database State (Users are fully sanitized of passwords)
 app.get('/api/db/all', async (req, res) => {
   const db = await getDB();
+  const reqUser = getRequestUser(req);
   res.json({
     success: true,
     data: {
       ...db,
+      memos: filterMemosForUser(db.memos || [], reqUser),
       users: sanitizeUsers(db.users)
     },
     cloudSynced: isCloudConnected
@@ -1208,11 +1252,29 @@ app.post('/api/db/sync', async (req, res) => {
     const currentDB = await getDB();
     const mergedDB = mergeServerDBs(currentDB, ensureDBShape(clientState));
     upgradeUsersToBcrypt(mergedDB.users);
+
+    // Sanitize any consultant memos to prevent leakage
+    if (Array.isArray(mergedDB.memos)) {
+      mergedDB.memos = mergedDB.memos.map((m: any) => {
+        if (m.senderRole === 'consultant' && (m.recipientId === 'all' || !m.recipientId)) {
+          return {
+            ...m,
+            recipientId: 'user-ceo',
+            targetUserId: 'user-ceo',
+            recipientName: 'سرپرست ارشد (مدیریت)'
+          };
+        }
+        return m;
+      });
+    }
+
     await persistDB(mergedDB);
+    const reqUser = getRequestUser(req);
     res.json({
       success: true,
       data: {
         ...mergedDB,
+        memos: filterMemosForUser(mergedDB.memos || [], reqUser),
         users: sanitizeUsers(mergedDB.users)
       },
       cloudSynced: isCloudConnected
@@ -1364,7 +1426,7 @@ app.delete('/api/db/users/:id', async (req, res) => {
       db.overallReports = (db.overallReports || []).filter((r: any) => r.consultantId !== id);
       db.leadSheets = (db.leadSheets || []).filter((s: any) => s.assignedToConsultantId !== id);
       db.sheetMessages = (db.sheetMessages || []).filter((m: any) => m.senderId !== id);
-      db.memos = (db.memos || []).filter((m: any) => m.senderId !== id && m.targetUserId !== id);
+      db.memos = (db.memos || []).filter((m: any) => m.senderId !== id && m.targetUserId !== id && m.recipientId !== id);
       addAuditLog(db, {
         timeShamsi: 'حذف کامل کاربر و سوابق',
         category: 'AUTH',
@@ -1906,9 +1968,34 @@ app.patch('/api/db/sheet-messages/:id/read', async (req, res) => {
 app.get('/api/db/memos', async (req, res) => {
   const db = await getDB();
   const { targetUserId } = req.query;
+  const reqUser = getRequestUser(req);
   let memos = db.memos || [];
-  if (targetUserId && typeof targetUserId === 'string') {
-    memos = memos.filter((m: any) => m.targetUserId === targetUserId || m.targetUserId === 'all' || m.senderId === targetUserId);
+
+  if (reqUser) {
+    memos = filterMemosForUser(memos, reqUser);
+  } else if (targetUserId && typeof targetUserId === 'string') {
+    const isTargetManager = targetUserId === 'user-ceo' || targetUserId === 'user-it';
+    if (isTargetManager) {
+      memos = memos.filter((m: any) =>
+        m.senderRole === 'consultant' ||
+        m.recipientId === targetUserId ||
+        m.targetUserId === targetUserId ||
+        m.recipientId === 'all' ||
+        m.targetUserId === 'all'
+      );
+    } else {
+      memos = memos.filter((m: any) =>
+        m.senderId === targetUserId ||
+        m.recipientId === targetUserId ||
+        m.targetUserId === targetUserId ||
+        ((m.recipientId === 'all' || m.targetUserId === 'all') && (m.senderRole === 'ceo' || m.senderRole === 'it_admin'))
+      );
+    }
+  } else {
+    memos = memos.filter((m: any) => 
+      (m.recipientId === 'all' || m.targetUserId === 'all') &&
+      (m.senderRole === 'ceo' || m.senderRole === 'it_admin')
+    );
   }
   res.json({ success: true, memos });
 });
@@ -1918,10 +2005,28 @@ app.post('/api/db/memos', async (req, res) => {
   if (!memo || !memo.content || !memo.title) {
     return res.status(400).json({ error: 'اطلاعات نامه اداری ناقص است.' });
   }
+
+  const reqUser = getRequestUser(req);
+  const effectiveRole = reqUser?.role || memo.senderRole || 'consultant';
+
+  let safeRecipientId = memo.recipientId || memo.targetUserId || 'all';
+  let safeRecipientName = memo.recipientName || 'کلیه مشاورین (بخشنامه عمومی)';
+
+  // Security enforcement: A consultant can NEVER broadcast to all or send to another consultant!
+  if (effectiveRole === 'consultant') {
+    if (safeRecipientId === 'all' || !safeRecipientId) {
+      safeRecipientId = 'user-ceo';
+      safeRecipientName = 'سرپرست ارشد (مدیریت)';
+    }
+  }
+
   const newMemo = {
     ...memo,
+    recipientId: safeRecipientId,
+    targetUserId: safeRecipientId,
+    recipientName: safeRecipientName,
     id: memo.id || `memo-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-    createdAt: new Date().toISOString()
+    createdAt: memo.createdAt || new Date().toISOString()
   };
 
   await dbMutex.runExclusive(async () => {

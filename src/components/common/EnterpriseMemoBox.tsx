@@ -42,13 +42,20 @@ export const EnterpriseMemoBox: React.FC<EnterpriseMemoBoxProps> = ({ currentUse
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMemo, setSelectedMemo] = useState<MemoMessage | null>(null);
 
+  const isManager = currentUser.role === 'ceo' || currentUser.role === 'it_admin';
+
+  // Find CEO / Supervisor user
+  const ceoUser = useMemo(() => {
+    return users.find(u => u.role === 'ceo') || { id: 'user-ceo', fullName: 'سرپرست ارشد (مدیریت)' };
+  }, [users]);
+
   // New Memo Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newContent, setNewContent] = useState('');
-  const [newRecipientId, setNewRecipientId] = useState('all');
+  const [newRecipientId, setNewRecipientId] = useState(isManager ? 'all' : 'user-ceo');
   const [newPriority, setNewPriority] = useState<MemoPriority>('normal');
-  const [newCategory, setNewCategory] = useState<MemoCategory>('directive');
+  const [newCategory, setNewCategory] = useState<MemoCategory>(isManager ? 'directive' : 'consultant_query');
   const [isSending, setIsSending] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
@@ -63,27 +70,71 @@ export const EnterpriseMemoBox: React.FC<EnterpriseMemoBoxProps> = ({ currentUse
     return () => window.removeEventListener('karino_db_synced', handleSync);
   }, []);
 
-  const isManager = currentUser.role === 'ceo' || currentUser.role === 'it_admin';
-
   // Consultants list
   const activeConsultants = useMemo(() => {
     return users.filter(u => u.role === 'consultant' && (u.status === 'active' || !u.status));
   }, [users]);
 
-  // Inbox memos: Memos addressed to currentUser OR to 'all' (if consultant)
+  const handleOpenCreateModal = () => {
+    if (!isManager) {
+      setNewRecipientId(ceoUser.id || 'user-ceo');
+      setNewCategory('consultant_query');
+    } else {
+      setNewRecipientId('all');
+      setNewCategory('directive');
+    }
+    setShowCreateModal(true);
+  };
+
+  // Inbox memos: STRICT CONFIDENTIALITY ISOLATION
+  // 1. Consultant must NEVER see other consultants' memos under any circumstances
+  // 2. Consultant sees: direct memos sent to them by management, and general circulars ('all') from management (CEO/IT)
+  // 3. Manager sees: all consultant reports/memos addressed to supervisor/management, and memos addressed to them
   const inboxMemos = useMemo(() => {
     return memos.filter(m => {
+      // Never show own sent memos in inbox (they belong in Sent tab)
       if (m.senderId === currentUser.id) return false;
-      if (m.recipientId === 'all') return true;
-      if (m.recipientId === currentUser.id) return true;
+
+      // STRICT CONSULTANT ISOLATION:
+      if (!isManager) {
+        // Under no circumstances can a consultant see another consultant's correspondence
+        if (m.senderRole === 'consultant') {
+          return m.recipientId === currentUser.id || (m as any).targetUserId === currentUser.id;
+        }
+
+        // Memos from management (CEO / IT Admin)
+        const isTargetedToMe = m.recipientId === currentUser.id || (m as any).targetUserId === currentUser.id;
+        const isBroadcastDirective = (m.recipientId === 'all' || (m as any).targetUserId === 'all') &&
+                                      (m.senderRole === 'ceo' || m.senderRole === 'it_admin');
+        return isTargetedToMe || isBroadcastDirective;
+      }
+
+      // MANAGER INBOX (CEO / IT Admin):
+      // 1. All consultant queries/reports sent to supervisor
+      if (m.senderRole === 'consultant') return true;
+      // 2. Memos addressed directly to current manager
+      if (m.recipientId === currentUser.id || (m as any).targetUserId === currentUser.id) return true;
+      // 3. Memos addressed to management role keywords or circulars
+      const managementKeys = ['all', 'ceo', 'user-ceo', 'it_admin', 'user-it', 'management'];
+      if (managementKeys.includes(m.recipientId) || managementKeys.includes((m as any).targetUserId)) return true;
+
       return false;
     });
-  }, [memos, currentUser]);
+  }, [memos, currentUser, isManager]);
 
   // Sent memos
   const sentMemos = useMemo(() => {
     return memos.filter(m => m.senderId === currentUser.id);
   }, [memos, currentUser]);
+
+  // Unread status checker
+  const isMemoUnread = (memo: MemoMessage) => {
+    if (memo.isRead) return false;
+    if (memo.recipientId === currentUser.id || (memo as any).targetUserId === currentUser.id) return true;
+    if (isManager && memo.senderRole === 'consultant') return true;
+    if (!isManager && (memo.recipientId === 'all' || (memo as any).targetUserId === 'all')) return true;
+    return false;
+  };
 
   // Filtered list
   const displayedMemos = useMemo(() => {
@@ -106,7 +157,13 @@ export const EnterpriseMemoBox: React.FC<EnterpriseMemoBoxProps> = ({ currentUse
   // Read Memo & Mark Read
   const handleOpenMemo = async (memo: MemoMessage) => {
     setSelectedMemo(memo);
-    if (!memo.isRead && memo.recipientId === currentUser.id) {
+    const shouldMarkRead = !memo.isRead && (
+      memo.recipientId === currentUser.id ||
+      (memo as any).targetUserId === currentUser.id ||
+      (isManager && memo.senderRole === 'consultant') ||
+      (!isManager && (memo.recipientId === 'all' || (memo as any).targetUserId === 'all'))
+    );
+    if (shouldMarkRead) {
       await markMemoRead(memo.id);
       reloadData();
     }
@@ -119,10 +176,18 @@ export const EnterpriseMemoBox: React.FC<EnterpriseMemoBoxProps> = ({ currentUse
 
     setIsSending(true);
     try {
-      let recipientName = 'کلیه مشاورین (بخشنامه عمومی)';
-      if (newRecipientId !== 'all') {
-        const target = users.find(u => u.id === newRecipientId);
-        if (target) recipientName = target.fullName;
+      let targetRecipientId = newRecipientId;
+      let targetRecipientName = 'کلیه مشاورین (بخشنامه عمومی)';
+
+      if (!isManager) {
+        // Consultants can ONLY send to management / supervisor
+        targetRecipientId = ceoUser.id || 'user-ceo';
+        targetRecipientName = ceoUser.fullName || 'سرپرست ارشد (مدیریت)';
+      } else {
+        if (newRecipientId !== 'all') {
+          const target = users.find(u => u.id === newRecipientId);
+          if (target) targetRecipientName = target.fullName;
+        }
       }
 
       const memoNumber = `KRN-${getCurrentShamsiDate().formatted.replace(/\//g, '')}-${Date.now().toString().slice(-3)}`;
@@ -133,8 +198,8 @@ export const EnterpriseMemoBox: React.FC<EnterpriseMemoBoxProps> = ({ currentUse
         senderId: currentUser.id,
         senderName: currentUser.fullName,
         senderRole: currentUser.role,
-        recipientId: newRecipientId,
-        recipientName,
+        recipientId: targetRecipientId,
+        recipientName: targetRecipientName,
         title: newTitle.trim(),
         content: newContent.trim(),
         priority: newPriority,
@@ -143,15 +208,16 @@ export const EnterpriseMemoBox: React.FC<EnterpriseMemoBoxProps> = ({ currentUse
         dateShamsi: getCurrentShamsiDate().formatted,
         isRead: false
       };
+      (newMemo as any).targetUserId = targetRecipientId;
 
       await saveMemo(newMemo);
       reloadData();
       setShowCreateModal(false);
       setNewTitle('');
       setNewContent('');
-      setNewRecipientId('all');
+      setNewRecipientId(isManager ? 'all' : (ceoUser.id || 'user-ceo'));
       setNewPriority('normal');
-      setNewCategory('directive');
+      setNewCategory(isManager ? 'directive' : 'consultant_query');
       setSuccessMsg(`مکاتبه شماره «${memoNumber}» با موفقیت صادر و ارسال گردید.`);
       setTimeout(() => setSuccessMsg(''), 4000);
     } catch {
@@ -200,7 +266,7 @@ export const EnterpriseMemoBox: React.FC<EnterpriseMemoBoxProps> = ({ currentUse
 
         <button
           type="button"
-          onClick={() => setShowCreateModal(true)}
+          onClick={handleOpenCreateModal}
           className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-lg active:scale-95 transition-all"
         >
           <Plus className="w-4 h-4" />
@@ -224,7 +290,7 @@ export const EnterpriseMemoBox: React.FC<EnterpriseMemoBoxProps> = ({ currentUse
           >
             <Inbox className="w-3.5 h-3.5" />
             <span>صندوق ورودی ({toPersianDigits(inboxMemos.length)})</span>
-            {inboxMemos.some(m => !m.isRead) && (
+            {inboxMemos.some(isMemoUnread) && (
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
             )}
           </button>
@@ -267,7 +333,7 @@ export const EnterpriseMemoBox: React.FC<EnterpriseMemoBoxProps> = ({ currentUse
         <div className="grid grid-cols-1 gap-2.5">
           {displayedMemos.map((memo) => {
             const catInfo = getCategoryLabel(memo.category);
-            const isUnread = !memo.isRead && memo.recipientId === currentUser.id;
+            const isUnread = isMemoUnread(memo);
 
             return (
               <div
@@ -413,8 +479,8 @@ export const EnterpriseMemoBox: React.FC<EnterpriseMemoBoxProps> = ({ currentUse
                     <input
                       type="text"
                       disabled
-                      value="سرپرست اجرایی"
-                      className="w-full bg-[#06111e] border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 font-bold outline-none"
+                      value={`${ceoUser.fullName} (سرپرست ارشد)`}
+                      className="w-full bg-[#06111e] border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 font-bold outline-none cursor-not-allowed"
                     />
                   )}
                 </div>

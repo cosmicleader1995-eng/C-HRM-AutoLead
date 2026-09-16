@@ -1985,7 +1985,9 @@ export function getStoredMemos(targetUserId?: string): MemoMessage[] {
   }
   list = list || [];
   if (targetUserId) {
-    return list.filter(m => m.targetUserId === targetUserId || m.targetUserId === 'all' || m.senderId === targetUserId);
+    return list.filter(m => (m.recipientId === targetUserId || (m as any).targetUserId === targetUserId) || 
+                            (m.recipientId === 'all' || (m as any).targetUserId === 'all') || 
+                            m.senderId === targetUserId);
   }
   return list;
 }
@@ -1996,6 +1998,7 @@ export function saveMemo(memo: Omit<MemoMessage, 'id' | 'createdAt'>): MemoMessa
     id: `memo-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
     createdAt: new Date().toISOString()
   };
+  (newMemo as any).targetUserId = newMemo.recipientId;
 
   const current = getStoredMemos();
   current.unshift(newMemo);
